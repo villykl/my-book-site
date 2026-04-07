@@ -98,9 +98,14 @@ button {
 let current = 1;
 const total = 3;
 
+function playSound() {
+  document.getElementById("flipSound").play();
+}
+
 function nextPage() {
   if (current <= total) {
     document.getElementById("p" + current).classList.add("flipped");
+    playSound();
     current++;
   }
 }
@@ -109,6 +114,7 @@ function prevPage() {
   if (current > 1) {
     current--;
     document.getElementById("p" + current).classList.remove("flipped");
+    playSound();
   }
 }
 </script>
