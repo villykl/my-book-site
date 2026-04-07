@@ -136,7 +136,43 @@ document.querySelectorAll('.page').forEach(page => {
   });
 
 });
-</script>
+</script>document.querySelectorAll('.page').forEach(page => {
+
+  page.addEventListener('touchstart', (e) => {
+    isDragging = true;
+    startX = e.touches[0].clientX;
+    currentPage = page;
+  });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!isDragging || !currentPage) return;
+
+    let diff = e.touches[0].clientX - startX;
+    let rotate = diff / 2;
+
+    if (rotate < 0) {
+      currentPage.style.transform = `rotateY(${rotate}deg)`;
+    }
+  });
+
+  document.addEventListener('touchend', () => {
+    if (!isDragging || !currentPage) return;
+
+    let transform = currentPage.style.transform;
+    let degree = parseFloat(transform.replace(/[^0-9\-]/g, ""));
+
+    if (degree < -90) {
+      currentPage.classList.add('flipped');
+      document.getElementById("flipSound").play();
+    } else {
+      currentPage.style.transform = '';
+    }
+
+    isDragging = false;
+    currentPage = null;
+  });
+
+});
 
 </body>
 </html>
