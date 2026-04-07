@@ -22,19 +22,22 @@ body {
   position: relative;
   perspective: 1500px;
 }
-
-.page {
+  .page {
   width: 50%;
   height: 100%;
-  background: #1a1a1a;
+  background: linear-gradient(to right, #1a1a1a, #111);
   position: absolute;
   top: 0;
   left: 50%;
   transform-origin: left;
-  transition: transform 1s;
+  transform-style: preserve-3d;
+  transition: transform 1s cubic-bezier(0.4, 0.2, 0.2, 1);
   padding: 20px;
   box-sizing: border-box;
-  box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+  box-shadow: 
+    inset 0 0 40px rgba(0,0,0,0.6),
+    0 0 20px rgba(0,0,0,0.4);
+  border-left: 1px solid rgba(255,255,255,0.05);
 }
 
 .page:nth-child(1) { z-index: 3; }
