@@ -7,9 +7,9 @@
 <style>
 body {
   margin: 0;
-  background: radial-gradient(circle, #111, #000);
+  background: radial-gradient(circle at top, #1a1a1a, #000);
   font-family: Georgia, serif;
-  color: white;
+  color: #f5f5f5;
 }
 
 /* МЕНЮ */
@@ -22,50 +22,80 @@ body {
 
 .menu button {
   margin: 5px;
-  padding: 8px 15px;
-  background: #111;
-  border: 1px solid #333;
-  color: white;
+  padding: 10px 18px;
+  background: rgba(20,20,20,0.8);
+  border: 1px solid #444;
+  color: #ddd;
   cursor: pointer;
+  border-radius: 8px;
+  transition: 0.3s;
 }
 
 .menu button:hover {
   background: #333;
+  color: white;
 }
 
-/* КНИГА */
+/* КОНТЕЙНЕР */
 .book {
   width: 90%;
-  max-width: 600px;
-  margin: 100px auto;
+  max-width: 700px;
+  margin: 120px auto;
 }
 
+/* СТРАНИЦЫ */
 .page {
   display: none;
-  padding: 20px;
-  background: #1a1a1a;
-  margin-bottom: 20px;
-  border-radius: 10px;
-  animation: fadeIn 0.5s;
+  padding: 30px;
+  background: linear-gradient(145deg, #1c1c1c, #111);
+  margin-bottom: 25px;
+  border-radius: 15px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.7);
+  animation: fadeIn 0.6s ease;
 }
 
 .page.active {
   display: block;
 }
 
+.page:hover {
+  transform: scale(1.02);
+  transition: 0.3s;
+}
+
+/* ЗАГОЛОВКИ */
+h1 {
+  font-size: 32px;
+  text-align: center;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+/* ТЕКСТ */
+p {
+  line-height: 1.6;
+  color: #ccc;
+}
+
 /* АНИМАЦИЯ */
 @keyframes fadeIn {
-  from {opacity: 0; transform: translateY(10px);}
+  from {opacity: 0; transform: translateY(15px);}
   to {opacity: 1; transform: translateY(0);}
 }
 
 /* КРОССВОРД */
 .cell {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   text-align: center;
   font-size: 20px;
   margin: 5px;
+  background: #222;
+  border: 1px solid #555;
+  color: white;
+  border-radius: 5px;
 }
 </style>
 </head>
@@ -83,7 +113,7 @@ body {
 
   <div class="page active" id="p1">
     <h1>Слова — это следы души</h1>
-    <p>Автор: Ты</p>
+    <p style="text-align:center; opacity:0.6;">Автор: Ты</p>
   </div>
 
   <div class="page" id="p2">
