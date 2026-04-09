@@ -5,25 +5,17 @@
 <title>Слова — это следы души</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
 
 <style>
 body {
   margin: 0;
   background: black;
   font-family: Georgia, serif;
-  overflow: hidden;
   color: white;
+  overflow: hidden;
 }
 
-/* ФОН (живой) */
-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: -1;
-}
-
-/* КНИГА */
 .book {
   width: 320px;
   height: 450px;
@@ -34,7 +26,6 @@ canvas {
   perspective: 3000px;
 }
 
-/* СТРАНИЦЫ */
 .page {
   width: 100%;
   height: 100%;
@@ -43,7 +34,6 @@ canvas {
   transform-origin: left;
   transition: transform 0.8s ease;
   padding: 20px;
-  box-sizing: border-box;
   color: #222;
 }
 
@@ -51,7 +41,6 @@ canvas {
   transform: rotateY(-180deg);
 }
 
-/* ОБЛОЖКА */
 .cover {
   background: linear-gradient(145deg, #222, #000);
   color: white;
@@ -61,7 +50,6 @@ canvas {
   text-align: center;
 }
 
-/* НАВИГАЦИЯ (как приложение) */
 .nav {
   position: fixed;
   bottom: 0;
@@ -79,25 +67,16 @@ canvas {
   font-size: 14px;
 }
 
-.nav button.active {
-  color: white;
-}
-
-/* КРОССВОРД */
 .cell {
   width: 35px;
   height: 35px;
-  margin: 3px;
-  text-align: center;
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="bg"></canvas>
-
-<div class="book" id="book">
+<div class="book">
 
   <div class="page cover">
     <div>
@@ -121,14 +100,10 @@ canvas {
     <input class="cell" maxlength="1">
     <input class="cell" maxlength="1">
     <input class="cell" maxlength="1">
-    <br><br>
-    <button onclick="check(event)">Проверить</button>
-    <p id="result"></p>
   </div>
 
 </div>
 
-<!-- НАВИГАЦИЯ -->
 <div class="nav">
   <button onclick="go(0)">📕</button>
   <button onclick="go(1)">✍️</button>
@@ -136,86 +111,26 @@ canvas {
   <button onclick="go(3)">🧩</button>
 </div>
 
-<audio id="flipSound" src="https://www.soundjay.com/page-flip-01a.mp3"></audio>
-
 <script>
 let pages = document.querySelectorAll(".page");
-let current = 0;
 
-/* ПЕРЕХОД */
 function go(n) {
   pages.forEach(p => p.classList.remove("flipped"));
-
   for (let i = 0; i < n; i++) {
     pages[i].classList.add("flipped");
   }
-
-  current = n;
-  localStorage.setItem("appPage", n);
-  sound();
+  localStorage.setItem("page", n);
 }
 
-/* ЗВУК */
-function sound() {
-  let s = document.getElementById("flipSound");
-  s.currentTime = 0;
-  s.play();
-}
-
-/* ЗАГРУЗКА */
 window.onload = () => {
-  let saved = localStorage.getItem("appPage");
+  let saved = localStorage.getItem("page");
   if (saved) go(parseInt(saved));
 };
 
-/* КРОССВОРД */
-function check(e) {
-  e.stopPropagation();
-  let letters = document.querySelectorAll('.cell');
-  let word = "";
-  letters.forEach(l => word += l.value.toLowerCase());
-  document.getElementById("result").innerText =
-    word === "мир" ? "Правильно ✅" : "Попробуй ещё ❌";
+/* PWA */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
 }
-
-/* ЖИВОЙ ФОН */
-let canvas = document.getElementById("bg");
-let ctx = canvas.getContext("2d");
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let particles = [];
-
-for (let i = 0; i < 60; i++) {
-  particles.push({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height,
-    r: Math.random()*2,
-    d: Math.random()*1
-  });
-}
-
-function draw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "white";
-
-  particles.forEach(p => {
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-    ctx.fill();
-    p.y += p.d;
-
-    if (p.y > canvas.height) {
-      p.y = 0;
-      p.x = Math.random()*canvas.width;
-    }
-  });
-
-  requestAnimationFrame(draw);
-}
-
-draw();
 </script>
 
 </body>
