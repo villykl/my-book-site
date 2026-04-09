@@ -7,116 +7,68 @@
 <style>
 body {
   margin: 0;
-  background: radial-gradient(circle at top, #1a1a1a, #000);
+  background: #0d0d0d;
   font-family: Georgia, serif;
-  color: #f5f5f5;
-}
-
-/* МЕНЮ */
-.menu {
-  position: fixed;
-  top: 20px;
-  width: 100%;
-  text-align: center;
-}
-
-.menu button {
-  margin: 5px;
-  padding: 10px 18px;
-  background: rgba(20,20,20,0.8);
-  border: 1px solid #444;
-  color: #ddd;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: 0.3s;
-}
-
-.menu button:hover {
-  background: #333;
   color: white;
+  overflow: hidden;
 }
 
-/* КОНТЕЙНЕР */
+/* КНИГА */
 .book {
-  width: 90%;
-  max-width: 700px;
-  margin: 120px auto;
+  position: absolute;
+  width: 320px;
+  height: 450px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  perspective: 2000px;
 }
 
 /* СТРАНИЦЫ */
 .page {
-  display: none;
-  padding: 30px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(145deg, #1c1c1c, #111);
-  margin-bottom: 25px;
-  border-radius: 15px;
-  box-shadow: 0 0 30px rgba(0,0,0,0.7);
-  animation: fadeIn 0.6s ease;
+  border-radius: 10px;
+  transform-origin: left;
+  transition: transform 0.6s;
+  padding: 20px;
+  box-shadow: 0 0 20px black;
 }
 
-.page.active {
-  display: block;
-}
-
-.page:hover {
-  transform: scale(1.02);
-  transition: 0.3s;
-}
-
-/* ЗАГОЛОВКИ */
-h1 {
-  font-size: 32px;
-  text-align: center;
-}
-
-h2 {
-  font-size: 24px;
+/* ПЕРЕЛИСТЫВАНИЕ */
+.page.flipped {
+  transform: rotateY(-180deg);
 }
 
 /* ТЕКСТ */
-p {
-  line-height: 1.6;
-  color: #ccc;
-}
+h1 { text-align: center; }
+h2 { margin-bottom: 10px; }
 
-/* АНИМАЦИЯ */
-@keyframes fadeIn {
-  from {opacity: 0; transform: translateY(15px);}
-  to {opacity: 1; transform: translateY(0);}
-}
-
-/* КРОССВОРД */
 .cell {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
+  margin: 4px;
   text-align: center;
   font-size: 20px;
-  margin: 5px;
   background: #222;
   border: 1px solid #555;
   color: white;
-  border-radius: 5px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="menu">
-  <button onclick="showPage(1)">Обложка</button>
-  <button onclick="showPage(2)">Стихи</button>
-  <button onclick="showPage(3)">Рассказы</button>
-  <button onclick="showPage(4)">Кроссворд</button>
-</div>
+<div class="book" id="book">
 
-<div class="book">
-
-  <div class="page active" id="p1">
+  <div class="page" onclick="flip(this)">
     <h1>Слова — это следы души</h1>
     <p style="text-align:center; opacity:0.6;">Автор: Ты</p>
   </div>
 
-  <div class="page" id="p2">
+  <div class="page" onclick="flip(this)">
     <h2>Глава I — Стихи</h2>
     <p>
     Тишина говорит со мной,<br>
@@ -126,12 +78,12 @@ p {
     </p>
   </div>
 
-  <div class="page" id="p3">
+  <div class="page" onclick="flip(this)">
     <h2>Глава II — Рассказы</h2>
     <p>Однажды ночью город молчал...</p>
   </div>
 
-  <div class="page" id="p4">
+  <div class="page" onclick="flip(this)">
     <h2>Глава III — Кроссворд</h2>
 
     <input maxlength="1" class="cell">
@@ -139,20 +91,49 @@ p {
     <input maxlength="1" class="cell">
 
     <br><br>
-
-    <button onclick="check()">Проверить</button>
+    <button onclick="check(event)">Проверить</button>
     <p id="result"></p>
   </div>
 
 </div>
 
+<!-- ЗВУК -->
+<audio id="flipSound" src="https://www.soundjay.com/page-flip-01a.mp3"></audio>
+
 <script>
-function showPage(n) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('p' + n).classList.add('active');
+let z = 1;
+
+/* ПЕРЕЛИСТЫВАНИЕ */
+function flip(page) {
+  page.classList.toggle("flipped");
+  page.style.zIndex = z++;
+
+  document.getElementById("flipSound").play();
 }
 
-function check() {
+/* DRAG (телефон + мышь) */
+let book = document.getElementById("book");
+let isDown = false;
+
+book.addEventListener("mousedown", () => isDown = true);
+document.addEventListener("mouseup", () => isDown = false);
+
+document.addEventListener("mousemove", (e) => {
+  if (!isDown) return;
+  book.style.left = e.clientX + "px";
+  book.style.top = e.clientY + "px";
+});
+
+/* ТЕЛЕФОН */
+book.addEventListener("touchmove", (e) => {
+  book.style.left = e.touches[0].clientX + "px";
+  book.style.top = e.touches[0].clientY + "px";
+});
+
+/* КРОССВОРД */
+function check(e) {
+  e.stopPropagation();
+
   let letters = document.querySelectorAll('.cell');
   let word = "";
 
