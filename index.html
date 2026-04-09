@@ -4,12 +4,23 @@
 <meta charset="UTF-8">
 <title>Слова — это следы души</title>
 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body {
   margin: 0;
-  background: radial-gradient(circle at center, #111, #000);
+  background: black;
   font-family: Georgia, serif;
   overflow: hidden;
+  color: white;
+}
+
+/* ФОН (живой) */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
 }
 
 /* КНИГА */
@@ -18,7 +29,7 @@ body {
   height: 450px;
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 45%;
   transform: translate(-50%, -50%);
   perspective: 3000px;
 }
@@ -31,29 +42,14 @@ body {
   background: #f4f1ea;
   transform-origin: left;
   transition: transform 0.8s ease;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
   padding: 20px;
   box-sizing: border-box;
+  color: #222;
 }
 
-/* ОБРАТНАЯ СТОРОНА */
-.page::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: #eae6dc;
-  transform: rotateY(180deg);
-  backface-visibility: hidden;
-}
-
-/* ПЕРЕВОРОТ */
 .page.flipped {
   transform: rotateY(-180deg);
 }
-
-/* ТЕКСТ */
-h1 { text-align: center; }
-h2 { margin-bottom: 10px; }
 
 /* ОБЛОЖКА */
 .cover {
@@ -65,34 +61,45 @@ h2 { margin-bottom: 10px; }
   text-align: center;
 }
 
-/* КЛИК-ЗОНЫ */
-.zone {
-  position: absolute;
-  top: 0;
-  width: 50%;
-  height: 100%;
-  z-index: 999;
+/* НАВИГАЦИЯ (как приложение) */
+.nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  background: rgba(0,0,0,0.9);
+  padding: 10px 0;
 }
 
-.leftZone { left: 0; }
-.rightZone { right: 0; }
+.nav button {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 14px;
+}
+
+.nav button.active {
+  color: white;
+}
 
 /* КРОССВОРД */
 .cell {
-  width: 40px;
-  height: 40px;
-  margin: 4px;
+  width: 35px;
+  height: 35px;
+  margin: 3px;
   text-align: center;
-  font-size: 20px;
 }
 </style>
 </head>
 
 <body>
 
+<canvas id="bg"></canvas>
+
 <div class="book" id="book">
 
-  <div class="page cover">  
+  <div class="page cover">
     <div>
       <h1>Слова — это следы души</h1>
       <p>Автор: Ты</p>
@@ -100,22 +107,17 @@ h2 { margin-bottom: 10px; }
   </div>
 
   <div class="page">
-    <h2>Глава I — Стихи</h2>
-    <p>
-    Тишина говорит со мной,<br>
-    Словно ветер в пустом окне...<br><br>
-    И я снова ищу покой,<br>
-    Но он прячется где-то во мне.
-    </p>
+    <h2>Стихи</h2>
+    <p>Тишина говорит со мной...</p>
   </div>
 
   <div class="page">
-    <h2>Глава II — Рассказы</h2>
-    <p>Однажды ночью город молчал...</p>
+    <h2>Рассказы</h2>
+    <p>Однажды ночью...</p>
   </div>
 
   <div class="page">
-    <h2>Глава III — Кроссворд</h2>
+    <h2>Кроссворд</h2>
     <input class="cell" maxlength="1">
     <input class="cell" maxlength="1">
     <input class="cell" maxlength="1">
@@ -126,9 +128,13 @@ h2 { margin-bottom: 10px; }
 
 </div>
 
-<!-- КЛИК ЗОНЫ -->
-<div class="zone leftZone" onclick="prev()"></div>
-<div class="zone rightZone" onclick="next()"></div>
+<!-- НАВИГАЦИЯ -->
+<div class="nav">
+  <button onclick="go(0)">📕</button>
+  <button onclick="go(1)">✍️</button>
+  <button onclick="go(2)">📖</button>
+  <button onclick="go(3)">🧩</button>
+</div>
 
 <audio id="flipSound" src="https://www.soundjay.com/page-flip-01a.mp3"></audio>
 
@@ -136,24 +142,17 @@ h2 { margin-bottom: 10px; }
 let pages = document.querySelectorAll(".page");
 let current = 0;
 
-/* ВПЕРЁД */
-function next() {
-  if (current < pages.length) {
-    pages[current].classList.add("flipped");
-    current++;
-    sound();
-    save();
-  }
-}
+/* ПЕРЕХОД */
+function go(n) {
+  pages.forEach(p => p.classList.remove("flipped"));
 
-/* НАЗАД */
-function prev() {
-  if (current > 0) {
-    current--;
-    pages[current].classList.remove("flipped");
-    sound();
-    save();
+  for (let i = 0; i < n; i++) {
+    pages[i].classList.add("flipped");
   }
+
+  current = n;
+  localStorage.setItem("appPage", n);
+  sound();
 }
 
 /* ЗВУК */
@@ -163,20 +162,10 @@ function sound() {
   s.play();
 }
 
-/* СОХРАНЕНИЕ */
-function save() {
-  localStorage.setItem("bookPage", current);
-}
-
 /* ЗАГРУЗКА */
 window.onload = () => {
-  let saved = localStorage.getItem("bookPage");
-  if (saved) {
-    current = parseInt(saved);
-    for (let i = 0; i < current; i++) {
-      pages[i].classList.add("flipped");
-    }
-  }
+  let saved = localStorage.getItem("appPage");
+  if (saved) go(parseInt(saved));
 };
 
 /* КРОССВОРД */
@@ -188,6 +177,45 @@ function check(e) {
   document.getElementById("result").innerText =
     word === "мир" ? "Правильно ✅" : "Попробуй ещё ❌";
 }
+
+/* ЖИВОЙ ФОН */
+let canvas = document.getElementById("bg");
+let ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+
+for (let i = 0; i < 60; i++) {
+  particles.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    r: Math.random()*2,
+    d: Math.random()*1
+  });
+}
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "white";
+
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fill();
+    p.y += p.d;
+
+    if (p.y > canvas.height) {
+      p.y = 0;
+      p.x = Math.random()*canvas.width;
+    }
+  });
+
+  requestAnimationFrame(draw);
+}
+
+draw();
 </script>
 
 </body>
