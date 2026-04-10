@@ -31,23 +31,18 @@ body {
   perspective: 2000px;
 }
 
-/* СТРАНИЦА */
+/* СТРАНИЦЫ */
 .page {
   width: 100%;
   height: 100%;
   position: absolute;
   background: #f4f1ea;
   transform-origin: left;
-  transition: transform 1s ease;
   border-radius: 5px;
   box-shadow: 0 5px 20px rgba(0,0,0,0.5);
   padding: 20px;
   box-sizing: border-box;
-}
-
-/* ПЕРЕВОРОТ */
-.page.flipped {
-  transform: rotateY(-180deg);
+  transition: transform 0.3s;
 }
 
 /* ОБЛОЖКА */
@@ -74,11 +69,11 @@ body {
 <div class="scene">
   <div class="book" id="book">
 
-    <div class="page cover" onclick="startBook()">
+    <div class="page cover">
       <div>
         <h2>Слова — это следы души</h2>
         <p>Вера Климошенко</p>
-        <small>Нажми, чтобы открыть</small>
+        <small>Потяни страницу →</small>
       </div>
     </div>
 
@@ -100,11 +95,6 @@ body {
       <p>Однажды ночью город молчал...</p>
     </div>
 
-    <div class="page">
-      <h3>Автор</h3>
-      <p>Вера Климошенко</p>
-    </div>
-
   </div>
 </div>
 
@@ -113,27 +103,56 @@ body {
 <script>
 let pages = document.querySelectorAll(".page");
 let current = 0;
+
+let dragging = false;
 let startX = 0;
 
-/* СТАРТ */
-function startBook() {
-  flipNext();
+/* НАЧАЛО ТЯГАНИЯ */
+document.addEventListener("mousedown", startDrag);
+document.addEventListener("touchstart", startDrag);
+
+function startDrag(e) {
+  if (current >= pages.length) return;
+
+  dragging = true;
+  startX = e.touches ? e.touches[0].clientX : e.clientX;
 }
 
-/* ПЕРЕВОРОТ */
-function flipNext() {
-  if (current < pages.length) {
-    pages[current].classList.add("flipped");
+/* ДВИЖЕНИЕ */
+document.addEventListener("mousemove", drag);
+document.addEventListener("touchmove", drag);
+
+function drag(e) {
+  if (!dragging) return;
+
+  let x = e.touches ? e.touches[0].clientX : e.clientX;
+  let dx = startX - x;
+
+  let percent = Math.min(Math.max(dx / 300, 0), 1);
+  let angle = percent * -180;
+
+  pages[current].style.transform = `rotateY(${angle}deg)`;
+}
+
+/* ОТПУСТИЛ */
+document.addEventListener("mouseup", endDrag);
+document.addEventListener("touchend", endDrag);
+
+function endDrag(e) {
+  if (!dragging) return;
+  dragging = false;
+
+  let x = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+  let dx = startX - x;
+
+  if (dx > 100) {
+    /* перевернуть */
+    pages[current].style.transform = "rotateY(-180deg)";
     current++;
     playSound();
-  }
-}
-
-function flipPrev() {
-  if (current > 0) {
-    current--;
-    pages[current].classList.remove("flipped");
-    playSound();
+  } else {
+    /* вернуть назад */
+    pages[current].style.transform = "rotateY(0deg)";
   }
 }
 
@@ -143,30 +162,6 @@ function playSound() {
   s.currentTime = 0;
   s.play();
 }
-
-/* СВАЙП */
-document.addEventListener("touchstart", e => {
-  startX = e.touches[0].clientX;
-});
-
-document.addEventListener("touchend", e => {
-  let endX = e.changedTouches[0].clientX;
-
-  if (endX < startX - 50) flipNext();
-  if (endX > startX + 50) flipPrev();
-});
-
-/* МЫШКА */
-document.addEventListener("mousedown", e => {
-  startX = e.clientX;
-});
-
-document.addEventListener("mouseup", e => {
-  let endX = e.clientX;
-
-  if (endX < startX - 50) flipNext();
-  if (endX > startX + 50) flipPrev();
-});
 </script>
 
 </body>
