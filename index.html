@@ -47,7 +47,6 @@ body {
   transition: transform 1.5s ease;
   z-index: 5;
   border-radius: 8px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
 }
 
 .book.open .cover {
@@ -67,6 +66,7 @@ body {
 
 .pages {
   display: flex;
+  height: 100%;
 }
 
 .left, .right {
@@ -74,25 +74,9 @@ body {
   padding: 10px;
 }
 
-/* НАВИГАЦИЯ */
-.nav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  display: none;
-  justify-content: space-around;
-  background: rgba(0,0,0,0.9);
-  padding: 10px 0;
-}
-
-.nav button {
-  background: none;
-  border: none;
-  color: white;
-}
-
 .poem {
   font-style: italic;
+  line-height: 1.7;
 }
 </style>
 </head>
@@ -103,6 +87,7 @@ body {
 
   <div class="book" id="book">
 
+    <!-- ОБЛОЖКА -->
     <div class="cover" onclick="openBook()">
       <div>
         <h2>Слова — это следы души</h2>
@@ -111,6 +96,7 @@ body {
       </div>
     </div>
 
+    <!-- СТРАНИЦЫ -->
     <div class="page">
       <div class="pages">
         <div class="left" id="left"></div>
@@ -120,13 +106,6 @@ body {
 
   </div>
 
-</div>
-
-<div class="nav" id="nav">
-  <button onclick="show(0)">📕</button>
-  <button onclick="show(1)">✍️</button>
-  <button onclick="show(2)">📖</button>
-  <button onclick="show(3)">👤</button>
 </div>
 
 <audio id="sound" src="https://www.soundjay.com/page-flip-01a.mp3"></audio>
@@ -139,24 +118,72 @@ let pages = [
   ["Автор", "Вера Климошенко"]
 ];
 
+let current = 0;
+
+/* ОТКРЫТИЕ */
 function openBook() {
   document.getElementById("book").classList.add("open");
-
-  let s = document.getElementById("sound");
-  s.play();
-
-  setTimeout(() => {
-    document.getElementById("nav").style.display = "flex";
-    show(0);
-  }, 1200);
+  document.getElementById("sound").play();
+  setTimeout(() => show(0), 1200);
 }
 
+/* ПОКАЗ СТРАНИЦЫ */
 function show(i) {
+  current = i;
+
   document.getElementById("left").innerHTML =
     "<h3>" + pages[i][0] + "</h3>";
 
   document.getElementById("right").innerHTML =
     "<p class='poem'>" + pages[i][1] + "</p>";
+}
+
+/* 👉 СВАЙП (главное) */
+let startX = 0;
+
+document.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchend", e => {
+  let endX = e.changedTouches[0].clientX;
+
+  if (endX < startX - 50) {
+    nextPage();
+  }
+
+  if (endX > startX + 50) {
+    prevPage();
+  }
+});
+
+/* МЫШКА */
+document.addEventListener("mousedown", e => {
+  startX = e.clientX;
+});
+
+document.addEventListener("mouseup", e => {
+  let endX = e.clientX;
+
+  if (endX < startX - 50) nextPage();
+  if (endX > startX + 50) prevPage();
+});
+
+/* ПЕРЕЛИСТЫВАНИЕ */
+function nextPage() {
+  if (current < pages.length - 1) {
+    current++;
+    show(current);
+    document.getElementById("sound").play();
+  }
+}
+
+function prevPage() {
+  if (current > 0) {
+    current--;
+    show(current);
+    document.getElementById("sound").play();
+  }
 }
 </script>
 
