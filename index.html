@@ -14,28 +14,20 @@ body {
   color: white;
 }
 
-/* ФОН */
+/* ГЛАВНАЯ */
 .hero {
   height: 100vh;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.7), #0b0b0b),
-              url('https://images.unsplash.com/photo-1507842217343-583bb7270b66');
-  background-size: cover;
+  background: radial-gradient(circle, #111, #000);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
 }
 
-/* ТЕКСТ */
 .hero h1 {
-  font-size: 48px;
+  font-size: 42px;
 }
 
-.hero p {
-  opacity: 0.7;
-}
-
-/* КНОПКА */
 .btn {
   margin-top: 20px;
   padding: 12px 25px;
@@ -46,42 +38,40 @@ body {
 }
 
 /* КНИГА */
-.book-section {
+.book {
   background: #fdfbf7;
   color: black;
-  padding: 40px 20px;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 700px;
+  margin: 40px auto;
 }
 
 .page {
-  max-width: 700px;
-  margin: auto;
   font-size: 18px;
   line-height: 1.8;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 
 /* АВТОР */
 .about {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 20px;
-  padding: 40px 20px;
+  align-items: center;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
 }
 
 .about img {
-  width: 220px;
+  width: 240px;
   border-radius: 10px;
-}
-
-.about-text {
-  max-width: 500px;
-}
-
-/* ФУТЕР */
-.footer {
-  text-align: center;
-  padding: 20px;
-  opacity: 0.6;
 }
 </style>
 </head>
@@ -98,57 +88,82 @@ body {
 </div>
 
 <!-- КНИГА -->
-<div class="book-section" id="book">
-  <div class="page">
+<div class="book" id="book">
+  <div id="content" class="page"></div>
 
-<h2>А ты пойдёшь с нами, Господи?</h2>
-
-<p>
-Этот день я вспоминаю всегда, когда проезжаю по Спрингфилдскому мосту...
-</p>
-
-<p>
-Прямого поезда на Брест не было. Поэтому нам нужно было торопиться.
-</p>
-
-<p>
-Мы шли по льду. Каждый шаг был испытанием.
-</p>
-
-<p>
-Мы успели. Слава Богу.
-</p>
-
+  <div class="controls">
+    <button onclick="prev()">⬅️</button>
+    <button onclick="next()">➡️</button>
   </div>
 </div>
 
-<!-- ОБ АВТОРЕ -->
+<!-- АВТОР -->
 <div class="about">
 
-<img src="YOUR_PHOTO.jpg">
+<img src="data:image/jpeg;base64,REPLACE_BASE64">
 
-<div class="about-text">
+<div>
 <h2>Об авторе</h2>
 <p>
 Вера Климошенко — автор произведений о вере, тишине и глубине души.
 </p>
-<p>
-Её тексты — это отражение внутреннего мира,
-переживаний и поиска света.
-</p>
 </div>
 
-</div>
-
-<!-- ФУТЕР -->
-<div class="footer">
-© Вера Климошенко
 </div>
 
 <script>
+
+/* ТВОЯ КНИГА */
+let pages = [
+
+`<h2>Слова — это следы души</h2>
+<p style="text-align:center;">Вера Климошенко</p>`,
+
+`<h3>А ты пойдёшь с нами, Господи?</h3>
+<p>
+Этот день я вспоминаю всегда, когда проезжаю по мосту...
+</p>`,
+
+`<p>
+Прямого поезда не было. Нам нужно было торопиться.
+</p>`,
+
+`<p>
+Мы шли по льду. Каждый шаг был испытанием.
+</p>`,
+
+`<p>
+Мы успели. Слава Богу.
+</p>`
+
+];
+
+let current = 0;
+
+function render(){
+  document.getElementById("content").innerHTML = pages[current];
+}
+
+function next(){
+  if(current < pages.length-1){
+    current++;
+    render();
+  }
+}
+
+function prev(){
+  if(current > 0){
+    current--;
+    render();
+  }
+}
+
 function scrollToBook(){
   document.getElementById("book").scrollIntoView({behavior:"smooth"});
 }
+
+window.onload = render;
+
 </script>
 
 </body>
