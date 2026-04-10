@@ -38,13 +38,8 @@ body {
   box-sizing: border-box;
 }
 
-.left {
-  left: 0;
-}
-
-.right {
-  right: 0;
-}
+.left { left: 0; }
+.right { right: 0; }
 
 .flip {
   position: absolute;
@@ -57,6 +52,11 @@ body {
 
 .title {
   text-align: center;
+  margin-bottom: 10px;
+}
+
+.text {
+  line-height: 1.6;
 }
 
 .poem {
@@ -70,11 +70,9 @@ body {
 
 <div class="scene">
   <div class="book">
-
     <div class="left" id="left"></div>
     <div class="right" id="right"></div>
     <div class="flip" id="flip"></div>
-
   </div>
 </div>
 
@@ -83,22 +81,23 @@ body {
 <script>
 let book = [
 
-  ["", "Слова — это следы души<br><br>Вера Климошенко"],
+["", "Слова — это следы души<br><br>Вера Климошенко"],
 
-  ["Открытие",
-  "Это начало книги.<br><br>Здесь появляются первые мысли."],
+["Предисловие",
+"Это книга тишины.<br><br>Книга чувств, которые не всегда можно сказать вслух."],
 
-  ["Стих 1",
-  "Тишина говорит со мной,<br>Словно ветер в пустом окне..."],
+["Рассказ",
+"Ночь была тихой.<br><br>Город словно замер, слушая свои собственные мысли."],
 
-  ["Стих 2",
-  "Слова — это следы души,<br>Их нельзя стереть во тьме..."],
+["Продолжение",
+"Окна домов светились мягким светом,<br>словно внутри каждого происходило что-то важное."],
 
-  ["Рассказ",
-  "Однажды ночью город молчал..."],
+["Ещё",
+"Иногда кажется, что тишина говорит громче слов."],
 
-  ["Конец",
-  "Каждая история оставляет след."]
+["Финал",
+"И, возможно, именно в этой тишине мы находим себя."]
+
 ];
 
 let index = 0;
@@ -106,11 +105,12 @@ let startX = 0;
 let dragging = false;
 
 function render() {
-  left.innerHTML = "<h3>"+book[index][0]+"</h3>";
-  right.innerHTML = "<div class='poem'>"+book[index][1]+"</div>";
-  flip.innerHTML = "<div class='poem'>"+(book[index+1]?.[1]||"")+"</div>";
+  left.innerHTML = "<h3 class='title'>"+book[index][0]+"</h3>";
+  right.innerHTML = "<div class='text'>"+book[index][1]+"</div>";
+  flip.innerHTML = "<div class='text'>"+(book[index+1]?.[1]||"")+"</div>";
 }
 
+/* DRAG */
 document.addEventListener("mousedown", start);
 document.addEventListener("touchstart", start);
 
