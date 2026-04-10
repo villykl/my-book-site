@@ -19,37 +19,58 @@ body {
   width: 100%;
   height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 /* КНИГА */
 .book {
-  width: 320px;
-  height: 420px;
+  width: 340px;
+  height: 440px;
   position: relative;
-  perspective: 2000px;
+  perspective: 3000px;
 }
 
-/* СТРАНИЦЫ */
-.page {
-  width: 100%;
-  height: 100%;
+/* ЛЕВАЯ СТРАНИЦА */
+.left-page {
   position: absolute;
+  width: 50%;
+  height: 100%;
+  left: 0;
+  background: #f4f1ea;
+  padding: 15px;
+  box-sizing: border-box;
+  border-radius: 5px 0 0 5px;
+}
+
+/* ПРАВАЯ */
+.right-page {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  right: 0;
+  background: #f4f1ea;
+  padding: 15px;
+  box-sizing: border-box;
+  border-radius: 0 5px 5px 0;
+}
+
+/* ПЕРЕВОРАЧИВАЕМАЯ */
+.flip {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  right: 0;
   background: #f4f1ea;
   transform-origin: left;
-  border-radius: 5px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-  padding: 20px;
-  box-sizing: border-box;
-  transition: transform 0.3s;
+  transform-style: preserve-3d;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
 /* ОБЛОЖКА */
 .cover {
-  background: linear-gradient(145deg, #1a1a1a, #000);
+  background: linear-gradient(145deg,#111,#000);
   color: white;
-  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -67,101 +88,105 @@ body {
 <body>
 
 <div class="scene">
-  <div class="book" id="book">
 
-    <div class="page cover">
-      <div>
-        <h2>Слова — это следы души</h2>
-        <p>Вера Климошенко</p>
-        <small>Потяни страницу →</small>
-      </div>
-    </div>
+<div class="book" id="book">
 
-    <div class="page">
-      <h3>Добро пожаловать</h3>
-      <p>Это книга чувств и мыслей.</p>
-    </div>
+  <!-- ЛЕВАЯ -->
+  <div class="left-page" id="left"></div>
 
-    <div class="page">
-      <h3>Стихи</h3>
-      <div class="poem">
-      Тишина говорит со мной,<br>
-      Словно ветер в пустом окне...
-      </div>
-    </div>
+  <!-- ПРАВАЯ -->
+  <div class="right-page" id="right"></div>
 
-    <div class="page">
-      <h3>Рассказы</h3>
-      <p>Однажды ночью город молчал...</p>
-    </div>
+  <!-- ПЕРЕЛИСТЫВАЕМАЯ -->
+  <div class="flip" id="flip"></div>
 
-  </div>
+</div>
+
 </div>
 
 <audio id="sound" src="https://www.soundjay.com/page-flip-01a.mp3"></audio>
 
 <script>
-let pages = document.querySelectorAll(".page");
-let current = 0;
+let data = [
+  ["", "Слова — это следы души<br><br>Вера Климошенко"],
+  ["Добро пожаловать", "Это книга чувств и мыслей."],
+  ["Стихи", "Тишина говорит со мной..."],
+  ["Рассказы", "Однажды ночью город молчал..."],
+  ["Автор", "Вера Климошенко"]
+];
 
+let index = 0;
 let dragging = false;
 let startX = 0;
 
-/* НАЧАЛО ТЯГАНИЯ */
-document.addEventListener("mousedown", startDrag);
-document.addEventListener("touchstart", startDrag);
+function render() {
+  document.getElementById("left").innerHTML =
+    "<h3>"+(data[index][0]||"")+"</h3>";
 
-function startDrag(e) {
-  if (current >= pages.length) return;
+  document.getElementById("right").innerHTML =
+    "<p class='poem'>"+data[index][1]+"</p>";
 
-  dragging = true;
-  startX = e.touches ? e.touches[0].clientX : e.clientX;
+  document.getElementById("flip").innerHTML =
+    "<p class='poem'>"+(data[index+1]?.[1]||"")+"</p>";
+
+  localStorage.setItem("page", index);
 }
 
-/* ДВИЖЕНИЕ */
-document.addEventListener("mousemove", drag);
-document.addEventListener("touchmove", drag);
+/* DRAG */
+document.addEventListener("mousedown", start);
+document.addEventListener("touchstart", start);
 
-function drag(e) {
-  if (!dragging) return;
+function start(e){
+  startX = e.touches ? e.touches[0].clientX : e.clientX;
+  dragging = true;
+}
+
+document.addEventListener("mousemove", move);
+document.addEventListener("touchmove", move);
+
+function move(e){
+  if(!dragging) return;
 
   let x = e.touches ? e.touches[0].clientX : e.clientX;
   let dx = startX - x;
 
-  let percent = Math.min(Math.max(dx / 300, 0), 1);
+  let percent = Math.min(Math.max(dx/300,0),1);
   let angle = percent * -180;
 
-  pages[current].style.transform = `rotateY(${angle}deg)`;
+  document.getElementById("flip").style.transform =
+    "rotateY("+angle+"deg)";
 }
 
-/* ОТПУСТИЛ */
-document.addEventListener("mouseup", endDrag);
-document.addEventListener("touchend", endDrag);
+document.addEventListener("mouseup", end);
+document.addEventListener("touchend", end);
 
-function endDrag(e) {
-  if (!dragging) return;
+function end(e){
+  if(!dragging) return;
   dragging = false;
 
   let x = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
   let dx = startX - x;
 
-  if (dx > 100) {
-    /* перевернуть */
-    pages[current].style.transform = "rotateY(-180deg)";
-    current++;
-    playSound();
-  } else {
-    /* вернуть назад */
-    pages[current].style.transform = "rotateY(0deg)";
+  if(dx > 100 && index < data.length-1){
+    index++;
+    play();
   }
+
+  document.getElementById("flip").style.transform = "rotateY(0deg)";
+  render();
 }
 
-/* ЗВУК */
-function playSound() {
+function play(){
   let s = document.getElementById("sound");
   s.currentTime = 0;
   s.play();
 }
+
+/* LOAD */
+window.onload = () => {
+  index = parseInt(localStorage.getItem("page")) || 0;
+  render();
+};
 </script>
 
 </body>
