@@ -13,41 +13,21 @@ body {
   background: black;
   font-family: Georgia, serif;
   color: white;
-  overflow: hidden;
 }
 
 .book {
   width: 320px;
   height: 450px;
-  position: absolute;
-  left: 50%;
-  top: 45%;
-  transform: translate(-50%, -50%);
-  perspective: 3000px;
+  margin: 80px auto;
+  perspective: 2000px;
 }
 
 .page {
   width: 100%;
   height: 100%;
-  position: absolute;
   background: #f4f1ea;
-  transform-origin: left;
-  transition: transform 0.8s ease;
   padding: 20px;
   color: #222;
-}
-
-.page.flipped {
-  transform: rotateY(-180deg);
-}
-
-.cover {
-  background: linear-gradient(145deg, #222, #000);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
 }
 
 .nav {
@@ -60,76 +40,48 @@ body {
   padding: 10px 0;
 }
 
-.nav button {
+button {
   background: none;
   border: none;
-  color: #aaa;
-  font-size: 14px;
-}
-
-.cell {
-  width: 35px;
-  height: 35px;
+  color: white;
 }
 </style>
 </head>
 
 <body>
 
-<div class="book">
-
-  <div class="page cover">
-    <div>
-      <h1>Слова — это следы души</h1>
-      <p>Автор: Ты</p>
-    </div>
-  </div>
-
-  <div class="page">
-    <h2>Стихи</h2>
-    <p>Тишина говорит со мной...</p>
-  </div>
-
-  <div class="page">
-    <h2>Рассказы</h2>
-    <p>Однажды ночью...</p>
-  </div>
-
-  <div class="page">
-    <h2>Кроссворд</h2>
-    <input class="cell" maxlength="1">
-    <input class="cell" maxlength="1">
-    <input class="cell" maxlength="1">
-  </div>
-
-</div>
+<div class="book" id="content"></div>
 
 <div class="nav">
-  <button onclick="go(0)">📕</button>
-  <button onclick="go(1)">✍️</button>
-  <button onclick="go(2)">📖</button>
-  <button onclick="go(3)">🧩</button>
+  <button onclick="show(0)">📕</button>
+  <button onclick="show(1)">✍️</button>
+  <button onclick="show(2)">📖</button>
+  <button onclick="show(3)">🧩</button>
 </div>
 
 <script>
-let pages = document.querySelectorAll(".page");
+let pages = [
+  "<h1>Слова — это следы души</h1><p>Автор: Ты</p>",
+  "<h2>Стихи</h2><p>Тишина говорит со мной...</p>",
+  "<h2>Рассказы</h2><p>Однажды ночью...</p>",
+  "<h2>Кроссворд</h2>"
+];
 
-function go(n) {
-  pages.forEach(p => p.classList.remove("flipped"));
-  for (let i = 0; i < n; i++) {
-    pages[i].classList.add("flipped");
-  }
+function show(n) {
+  document.getElementById("content").innerHTML = pages[n];
   localStorage.setItem("page", n);
 }
 
 window.onload = () => {
-  let saved = localStorage.getItem("page");
-  if (saved) go(parseInt(saved));
+  let saved = localStorage.getItem("page") || 0;
+  show(saved);
 };
 
-/* PWA */
+/* РЕГИСТРАЦИЯ SW */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.register('./sw.js')
+    .then(reg => console.log("SW OK"))
+    .catch(err => console.log("SW error", err));
 }
 </script>
 
