@@ -3,195 +3,154 @@
 <head>
 <meta charset="UTF-8">
 <title>Вера Климошенко — Слова это следы души</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
   margin:0;
   font-family: Georgia, serif;
-  background:#000;
-  color:white;
-}
-
-/* 🌌 ФОН */
-.bg {
-  position:fixed;
-  width:100%;
-  height:100%;
-  z-index:-1;
-}
-.star {
-  position:absolute;
-  width:2px;
-  height:2px;
-  background:white;
-  opacity:0.7;
-  animation:move 10s linear infinite;
-}
-@keyframes move {
-  from{transform:translateY(0);}
-  to{transform:translateY(100vh);}
-}
-
-/* ГЛАВНАЯ */
-.hero {
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-}
-
-.hero h1 {font-size:42px;}
-.hero p {opacity:0.7;}
-
-.btn {
-  margin-top:20px;
-  padding:12px 25px;
-  border:1px solid white;
-  background:none;
-  color:white;
-  cursor:pointer;
+  background:#111;
+  color:#000;
+  overflow:hidden;
 }
 
 /* КНИГА */
 .book {
-  background:#fdfbf7;
-  color:black;
-  max-width:700px;
-  margin:40px auto;
-  padding:30px;
-  border-radius:12px;
-  box-shadow:0 20px 60px rgba(0,0,0,0.7);
+  width:100%;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  perspective:2000px;
 }
 
+/* СТРАНИЦА */
 .page {
-  font-size:18px;
-  line-height:1.8;
+  width:320px;
+  height:440px;
+  background:#fdfbf7;
+  position:absolute;
+  transform-origin:left;
+  box-shadow:0 10px 40px rgba(0,0,0,0.7);
+  padding:20px;
+  box-sizing:border-box;
+  border-radius:8px;
 }
 
 /* КНОПКИ */
-.controls {
+.ui {
+  position:fixed;
+  bottom:10px;
+  width:100%;
   display:flex;
-  justify-content:space-between;
-  margin-top:20px;
+  justify-content:space-around;
 }
 
-/* АВТОР */
-.about {
-  display:flex;
-  flex-wrap:wrap;
-  gap:30px;
-  align-items:center;
-  max-width:900px;
-  margin:60px auto;
-  padding:20px;
+button {
+  padding:10px;
 }
 
-.about img {
-  width:260px;
-  border-radius:12px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.6);
-}
-
-.footer {
-  text-align:center;
-  padding:20px;
-  opacity:0.5;
+/* ТЁМНАЯ ТЕМА */
+.dark .page {
+  background:#222;
+  color:white;
 }
 </style>
 </head>
 
 <body>
 
-<div class="bg" id="bg"></div>
+<div class="book" id="book"></div>
 
-<!-- ГЛАВНАЯ -->
-<div class="hero">
-  <div>
-    <h1>Вера Климошенко</h1>
-    <p>Слова — это следы души</p>
-    <button class="btn" onclick="go()">Читать книгу</button>
-  </div>
+<div class="ui">
+  <button onclick="prev()">⬅️</button>
+  <button onclick="toggleTheme()">🌙</button>
+  <button onclick="next()">➡️</button>
 </div>
-
-<!-- КНИГА -->
-<div class="book" id="book">
-  <div id="content" class="page"></div>
-
-  <div class="controls">
-    <button onclick="prev()">⬅️</button>
-    <button onclick="next()">➡️</button>
-  </div>
-</div>
-
-<!-- АВТОР -->
-<div class="about">
-
-<img src="photo.jpg" onerror="this.style.display='none'">
-
-<div>
-<h2>Об авторе</h2>
-<p>
-Вера Климошенко — автор произведений о вере, тишине и глубине души.
-</p>
-</div>
-
-</div>
-
-<div class="footer">© Вера Климошенко</div>
 
 <script>
 
-/* 🌌 ЗВЁЗДЫ */
-for(let i=0;i<60;i++){
-  let s=document.createElement("div");
-  s.className="star";
-  s.style.left=Math.random()*100+"%";
-  s.style.top=Math.random()*100+"%";
-  document.getElementById("bg").appendChild(s);
-}
-
-/* КНИГА */
-let pages = [
+let content = [
 
 `<h2>Слова — это следы души</h2>
 <p style="text-align:center;">Вера Климошенко</p>`,
 
 `<h3>А ты пойдёшь с нами, Господи?</h3>
-<p>Этот день я вспоминаю всегда, когда проезжаю по мосту...</p>`,
+<p>
+Этот день я вспоминаю всегда, когда проезжаю по мосту.
+</p>`,
 
-`<p>Прямого поезда не было. Нам нужно было торопиться.</p>`,
+`<p>
+Прямого поезда не было. Нам нужно было торопиться.
+</p>`,
 
-`<p>Мы шли по льду. Каждый шаг был испытанием.</p>`,
+`<p>
+Мы шли по льду. Каждый шаг был испытанием.
+</p>`,
 
-`<p>Мы успели. Слава Богу.</p>`
+`<p>
+Мы успели. Слава Богу.
+</p>`
 
 ];
 
 let current = 0;
 
+/* СОЗДАНИЕ СТРАНИЦ */
 function render(){
-  content.innerHTML = pages[current];
+  let book = document.getElementById("book");
+  book.innerHTML = "";
+
+  let page = document.createElement("div");
+  page.className = "page";
+  page.innerHTML = content[current];
+
+  book.appendChild(page);
+
   localStorage.setItem("page", current);
 }
 
+/* ПЕРЕЛИСТЫВАНИЕ */
 function next(){
-  if(current < pages.length-1){current++; render();}
+  if(current < content.length-1){
+    current++;
+    render();
+  }
 }
 
 function prev(){
-  if(current > 0){current--; render();}
+  if(current > 0){
+    current--;
+    render();
+  }
 }
 
-function go(){
-  document.getElementById("book").scrollIntoView({behavior:"smooth"});
+/* СВАЙП */
+let startX=0;
+
+document.addEventListener("touchstart", e=>{
+  startX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchend", e=>{
+  let dx = startX - e.changedTouches[0].clientX;
+
+  if(dx > 50) next();
+  if(dx < -50) prev();
+});
+
+/* ТЕМА */
+function toggleTheme(){
+  document.body.classList.toggle("dark");
 }
 
-window.onload = () => {
+/* ЗАПУСК */
+window.onload = ()=>{
   current = parseInt(localStorage.getItem("page")) || 0;
   render();
 };
+
 </script>
 
 </body>
