@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Слова — это следы души</title>
+<title>Вера Климошенко — Слова это следы души</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -10,55 +10,57 @@
 body {
   margin: 0;
   font-family: Georgia, serif;
-  background: radial-gradient(circle at center, #0a0a0a, #000);
-  color: #eaeaea;
+  background: #050505;
+  color: #eee;
 }
 
-/* ФОН-ДЫМ */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle, rgba(255,255,255,0.05), transparent);
-  animation: fog 10s infinite alternate;
-  z-index: -1;
-}
-
-@keyframes fog {
-  from {transform: scale(1);}
-  to {transform: scale(1.2);}
-}
-
-/* ШАПКА */
-.header {
+/* БРЕНД */
+.brand {
   text-align: center;
-  padding: 60px 20px 30px;
+  padding: 70px 20px 30px;
 }
 
-.header h1 {
-  font-size: 36px;
-  letter-spacing: 2px;
+.brand h1 {
+  font-size: 42px;
+  letter-spacing: 4px;
+  font-weight: normal;
 }
 
-.header p {
-  opacity: 0.5;
+.brand .subtitle {
+  margin-top: 10px;
   font-size: 14px;
+  opacity: 0.5;
+}
+
+.quote {
+  margin-top: 25px;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* ЛИНИЯ */
+.line {
+  width: 80px;
+  height: 1px;
+  background: white;
+  margin: 25px auto;
+  opacity: 0.3;
 }
 
 /* НАВИГАЦИЯ */
 .nav {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   padding: 10px;
 }
 
 .nav button {
   background: transparent;
-  border: 1px solid #333;
+  border: 1px solid #222;
   color: #aaa;
-  padding: 10px 15px;
-  border-radius: 8px;
+  padding: 10px 18px;
+  border-radius: 20px;
   cursor: pointer;
   transition: 0.3s;
 }
@@ -69,15 +71,15 @@ body::before {
 }
 
 .nav button.active {
-  border-color: white;
   color: white;
+  border-color: white;
 }
 
 /* КОНТЕНТ */
 .content {
-  max-width: 700px;
+  max-width: 720px;
   margin: auto;
-  padding: 30px;
+  padding: 40px 20px;
   animation: fade 0.6s;
 }
 
@@ -87,50 +89,44 @@ body::before {
 }
 
 /* БЛОК */
-.card {
-  background: rgba(20,20,20,0.8);
-  padding: 25px;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+.block {
+  margin-bottom: 40px;
 }
 
-/* СТИХ */
+/* СТИХИ */
 .poem {
-  line-height: 1.7;
+  line-height: 1.9;
   font-style: italic;
+  font-size: 17px;
+  opacity: 0.9;
+}
+
+/* ТЕКСТ */
+.text {
+  line-height: 1.7;
+  opacity: 0.85;
 }
 
 /* КНОПКИ */
 button {
   font-family: inherit;
 }
-
-/* КРОССВОРД */
-.cell {
-  width: 35px;
-  height: 35px;
-  margin: 3px;
-  text-align: center;
-  background: #111;
-  border: 1px solid #444;
-  color: white;
-}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <h1>Слова — это следы души</h1>
-  <p>Автор: Ты</p>
+<div class="brand">
+  <h1>Вера Климошенко</h1>
+  <div class="subtitle">автор</div>
+  <div class="line"></div>
+  <div class="quote">«Слова — это следы души»</div>
 </div>
 
 <div class="nav">
   <button onclick="show('home')" class="active">Главная</button>
   <button onclick="show('poems')">Стихи</button>
   <button onclick="show('stories')">Рассказы</button>
-  <button onclick="show('game')">Игра</button>
   <button onclick="show('about')">О себе</button>
 </div>
 
@@ -146,78 +142,54 @@ function show(section) {
 
   if (section === "home") {
     html = `
-      <div class="card">
-        <h2>Добро пожаловать</h2>
-        <p>Это не просто сайт. Это отражение мыслей, чувств и тишины между словами.</p>
+      <div class="block text">
+        Здесь живут слова, которые невозможно удержать внутри.
+        Это пространство чувств, тишины и внутреннего диалога.
       </div>
     `;
   }
 
   if (section === "poems") {
     html = `
-      <div class="card poem">
+      <div class="block poem">
       Тишина говорит со мной,<br>
       Словно ветер в пустом окне...<br><br>
       И я снова ищу покой,<br>
       Но он прячется где-то во мне.
       </div>
 
-      <div class="card poem">
+      <div class="block poem">
       Слова — это следы души,<br>
-      Их нельзя стереть во тьме...
+      Их нельзя стереть во тьме,<br>
+      Они остаются внутри,<br>
+      Даже когда нет меня.
       </div>
     `;
   }
 
   if (section === "stories") {
     html = `
-      <div class="card">
-      Однажды ночью город молчал...  
-      И только свет в окне говорил о чьей-то душе.
-      </div>
-    `;
-  }
-
-  if (section === "game") {
-    html = `
-      <div class="card">
-      <h2>Кроссворд</h2>
-      <input class="cell" maxlength="1">
-      <input class="cell" maxlength="1">
-      <input class="cell" maxlength="1">
-      <br><br>
-      <button onclick="check()">Проверить</button>
-      <p id="result"></p>
+      <div class="block text">
+      Однажды ночью город замолчал.  
+      И только редкие окна напоминали о том, что внутри каждого —
+      целый мир, полный чувств.
       </div>
     `;
   }
 
   if (section === "about") {
     html = `
-      <div class="card">
-      <h2>О себе</h2>
-      <p>Я пишу о том, что нельзя сказать вслух.</p>
+      <div class="block text">
+      Я пишу о том, что сложно объяснить словами,
+      но невозможно не почувствовать.
       </div>
     `;
   }
 
   document.getElementById("content").innerHTML = html;
-  localStorage.setItem("section", section);
 }
 
-window.onload = () => {
-  let saved = localStorage.getItem("section") || "home";
-  show(saved);
-};
-
-function check() {
-  let letters = document.querySelectorAll('.cell');
-  let word = "";
-  letters.forEach(l => word += l.value.toLowerCase());
-
-  document.getElementById("result").innerText =
-    word === "мир" ? "Правильно ✅" : "Попробуй ещё ❌";
-}
+window.onload = () => show("home");
 </script>
 
 </body>
