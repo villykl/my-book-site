@@ -13,7 +13,7 @@ body {
   color:#222;
 }
 
-/* ТЕМНАЯ ТЕМА */
+/* ТЁМНАЯ ТЕМА */
 .dark {
   background:#111;
   color:#eee;
@@ -26,8 +26,8 @@ body {
   padding:20px;
 }
 
-/* ОГЛАВЛЕНИЕ */
-.menu button {
+/* КНОПКИ */
+button {
   display:block;
   width:100%;
   margin:10px 0;
@@ -35,7 +35,7 @@ body {
   font-size:18px;
 }
 
-/* КНОПКИ */
+/* НАВИГАЦИЯ */
 .controls {
   position:fixed;
   bottom:10px;
@@ -44,8 +44,8 @@ body {
   justify-content:space-around;
 }
 
-button {
-  padding:10px;
+.controls button {
+  width:auto;
 }
 
 /* ТЕКСТ */
@@ -81,84 +81,120 @@ p {
 
 /* СОСТОЯНИЕ */
 let state = {
-  book: localStorage.getItem("book") || "menu",
+  screen: localStorage.getItem("screen") || "books",
+  book: parseInt(localStorage.getItem("book")) || 0,
+  chapter: parseInt(localStorage.getItem("chapter")) || 0,
   page: parseInt(localStorage.getItem("page")) || 0
 };
 
-/* КНИГА 1 */
-let book1 = [
-`<h1>Слова — это следы души</h1><p style="text-align:center;">Вера Климошенко</p>`,
+/* КНИГИ С ГЛАВАМИ */
+let books = [
+
+{
+title: "Слова — это следы души",
+chapters: [
+
+{
+title: "А ты пойдёшь с нами, Господи?",
+pages: [
 `<h2>А ты пойдёшь с нами, Господи?</h2><p>Этот день я вспоминаю всегда...</p>`,
 `<p>Прямого поезда не было...</p>`,
 `<p>Мы шли по льду...</p>`,
 `<p>Мы успели. Слава Богу.</p>`
+]
+}
+
+]
+},
+
+{
+title: "Вторая книга",
+chapters: [
+
+{
+title: "Новый рассказ",
+pages: [
+`<h2>Новый рассказ</h2><p>Здесь будет твой текст...</p>`,
+`<p>Добавь сюда новые истории</p>`
+]
+}
+
+]
+}
+
 ];
 
-/* КНИГА 2 */
-let book2 = [
-`<h1>Вторая книга</h1><p style="text-align:center;">Вера Климошенко</p>`,
-`<h2>Новый рассказ</h2><p>Здесь будет твой второй текст...</p>`,
-`<p>Добавь сюда свои рассказы</p>`
-];
+/* ЭКРАНЫ */
+function showBooks(){
+  app.innerHTML = "<h1>📚 Книги</h1>";
 
-/* ОГЛАВЛЕНИЕ */
-function menu(){
-  app.innerHTML = `
-  <h1>📚 Книги</h1>
+  books.forEach((b,i)=>{
+    app.innerHTML += `<button onclick="openBook(${i})">${b.title}</button>`;
+  });
 
-  <div class="menu">
-    <button onclick="openBook(1)">📖 Слова — это следы души</button>
-    <button onclick="openBook(2)">📘 Вторая книга</button>
-  </div>
-
+  app.innerHTML += `
   <div class="author">
     <h3>Вера Климошенко</h3>
     <img src="https://i.postimg.cc/8z0t9b2T/author.jpg">
-  </div>
-  `;
+  </div>`;
 }
 
-/* ОТКРЫТЬ КНИГУ */
-function openBook(n){
-  state.book = n;
+function openBook(i){
+  state.book = i;
+  state.screen = "chapters";
+  save();
+  showChapters();
+}
+
+function showChapters(){
+  let b = books[state.book];
+  app.innerHTML = `<h1>${b.title}</h1>`;
+
+  b.chapters.forEach((c,i)=>{
+    app.innerHTML += `<button onclick="openChapter(${i})">${c.title}</button>`;
+  });
+}
+
+function openChapter(i){
+  state.chapter = i;
   state.page = 0;
+  state.screen = "read";
   save();
   render();
 }
 
-/* РЕНДЕР */
+/* ЧТЕНИЕ */
 function render(){
+  if(state.screen === "books") return showBooks();
+  if(state.screen === "chapters") return showChapters();
 
-  if(state.book === "menu"){
-    menu();
-    return;
-  }
-
-  let book = state.book == 1 ? book1 : book2;
-
-  app.innerHTML = book[state.page];
+  let page = books[state.book].chapters[state.chapter].pages[state.page];
+  app.innerHTML = page;
 }
 
 /* НАВИГАЦИЯ */
 function next(){
-  if(state.book === "menu") return;
+  if(state.screen !== "read") return;
 
-  let book = state.book == 1 ? book1 : book2;
+  let pages = books[state.book].chapters[state.chapter].pages;
 
-  if(state.page < book.length-1){
+  if(state.page < pages.length-1){
     state.page++;
-    save();
-    render();
   }
+
+  save();
+  render();
 }
 
 function prev(){
-  if(state.book === "menu") return;
-
-  if(state.page > 0){
-    state.page--;
-  } else {
-    state.book = "menu";
+  if(state.screen === "read"){
+    if(state.page > 0){
+      state.page--;
+    } else {
+      state.screen = "chapters";
+    }
+  } else if(state.screen === "chapters"){
+    state.screen = "books";
   }
 
   save();
@@ -167,7 +203,9 @@ function prev(){
 
 /* СОХРАНЕНИЕ */
 function save(){
+  localStorage.setItem("screen", state.screen);
   localStorage.setItem("book", state.book);
+  localStorage.setItem("chapter", state.chapter);
   localStorage.setItem("page", state.page);
 }
 
