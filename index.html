@@ -13,20 +13,17 @@ body {
   color:#222;
 }
 
-/* ТЁМНАЯ ТЕМА */
 .dark {
   background:#111;
   color:#eee;
 }
 
-/* КОНТЕЙНЕР */
 .container {
   max-width:700px;
   margin:auto;
   padding:20px;
 }
 
-/* КНОПКИ */
 button {
   display:block;
   width:100%;
@@ -35,7 +32,6 @@ button {
   font-size:18px;
 }
 
-/* НАВИГАЦИЯ */
 .controls {
   position:fixed;
   bottom:10px;
@@ -48,13 +44,12 @@ button {
   width:auto;
 }
 
-/* ТЕКСТ */
 p {
   font-size:20px;
   line-height:1.8;
 }
 
-/* АВТОР */
+/* автор */
 .author {
   text-align:center;
   margin-top:40px;
@@ -83,48 +78,92 @@ p {
 let state = {
   screen: localStorage.getItem("screen") || "books",
   book: parseInt(localStorage.getItem("book")) || 0,
-  chapter: parseInt(localStorage.getItem("chapter")) || 0,
   page: parseInt(localStorage.getItem("page")) || 0
 };
 
-/* КНИГИ С ГЛАВАМИ */
-let books = [
+/* 🔥 ВСТАВЬ СЮДА СВОИ ТЕКСТЫ */
+let texts = [
 
 {
 title: "Слова — это следы души",
-chapters: [
+content: `
+А ты пойдёшь с нами, Господи?
 
-{
-title: "А ты пойдёшь с нами, Господи?",
-pages: [
-`<h2>А ты пойдёшь с нами, Господи?</h2><p>Этот день я вспоминаю всегда...</p>`,
-`<p>Прямого поезда не было...</p>`,
-`<p>Мы шли по льду...</p>`,
-`<p>Мы успели. Слава Богу.</p>`
-]
-}
+Этот день я вспоминаю всегда, когда проезжаю по мосту.
+Этот день навсегда остался в моей памяти.
 
-]
+Прямого поезда на Брест не было.
+Поэтому нам нужно было торопиться.
+
+Оставив вещи, мы поспешили в город.
+Ранняя весна наполняла душу радостью.
+
+Но вот электричка...
+Господь идёт впереди нас.
+
+И вдруг — ошибка...
+Мы оказались не на том берегу.
+
+Господи, что делать?
+И вдруг мысль — идти по льду.
+
+Первый шаг был самым трудным.
+Сердце билось всё сильнее.
+
+Мы шли по льду...
+Каждый шаг был испытанием.
+
+И вот берег...
+Мы дошли.
+
+Но чудо только начиналось...
+
+Мы успели. Слава Богу.
+`
 },
 
 {
 title: "Вторая книга",
-chapters: [
+content: `
+Здесь будет твой второй рассказ.
 
-{
-title: "Новый рассказ",
-pages: [
-`<h2>Новый рассказ</h2><p>Здесь будет твой текст...</p>`,
-`<p>Добавь сюда новые истории</p>`
-]
-}
+Просто вставь сюда длинный текст —
+и он сам разобьётся на страницы.
 
-]
+Это уже уровень настоящей книги.
+`
 }
 
 ];
 
-/* ЭКРАНЫ */
+/* 🔥 АВТО РАЗБИЕНИЕ */
+function splitText(text){
+  let words = text.split(" ");
+  let pages = [];
+  let page = "";
+
+  words.forEach(w=>{
+    page += w + " ";
+    if(page.length > 800){
+      pages.push("<p>"+page+"</p>");
+      page = "";
+    }
+  });
+
+  if(page) pages.push("<p>"+page+"</p>");
+
+  return pages;
+}
+
+/* ПРЕОБРАЗОВАНИЕ */
+let books = texts.map(t=>{
+  return {
+    title: t.title,
+    pages: splitText(t.content)
+  };
+});
+
+/* МЕНЮ */
 function showBooks(){
   app.innerHTML = "<h1>📚 Книги</h1>";
 
@@ -139,36 +178,24 @@ function showBooks(){
   </div>`;
 }
 
+/* ОТКРЫТЬ */
 function openBook(i){
   state.book = i;
-  state.screen = "chapters";
-  save();
-  showChapters();
-}
-
-function showChapters(){
-  let b = books[state.book];
-  app.innerHTML = `<h1>${b.title}</h1>`;
-
-  b.chapters.forEach((c,i)=>{
-    app.innerHTML += `<button onclick="openChapter(${i})">${c.title}</button>`;
-  });
-}
-
-function openChapter(i){
-  state.chapter = i;
   state.page = 0;
   state.screen = "read";
   save();
   render();
 }
 
-/* ЧТЕНИЕ */
+/* РЕНДЕР */
 function render(){
-  if(state.screen === "books") return showBooks();
-  if(state.screen === "chapters") return showChapters();
 
-  let page = books[state.book].chapters[state.chapter].pages[state.page];
+  if(state.screen === "books"){
+    showBooks();
+    return;
+  }
+
+  let page = books[state.book].pages[state.page];
   app.innerHTML = page;
 }
 
@@ -176,9 +203,9 @@ function render(){
 function next(){
   if(state.screen !== "read") return;
 
-  let pages = books[state.book].chapters[state.chapter].pages;
+  let b = books[state.book];
 
-  if(state.page < pages.length-1){
+  if(state.page < b.pages.length-1){
     state.page++;
   }
 
@@ -191,10 +218,8 @@ function prev(){
     if(state.page > 0){
       state.page--;
     } else {
-      state.screen = "chapters";
+      state.screen = "books";
     }
-  } else if(state.screen === "chapters"){
-    state.screen = "books";
   }
 
   save();
@@ -205,7 +230,6 @@ function prev(){
 function save(){
   localStorage.setItem("screen", state.screen);
   localStorage.setItem("book", state.book);
-  localStorage.setItem("chapter", state.chapter);
   localStorage.setItem("page", state.page);
 }
 
