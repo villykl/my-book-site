@@ -14,7 +14,6 @@ body {
   overflow: hidden;
 }
 
-/* СЦЕНА */
 .scene {
   width: 100%;
   height: 100vh;
@@ -23,39 +22,30 @@ body {
   align-items: center;
 }
 
-/* КНИГА */
 .book {
-  width: 340px;
-  height: 440px;
-  position: relative;
+  width: 360px;
+  height: 460px;
   perspective: 3000px;
+  position: relative;
 }
 
-/* ЛЕВАЯ СТРАНИЦА */
-.left-page {
+.left, .right {
   position: absolute;
   width: 50%;
   height: 100%;
+  background: #f4f1ea;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.left {
   left: 0;
-  background: #f4f1ea;
-  padding: 15px;
-  box-sizing: border-box;
-  border-radius: 5px 0 0 5px;
 }
 
-/* ПРАВАЯ */
-.right-page {
-  position: absolute;
-  width: 50%;
-  height: 100%;
+.right {
   right: 0;
-  background: #f4f1ea;
-  padding: 15px;
-  box-sizing: border-box;
-  border-radius: 0 5px 5px 0;
 }
 
-/* ПЕРЕВОРАЧИВАЕМАЯ */
 .flip {
   position: absolute;
   width: 50%;
@@ -63,19 +53,10 @@ body {
   right: 0;
   background: #f4f1ea;
   transform-origin: left;
-  transform-style: preserve-3d;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
-/* ОБЛОЖКА */
-.cover {
-  background: linear-gradient(145deg,#111,#000);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.title {
   text-align: center;
-  cursor: pointer;
 }
 
 .poem {
@@ -88,51 +69,48 @@ body {
 <body>
 
 <div class="scene">
+  <div class="book">
 
-<div class="book" id="book">
+    <div class="left" id="left"></div>
+    <div class="right" id="right"></div>
+    <div class="flip" id="flip"></div>
 
-  <!-- ЛЕВАЯ -->
-  <div class="left-page" id="left"></div>
-
-  <!-- ПРАВАЯ -->
-  <div class="right-page" id="right"></div>
-
-  <!-- ПЕРЕЛИСТЫВАЕМАЯ -->
-  <div class="flip" id="flip"></div>
-
-</div>
-
+  </div>
 </div>
 
 <audio id="sound" src="https://www.soundjay.com/page-flip-01a.mp3"></audio>
 
 <script>
-let data = [
+let book = [
+
   ["", "Слова — это следы души<br><br>Вера Климошенко"],
-  ["Добро пожаловать", "Это книга чувств и мыслей."],
-  ["Стихи", "Тишина говорит со мной..."],
-  ["Рассказы", "Однажды ночью город молчал..."],
-  ["Автор", "Вера Климошенко"]
+
+  ["Открытие",
+  "Это начало книги.<br><br>Здесь появляются первые мысли."],
+
+  ["Стих 1",
+  "Тишина говорит со мной,<br>Словно ветер в пустом окне..."],
+
+  ["Стих 2",
+  "Слова — это следы души,<br>Их нельзя стереть во тьме..."],
+
+  ["Рассказ",
+  "Однажды ночью город молчал..."],
+
+  ["Конец",
+  "Каждая история оставляет след."]
 ];
 
 let index = 0;
-let dragging = false;
 let startX = 0;
+let dragging = false;
 
 function render() {
-  document.getElementById("left").innerHTML =
-    "<h3>"+(data[index][0]||"")+"</h3>";
-
-  document.getElementById("right").innerHTML =
-    "<p class='poem'>"+data[index][1]+"</p>";
-
-  document.getElementById("flip").innerHTML =
-    "<p class='poem'>"+(data[index+1]?.[1]||"")+"</p>";
-
-  localStorage.setItem("page", index);
+  left.innerHTML = "<h3>"+book[index][0]+"</h3>";
+  right.innerHTML = "<div class='poem'>"+book[index][1]+"</div>";
+  flip.innerHTML = "<div class='poem'>"+(book[index+1]?.[1]||"")+"</div>";
 }
 
-/* DRAG */
 document.addEventListener("mousedown", start);
 document.addEventListener("touchstart", start);
 
@@ -153,8 +131,7 @@ function move(e){
   let percent = Math.min(Math.max(dx/300,0),1);
   let angle = percent * -180;
 
-  document.getElementById("flip").style.transform =
-    "rotateY("+angle+"deg)";
+  flip.style.transform = "rotateY("+angle+"deg)";
 }
 
 document.addEventListener("mouseup", end);
@@ -167,12 +144,12 @@ function end(e){
   let x = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
   let dx = startX - x;
 
-  if(dx > 100 && index < data.length-1){
+  if(dx > 100 && index < book.length-1){
     index++;
     play();
   }
 
-  document.getElementById("flip").style.transform = "rotateY(0deg)";
+  flip.style.transform = "rotateY(0deg)";
   render();
 }
 
@@ -182,11 +159,7 @@ function play(){
   s.play();
 }
 
-/* LOAD */
-window.onload = () => {
-  index = parseInt(localStorage.getItem("page")) || 0;
-  render();
-};
+window.onload = render;
 </script>
 
 </body>
