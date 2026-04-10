@@ -10,44 +10,67 @@
 body {
   margin: 0;
   font-family: Georgia, serif;
-  background: #0b0b0b;
-  color: #eee;
+  background: radial-gradient(circle at center, #0a0a0a, #000);
+  color: #eaeaea;
+}
+
+/* ФОН-ДЫМ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.05), transparent);
+  animation: fog 10s infinite alternate;
+  z-index: -1;
+}
+
+@keyframes fog {
+  from {transform: scale(1);}
+  to {transform: scale(1.2);}
 }
 
 /* ШАПКА */
 .header {
   text-align: center;
-  padding: 40px 20px;
-  background: linear-gradient(#000, #111);
+  padding: 60px 20px 30px;
 }
 
 .header h1 {
-  margin: 0;
-  font-size: 32px;
+  font-size: 36px;
+  letter-spacing: 2px;
 }
 
 .header p {
-  opacity: 0.6;
+  opacity: 0.5;
+  font-size: 14px;
 }
 
 /* НАВИГАЦИЯ */
 .nav {
   display: flex;
   justify-content: center;
-  background: #111;
+  gap: 10px;
+  padding: 10px;
 }
 
 .nav button {
-  padding: 15px;
-  background: none;
-  border: none;
+  background: transparent;
+  border: 1px solid #333;
   color: #aaa;
+  padding: 10px 15px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: 0.3s;
+}
+
+.nav button:hover {
+  background: #111;
+  color: white;
 }
 
 .nav button.active {
+  border-color: white;
   color: white;
-  border-bottom: 2px solid white;
 }
 
 /* КОНТЕНТ */
@@ -55,18 +78,32 @@ body {
   max-width: 700px;
   margin: auto;
   padding: 30px;
-  animation: fade 0.5s;
+  animation: fade 0.6s;
 }
 
 @keyframes fade {
-  from {opacity: 0;}
-  to {opacity: 1;}
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
 }
 
-/* СТИХИ */
+/* БЛОК */
+.card {
+  background: rgba(20,20,20,0.8);
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+
+/* СТИХ */
 .poem {
-  margin-bottom: 30px;
-  line-height: 1.6;
+  line-height: 1.7;
+  font-style: italic;
+}
+
+/* КНОПКИ */
+button {
+  font-family: inherit;
 }
 
 /* КРОССВОРД */
@@ -75,11 +112,9 @@ body {
   height: 35px;
   margin: 3px;
   text-align: center;
-}
-
-/* КНОПКИ */
-button {
-  font-family: inherit;
+  background: #111;
+  border: 1px solid #444;
+  color: white;
 }
 </style>
 </head>
@@ -111,38 +146,41 @@ function show(section) {
 
   if (section === "home") {
     html = `
-      <h2>Добро пожаловать</h2>
-      <p>Это моя книга. Здесь мои мысли, чувства и истории.</p>
+      <div class="card">
+        <h2>Добро пожаловать</h2>
+        <p>Это не просто сайт. Это отражение мыслей, чувств и тишины между словами.</p>
+      </div>
     `;
   }
 
   if (section === "poems") {
     html = `
-      <h2>Стихи</h2>
-
-      <div class="poem">
+      <div class="card poem">
       Тишина говорит со мной,<br>
       Словно ветер в пустом окне...<br><br>
       И я снова ищу покой,<br>
       Но он прячется где-то во мне.
       </div>
 
-      <div class="poem">
+      <div class="card poem">
       Слова — это следы души,<br>
-      Их не скрыть и не стереть...
+      Их нельзя стереть во тьме...
       </div>
     `;
   }
 
   if (section === "stories") {
     html = `
-      <h2>Рассказы</h2>
-      <p>Однажды ночью город молчал...</p>
+      <div class="card">
+      Однажды ночью город молчал...  
+      И только свет в окне говорил о чьей-то душе.
+      </div>
     `;
   }
 
   if (section === "game") {
     html = `
+      <div class="card">
       <h2>Кроссворд</h2>
       <input class="cell" maxlength="1">
       <input class="cell" maxlength="1">
@@ -150,28 +188,28 @@ function show(section) {
       <br><br>
       <button onclick="check()">Проверить</button>
       <p id="result"></p>
+      </div>
     `;
   }
 
   if (section === "about") {
     html = `
+      <div class="card">
       <h2>О себе</h2>
-      <p>Я автор, который пишет о чувствах и жизни.</p>
+      <p>Я пишу о том, что нельзя сказать вслух.</p>
+      </div>
     `;
   }
 
   document.getElementById("content").innerHTML = html;
-
   localStorage.setItem("section", section);
 }
 
-/* ЗАГРУЗКА */
 window.onload = () => {
   let saved = localStorage.getItem("section") || "home";
   show(saved);
 };
 
-/* КРОССВОРД */
 function check() {
   let letters = document.querySelectorAll('.cell');
   let word = "";
