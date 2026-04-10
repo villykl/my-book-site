@@ -9,9 +9,33 @@
 <style>
 body {
   margin: 0;
-  font-family: 'Georgia', serif;
-  background: #0a0a0a;
+  font-family: Georgia, serif;
+  background: #000;
   color: white;
+  overflow-x: hidden;
+}
+
+/* 🌌 ФОН */
+.bg {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, #111, #000);
+  overflow: hidden;
+  z-index: -1;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  animation: move 10s linear infinite;
+}
+
+@keyframes move {
+  from {transform: translateY(0);}
+  to {transform: translateY(100vh);}
 }
 
 /* МЕНЮ */
@@ -23,8 +47,8 @@ body {
   justify-content: center;
   gap: 30px;
   padding: 15px;
-  backdrop-filter: blur(10px);
   background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
   z-index: 100;
 }
 
@@ -33,11 +57,7 @@ body {
   border: none;
   color: white;
   font-size: 16px;
-  transition: 0.3s;
-}
-
-.nav button:hover {
-  opacity: 0.6;
+  cursor: pointer;
 }
 
 /* СЕКЦИИ */
@@ -55,7 +75,7 @@ body {
 
 @keyframes fade {
   from {opacity:0; transform: translateY(20px);}
-  to {opacity:1; transform: translateY(0);}
+  to {opacity:1;}
 }
 
 /* ГЛАВНАЯ */
@@ -65,13 +85,11 @@ body {
 }
 
 .hero h1 {
-  font-size: 42px;
-  letter-spacing: 2px;
+  font-size: 48px;
 }
 
 .hero p {
   opacity: 0.7;
-  font-size: 18px;
 }
 
 /* КНОПКА */
@@ -98,38 +116,30 @@ body {
   font-size: 18px;
 }
 
+/* КНОПКИ */
 .controls {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
 }
 
-/* ОБ АВТОРЕ */
+/* АВТОР */
 .about {
   line-height: 1.8;
   font-size: 18px;
-}
-
-/* КОНТАКТЫ */
-.contact input, .contact textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  background: #111;
-  border: 1px solid #333;
-  color: white;
 }
 </style>
 </head>
 
 <body>
 
+<div class="bg" id="bg"></div>
+
 <!-- МЕНЮ -->
 <div class="nav">
   <button onclick="show('home')">Главная</button>
   <button onclick="show('book')">Книга</button>
   <button onclick="show('about')">Об авторе</button>
-  <button onclick="show('contact')">Контакты</button>
 </div>
 
 <!-- ГЛАВНАЯ -->
@@ -146,8 +156,8 @@ body {
   <div class="book" id="bookContent"></div>
 
   <div class="controls">
-    <button onclick="prev()">⬅️ Назад</button>
-    <button onclick="next()">Вперёд ➡️</button>
+    <button onclick="prev()">⬅️</button>
+    <button onclick="next()">➡️</button>
   </div>
 </div>
 
@@ -155,24 +165,22 @@ body {
 <div id="about" class="section">
   <h2>Об авторе</h2>
   <div class="about">
-    Вера Климошенко — автор произведений о внутреннем мире человека,
-    тишине, вере и переживаниях души.
-    <br><br>
-    Её тексты — это отражение чувств и глубоких размышлений.
-  </div>
-</div>
-
-<!-- КОНТАКТЫ -->
-<div id="contact" class="section">
-  <h2>Контакты</h2>
-  <div class="contact">
-    <input placeholder="Ваше имя">
-    <input placeholder="Email">
-    <textarea placeholder="Сообщение"></textarea>
+    Вера Климошенко — автор, создающий тексты о тишине,
+    внутреннем мире и переживаниях души.
   </div>
 </div>
 
 <script>
+
+/* 🌌 ЗВЁЗДЫ */
+for(let i=0;i<80;i++){
+  let s=document.createElement("div");
+  s.className="star";
+  s.style.left=Math.random()*100+"%";
+  s.style.top=Math.random()*100+"%";
+  s.style.opacity=Math.random();
+  document.getElementById("bg").appendChild(s);
+}
 
 /* НАВИГАЦИЯ */
 function show(id){
@@ -187,11 +195,19 @@ let pages = [
 <p style="text-align:center;">Вера Климошенко</p>`,
 
 `<h3>А ты пойдёшь с нами, Господи?</h3>
-<p>Этот день я вспоминаю всегда...</p>`,
+<p>
+Этот день я вспоминаю всегда, когда проезжаю по мосту...
+</p>`,
 
-`<p>Мы шли по льду...</p>`,
+`<p>
+Мы шли по льду.  
+Каждый шаг был испытанием.
+</p>`,
 
-`<p>Мы успели. Слава Богу.</p>`
+`<p>
+Мы успели.  
+Слава Богу.
+</p>`
 
 ];
 
