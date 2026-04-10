@@ -2,171 +2,181 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Вера Климошенко — Слова это следы души</title>
+<title>Вера Климошенко — Автор</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
   margin: 0;
-  background: #111;
   font-family: Georgia, serif;
+  background: #111;
+  color: white;
 }
 
-.container {
-  max-width: 700px;
-  margin: auto;
-  padding: 20px;
-  background: #fdfbf7;
-  min-height: 100vh;
-}
-
-h1 {
-  text-align: center;
-  margin-top: 40px;
-}
-
-h2 {
-  margin-top: 40px;
-}
-
-.page {
-  margin-bottom: 60px;
-  line-height: 1.8;
-  font-size: 18px;
-}
-
+/* МЕНЮ */
 .nav {
   position: fixed;
-  bottom: 0;
+  top: 0;
   width: 100%;
-  background: #000;
-  color: white;
+  background: black;
   display: flex;
-  justify-content: space-around;
-  padding: 10px;
+  justify-content: center;
+  gap: 20px;
+  padding: 15px;
+  z-index: 100;
 }
 
-button {
+.nav button {
   background: none;
   border: none;
   color: white;
   font-size: 16px;
+}
+
+/* СТРАНИЦЫ */
+.section {
+  display: none;
+  padding: 80px 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.active {
+  display: block;
+}
+
+/* ГЛАВНАЯ */
+.hero {
+  text-align: center;
+  margin-top: 100px;
+}
+
+.hero h1 {
+  font-size: 32px;
+}
+
+.hero p {
+  opacity: 0.7;
+}
+
+/* КНИГА */
+.book {
+  background: #fdfbf7;
+  color: black;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.page {
+  margin-bottom: 40px;
+  line-height: 1.8;
+}
+
+/* КНОПКИ */
+.controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container" id="content"></div>
-
+<!-- МЕНЮ -->
 <div class="nav">
-  <button onclick="prev()">⬅️</button>
-  <button onclick="next()">➡️</button>
+  <button onclick="show('home')">🏠</button>
+  <button onclick="show('book')">📖</button>
+  <button onclick="show('about')">👤</button>
+  <button onclick="show('contact')">📬</button>
+</div>
+
+<!-- ГЛАВНАЯ -->
+<div id="home" class="section active">
+  <div class="hero">
+    <h1>Вера Климошенко</h1>
+    <p>Слова — это следы души</p>
+  </div>
+</div>
+
+<!-- КНИГА -->
+<div id="book" class="section">
+  <div class="book" id="bookContent"></div>
+
+  <div class="controls">
+    <button onclick="prev()">⬅️</button>
+    <button onclick="next()">➡️</button>
+  </div>
+</div>
+
+<!-- ОБ АВТОРЕ -->
+<div id="about" class="section">
+  <h2>Об авторе</h2>
+  <p>
+  Вера Климошенко — автор произведений о тишине, вере и внутреннем мире человека.
+  </p>
+</div>
+
+<!-- КОНТАКТЫ -->
+<div id="contact" class="section">
+  <h2>Контакты</h2>
+  <p>Напишите мне...</p>
 </div>
 
 <script>
 
+/* НАВИГАЦИЯ */
+function show(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+/* КНИГА */
 let pages = [
 
-`<h1>Слова — это следы души</h1>
+`<h2>Слова — это следы души</h2>
 <p style="text-align:center;">Вера Климошенко</p>`,
 
-`<h2>А ты пойдёшь с нами, Господи?</h2>
+`<h3>А ты пойдёшь с нами, Господи?</h3>
 <p>
-Этот день я вспоминаю всегда, когда проезжаю по Спрингфилдскому мосту.
-Этот день навсегда остался в моей памяти.
+Этот день я вспоминаю всегда...
 </p>`,
 
-`<p>
-Прямого поезда на Брест не было.  
-Поэтому нам нужно было торопиться.
-</p>`,
+`<p>Прямого поезда на Брест не было...</p>`,
 
-`<p>
-Оставив вещи, мы поспешили в город.  
-Ранняя весна наполняла душу радостью.
-</p>`,
+`<p>Мы шли по льду...</p>`,
 
-`<p>
-Но вот электричка...  
-Господь идёт впереди нас.
-</p>`,
-
-`<p>
-И вдруг — ошибка...  
-Мы оказались не на том берегу.
-</p>`,
-
-`<p>
-Господи, что делать?  
-И вдруг мысль — идти по льду.
-</p>`,
-
-`<p>
-Первый шаг был самым трудным.  
-Сердце билось всё сильнее.
-</p>`,
-
-`<p>
-Мы шли по льду...  
-Каждый шаг был испытанием.
-</p>`,
-
-`<p>
-И вот берег.  
-Мы дошли.
-</p>`,
-
-`<p>
-Но чудо только начиналось...  
-Мы оказались в нужном доме.
-</p>`,
-
-`<p>
-А затем бег к поезду...  
-И последние секунды.
-</p>`,
-
-`<p>
-Мы успели.  
-Слава Богу.
-</p>`,
-
-`<p>
-Этот день навсегда остался в моей душе —  
-как свидетельство Божьей помощи.
-</p>`
+`<p>Мы успели. Слава Богу.</p>`
 
 ];
 
 let current = 0;
 
-function render() {
-  document.getElementById("content").innerHTML =
+function render(){
+  document.getElementById("bookContent").innerHTML =
     "<div class='page'>" + pages[current] + "</div>";
-
-  localStorage.setItem("page", current);
 }
 
-function next() {
-  if (current < pages.length - 1) {
+function next(){
+  if(current < pages.length-1){
     current++;
     render();
   }
 }
 
-function prev() {
-  if (current > 0) {
+function prev(){
+  if(current > 0){
     current--;
     render();
   }
 }
 
-window.onload = () => {
-  current = parseInt(localStorage.getItem("page")) || 0;
-  render();
-};
+window.onload = render;
+
 </script>
 
 </body>
