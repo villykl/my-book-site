@@ -28,6 +28,10 @@ body {
   font-size: 42px;
 }
 
+.hero p {
+  opacity: 0.7;
+}
+
 .btn {
   margin-top: 20px;
   padding: 12px 25px;
@@ -42,9 +46,10 @@ body {
   background: #fdfbf7;
   color: black;
   padding: 30px;
-  border-radius: 10px;
+  border-radius: 12px;
   max-width: 700px;
   margin: 40px auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
 }
 
 .page {
@@ -62,16 +67,28 @@ body {
 .about {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 30px;
   align-items: center;
   max-width: 900px;
-  margin: 40px auto;
+  margin: 60px auto;
   padding: 20px;
 }
 
 .about img {
-  width: 240px;
-  border-radius: 10px;
+  width: 260px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+.about-text {
+  max-width: 500px;
+}
+
+/* ФУТЕР */
+.footer {
+  text-align: center;
+  padding: 20px;
+  opacity: 0.6;
 }
 </style>
 </head>
@@ -92,28 +109,36 @@ body {
   <div id="content" class="page"></div>
 
   <div class="controls">
-    <button onclick="prev()">⬅️</button>
-    <button onclick="next()">➡️</button>
+    <button onclick="prev()">⬅️ Назад</button>
+    <button onclick="next()">Вперёд ➡️</button>
   </div>
 </div>
 
 <!-- АВТОР -->
 <div class="about">
 
-<img src="data:image/jpeg;base64,REPLACE_BASE64">
+<img src="photo.jpg">
 
-<div>
+<div class="about-text">
 <h2>Об авторе</h2>
 <p>
 Вера Климошенко — автор произведений о вере, тишине и глубине души.
+</p>
+<p>
+Её тексты — это отражение внутреннего мира,
+переживаний и поиска света.
 </p>
 </div>
 
 </div>
 
+<div class="footer">
+© Вера Климошенко
+</div>
+
 <script>
 
-/* ТВОЯ КНИГА */
+/* КНИГА (ВСЕ РАССКАЗЫ) */
 let pages = [
 
 `<h2>Слова — это следы души</h2>
@@ -121,19 +146,68 @@ let pages = [
 
 `<h3>А ты пойдёшь с нами, Господи?</h3>
 <p>
-Этот день я вспоминаю всегда, когда проезжаю по мосту...
+Этот день я вспоминаю всегда, когда проезжаю по мосту.
+Этот день навсегда остался в моей памяти.
 </p>`,
 
 `<p>
-Прямого поезда не было. Нам нужно было торопиться.
+Прямого поезда на Брест не было.  
+Поэтому нам нужно было торопиться.
 </p>`,
 
 `<p>
-Мы шли по льду. Каждый шаг был испытанием.
+Оставив вещи, мы поспешили в город.  
+Ранняя весна наполняла душу радостью.
 </p>`,
 
 `<p>
-Мы успели. Слава Богу.
+Но вот электричка...  
+Господь идёт впереди нас.
+</p>`,
+
+`<p>
+И вдруг — ошибка...  
+Мы оказались не на том берегу.
+</p>`,
+
+`<p>
+Господи, что делать?  
+И вдруг мысль — идти по льду.
+</p>`,
+
+`<p>
+Первый шаг был самым трудным.  
+Сердце билось всё сильнее.
+</p>`,
+
+`<p>
+Мы шли по льду...  
+Каждый шаг был испытанием.
+</p>`,
+
+`<p>
+И вот берег...  
+Мы дошли.
+</p>`,
+
+`<p>
+Но чудо только начиналось...  
+Мы оказались в нужном доме.
+</p>`,
+
+`<p>
+А затем бег к поезду...  
+И последние секунды.
+</p>`,
+
+`<p>
+Мы успели.  
+Слава Богу.
+</p>`,
+
+`<p>
+Этот день навсегда остался в моей душе —  
+как свидетельство Божьей помощи.
 </p>`
 
 ];
@@ -142,6 +216,7 @@ let current = 0;
 
 function render(){
   document.getElementById("content").innerHTML = pages[current];
+  localStorage.setItem("page", current);
 }
 
 function next(){
@@ -162,7 +237,10 @@ function scrollToBook(){
   document.getElementById("book").scrollIntoView({behavior:"smooth"});
 }
 
-window.onload = render;
+window.onload = () => {
+  current = parseInt(localStorage.getItem("page")) || 0;
+  render();
+};
 
 </script>
 
