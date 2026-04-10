@@ -18,12 +18,32 @@ body {
   color:#eee;
 }
 
+/* КОНТЕЙНЕР */
 .container {
-  max-width:700px;
+  max-width:680px;
   margin:auto;
-  padding:20px;
+  padding:30px 20px;
 }
 
+/* ТИПОГРАФИКА */
+h1 {
+  text-align:center;
+  margin-bottom:30px;
+}
+
+h2 {
+  margin-top:40px;
+}
+
+p {
+  font-size:20px;
+  line-height:1.9;
+  margin-bottom:18px;
+  text-align:justify;
+  text-indent:2em;
+}
+
+/* КНОПКИ */
 button {
   display:block;
   width:100%;
@@ -44,19 +64,14 @@ button {
   width:auto;
 }
 
-p {
-  font-size:20px;
-  line-height:1.8;
-}
-
-/* автор */
+/* АВТОР */
 .author {
   text-align:center;
   margin-top:40px;
 }
 
 .author img {
-  width:150px;
+  width:140px;
   border-radius:50%;
 }
 </style>
@@ -78,10 +93,11 @@ p {
 let state = {
   screen: localStorage.getItem("screen") || "books",
   book: parseInt(localStorage.getItem("book")) || 0,
+  chapter: parseInt(localStorage.getItem("chapter")) || 0,
   page: parseInt(localStorage.getItem("page")) || 0
 };
 
-/* 🔥 ВСТАВЬ СЮДА СВОИ ТЕКСТЫ */
+/* 🔥 ВСТАВЛЯЙ СЮДА ТЕКСТЫ */
 let texts = [
 
 {
@@ -125,77 +141,97 @@ content: `
 {
 title: "Вторая книга",
 content: `
-Здесь будет твой второй рассказ.
+Это вторая книга.
 
-Просто вставь сюда длинный текст —
-и он сам разобьётся на страницы.
+Здесь ты можешь писать новые рассказы.
 
-Это уже уровень настоящей книги.
+Просто вставляй текст —
+и всё оформится автоматически.
 `
 }
 
 ];
 
-/* 🔥 АВТО РАЗБИЕНИЕ */
-function splitText(text){
-  let words = text.split(" ");
+/* 📑 АВТО ГЛАВЫ */
+function splitChapters(text){
+  return text.split("\n\n").filter(t=>t.trim() !== "");
+}
+
+/* 📖 АВТО СТРАНИЦЫ */
+function splitPages(paragraphs){
   let pages = [];
   let page = "";
 
-  words.forEach(w=>{
-    page += w + " ";
-    if(page.length > 800){
-      pages.push("<p>"+page+"</p>");
-      page = "";
+  paragraphs.forEach(p=>{
+    let block = `<p>${p}</p>`;
+
+    if((page + block).length > 1200){
+      pages.push(page);
+      page = block;
+    } else {
+      page += block;
     }
   });
 
-  if(page) pages.push("<p>"+page+"</p>");
+  if(page) pages.push(page);
 
   return pages;
 }
 
-/* ПРЕОБРАЗОВАНИЕ */
+/* 📚 СОЗДАНИЕ КНИГИ */
 let books = texts.map(t=>{
+  let chapters = splitChapters(t.content);
+
   return {
     title: t.title,
-    pages: splitText(t.content)
+    chapters: chapters.map(ch => ({
+      title: ch.split("\n")[0].slice(0,40),
+      pages: splitPages(ch.split("\n"))
+    }))
   };
 });
 
-/* МЕНЮ */
+/* ЭКРАНЫ */
 function showBooks(){
-  app.innerHTML = "<h1>📚 Книги</h1>";
+  app.innerHTML = `<h1>📚 Книги</h1>`;
 
   books.forEach((b,i)=>{
     app.innerHTML += `<button onclick="openBook(${i})">${b.title}</button>`;
   });
-
-  app.innerHTML += `
-  <div class="author">
-    <h3>Вера Климошенко</h3>
-    <img src="https://i.postimg.cc/8z0t9b2T/author.jpg">
-  </div>`;
 }
 
-/* ОТКРЫТЬ */
 function openBook(i){
   state.book = i;
+  state.screen = "chapters";
+  save();
+  showChapters();
+}
+
+function showChapters(){
+  let b = books[state.book];
+
+  app.innerHTML = `<h1>${b.title}</h1>`;
+
+  b.chapters.forEach((c,i)=>{
+    app.innerHTML += `<button onclick="openChapter(${i})">${c.title}</button>`;
+  });
+}
+
+function openChapter(i){
+  state.chapter = i;
   state.page = 0;
   state.screen = "read";
   save();
   render();
 }
 
-/* РЕНДЕР */
+/* ЧТЕНИЕ */
 function render(){
 
-  if(state.screen === "books"){
-    showBooks();
-    return;
-  }
+  if(state.screen === "books") return showBooks();
+  if(state.screen === "chapters") return showChapters();
 
-  let page = books[state.book].pages[state.page];
+  let page = books[state.book].chapters[state.chapter].pages[state.page];
   app.innerHTML = page;
 }
 
@@ -203,9 +239,9 @@ function render(){
 function next(){
   if(state.screen !== "read") return;
 
-  let b = books[state.book];
+  let pages = books[state.book].chapters[state.chapter].pages;
 
-  if(state.page < b.pages.length-1){
+  if(state.page < pages.length-1){
     state.page++;
   }
 
@@ -218,8 +254,10 @@ function prev(){
     if(state.page > 0){
       state.page--;
     } else {
-      state.screen = "books";
+      state.screen = "chapters";
     }
+  } else if(state.screen === "chapters"){
+    state.screen = "books";
   }
 
   save();
@@ -230,6 +268,7 @@ function prev(){
 function save(){
   localStorage.setItem("screen", state.screen);
   localStorage.setItem("book", state.book);
+  localStorage.setItem("chapter", state.chapter);
   localStorage.setItem("page", state.page);
 }
 
