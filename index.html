@@ -9,157 +9,164 @@
 <style>
 body {
   margin: 0;
-  background: radial-gradient(circle, #0a0a0a, #000);
+  background: #111;
   font-family: Georgia, serif;
-  overflow: hidden;
 }
 
-.scene {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.container {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+  background: #fdfbf7;
+  min-height: 100vh;
 }
 
-.book {
-  width: 360px;
-  height: 460px;
-  perspective: 3000px;
-  position: relative;
-}
-
-.left, .right {
-  position: absolute;
-  width: 50%;
-  height: 100%;
-  background: #f4f1ea;
-  padding: 15px;
-  box-sizing: border-box;
-}
-
-.left { left: 0; }
-.right { right: 0; }
-
-.flip {
-  position: absolute;
-  width: 50%;
-  height: 100%;
-  right: 0;
-  background: #f4f1ea;
-  transform-origin: left;
-}
-
-.title {
+h1 {
   text-align: center;
-  margin-bottom: 10px;
+  margin-top: 40px;
 }
 
-.text {
-  line-height: 1.6;
+h2 {
+  margin-top: 40px;
 }
 
-.poem {
-  font-style: italic;
-  line-height: 1.7;
+.page {
+  margin-bottom: 60px;
+  line-height: 1.8;
+  font-size: 18px;
+}
+
+.nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #000;
+  color: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+}
+
+button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="scene">
-  <div class="book">
-    <div class="left" id="left"></div>
-    <div class="right" id="right"></div>
-    <div class="flip" id="flip"></div>
-  </div>
+<div class="container" id="content"></div>
+
+<div class="nav">
+  <button onclick="prev()">⬅️</button>
+  <button onclick="next()">➡️</button>
 </div>
 
-<audio id="sound" src="https://www.soundjay.com/page-flip-01a.mp3"></audio>
-
 <script>
-let book = [
 
-["", "Слова — это следы души<br><br>Вера Климошенко"],
+let pages = [
 
-["Предисловие",
-"Это книга тишины.<br><br>Книга чувств, которые не всегда можно сказать вслух."],
+`<h1>Слова — это следы души</h1>
+<p style="text-align:center;">Вера Климошенко</p>`,
 
-["Рассказ",
-"Ночь была тихой.<br><br>Город словно замер, слушая свои собственные мысли."],
+`<h2>А ты пойдёшь с нами, Господи?</h2>
+<p>
+Этот день я вспоминаю всегда, когда проезжаю по Спрингфилдскому мосту.
+Этот день навсегда остался в моей памяти.
+</p>`,
 
-["Продолжение",
-"Окна домов светились мягким светом,<br>словно внутри каждого происходило что-то важное."],
+`<p>
+Прямого поезда на Брест не было.  
+Поэтому нам нужно было торопиться.
+</p>`,
 
-["Ещё",
-"Иногда кажется, что тишина говорит громче слов."],
+`<p>
+Оставив вещи, мы поспешили в город.  
+Ранняя весна наполняла душу радостью.
+</p>`,
 
-["Финал",
-"И, возможно, именно в этой тишине мы находим себя."]
+`<p>
+Но вот электричка...  
+Господь идёт впереди нас.
+</p>`,
+
+`<p>
+И вдруг — ошибка...  
+Мы оказались не на том берегу.
+</p>`,
+
+`<p>
+Господи, что делать?  
+И вдруг мысль — идти по льду.
+</p>`,
+
+`<p>
+Первый шаг был самым трудным.  
+Сердце билось всё сильнее.
+</p>`,
+
+`<p>
+Мы шли по льду...  
+Каждый шаг был испытанием.
+</p>`,
+
+`<p>
+И вот берег.  
+Мы дошли.
+</p>`,
+
+`<p>
+Но чудо только начиналось...  
+Мы оказались в нужном доме.
+</p>`,
+
+`<p>
+А затем бег к поезду...  
+И последние секунды.
+</p>`,
+
+`<p>
+Мы успели.  
+Слава Богу.
+</p>`,
+
+`<p>
+Этот день навсегда остался в моей душе —  
+как свидетельство Божьей помощи.
+</p>`
 
 ];
 
-let index = 0;
-let startX = 0;
-let dragging = false;
+let current = 0;
 
 function render() {
-  left.innerHTML = "<h3 class='title'>"+book[index][0]+"</h3>";
-  right.innerHTML = "<div class='text'>"+book[index][1]+"</div>";
-  flip.innerHTML = "<div class='text'>"+(book[index+1]?.[1]||"")+"</div>";
+  document.getElementById("content").innerHTML =
+    "<div class='page'>" + pages[current] + "</div>";
+
+  localStorage.setItem("page", current);
 }
 
-/* DRAG */
-document.addEventListener("mousedown", start);
-document.addEventListener("touchstart", start);
-
-function start(e){
-  startX = e.touches ? e.touches[0].clientX : e.clientX;
-  dragging = true;
-}
-
-document.addEventListener("mousemove", move);
-document.addEventListener("touchmove", move);
-
-function move(e){
-  if(!dragging) return;
-
-  let x = e.touches ? e.touches[0].clientX : e.clientX;
-  let dx = startX - x;
-
-  let percent = Math.min(Math.max(dx/300,0),1);
-  let angle = percent * -180;
-
-  flip.style.transform = "rotateY("+angle+"deg)";
-}
-
-document.addEventListener("mouseup", end);
-document.addEventListener("touchend", end);
-
-function end(e){
-  if(!dragging) return;
-  dragging = false;
-
-  let x = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-  let dx = startX - x;
-
-  if(dx > 100 && index < book.length-1){
-    index++;
-    play();
+function next() {
+  if (current < pages.length - 1) {
+    current++;
+    render();
   }
+}
 
-  flip.style.transform = "rotateY(0deg)";
+function prev() {
+  if (current > 0) {
+    current--;
+    render();
+  }
+}
+
+window.onload = () => {
+  current = parseInt(localStorage.getItem("page")) || 0;
   render();
-}
-
-function play(){
-  let s = document.getElementById("sound");
-  s.currentTime = 0;
-  s.play();
-}
-
-window.onload = render;
+};
 </script>
 
 </body>
