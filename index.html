@@ -3,104 +3,115 @@
 <head>
 <meta charset="UTF-8">
 <title>Вера Климошенко — Слова это следы души</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
-  margin: 0;
+  margin:0;
   font-family: Georgia, serif;
-  background: #0b0b0b;
-  color: white;
+  background:#000;
+  color:white;
+}
+
+/* 🌌 ФОН */
+.bg {
+  position:fixed;
+  width:100%;
+  height:100%;
+  z-index:-1;
+}
+.star {
+  position:absolute;
+  width:2px;
+  height:2px;
+  background:white;
+  opacity:0.7;
+  animation:move 10s linear infinite;
+}
+@keyframes move {
+  from{transform:translateY(0);}
+  to{transform:translateY(100vh);}
 }
 
 /* ГЛАВНАЯ */
 .hero {
-  height: 100vh;
-  background: radial-gradient(circle, #111, #000);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 }
 
-.hero h1 {
-  font-size: 42px;
-}
-
-.hero p {
-  opacity: 0.7;
-}
+.hero h1 {font-size:42px;}
+.hero p {opacity:0.7;}
 
 .btn {
-  margin-top: 20px;
-  padding: 12px 25px;
-  border: 1px solid white;
-  background: none;
-  color: white;
-  cursor: pointer;
+  margin-top:20px;
+  padding:12px 25px;
+  border:1px solid white;
+  background:none;
+  color:white;
+  cursor:pointer;
 }
 
 /* КНИГА */
 .book {
-  background: #fdfbf7;
-  color: black;
-  padding: 30px;
-  border-radius: 12px;
-  max-width: 700px;
-  margin: 40px auto;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  background:#fdfbf7;
+  color:black;
+  max-width:700px;
+  margin:40px auto;
+  padding:30px;
+  border-radius:12px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.7);
 }
 
 .page {
-  font-size: 18px;
-  line-height: 1.8;
+  font-size:18px;
+  line-height:1.8;
 }
 
+/* КНОПКИ */
 .controls {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+  display:flex;
+  justify-content:space-between;
+  margin-top:20px;
 }
 
 /* АВТОР */
 .about {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
-  align-items: center;
-  max-width: 900px;
-  margin: 60px auto;
-  padding: 20px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:30px;
+  align-items:center;
+  max-width:900px;
+  margin:60px auto;
+  padding:20px;
 }
 
 .about img {
-  width: 260px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  width:260px;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.6);
 }
 
-.about-text {
-  max-width: 500px;
-}
-
-/* ФУТЕР */
 .footer {
-  text-align: center;
-  padding: 20px;
-  opacity: 0.6;
+  text-align:center;
+  padding:20px;
+  opacity:0.5;
 }
 </style>
 </head>
 
 <body>
 
+<div class="bg" id="bg"></div>
+
 <!-- ГЛАВНАЯ -->
 <div class="hero">
   <div>
     <h1>Вера Климошенко</h1>
     <p>Слова — это следы души</p>
-    <button class="btn" onclick="scrollToBook()">Читать книгу</button>
+    <button class="btn" onclick="go()">Читать книгу</button>
   </div>
 </div>
 
@@ -109,131 +120,71 @@ body {
   <div id="content" class="page"></div>
 
   <div class="controls">
-    <button onclick="prev()">⬅️ Назад</button>
-    <button onclick="next()">Вперёд ➡️</button>
+    <button onclick="prev()">⬅️</button>
+    <button onclick="next()">➡️</button>
   </div>
 </div>
 
 <!-- АВТОР -->
 <div class="about">
 
-<img src="photo.jpg">
+<img src="photo.jpg" onerror="this.style.display='none'">
 
-<div class="about-text">
+<div>
 <h2>Об авторе</h2>
 <p>
 Вера Климошенко — автор произведений о вере, тишине и глубине души.
 </p>
-<p>
-Её тексты — это отражение внутреннего мира,
-переживаний и поиска света.
-</p>
 </div>
 
 </div>
 
-<div class="footer">
-© Вера Климошенко
-</div>
+<div class="footer">© Вера Климошенко</div>
 
 <script>
 
-/* КНИГА (ВСЕ РАССКАЗЫ) */
+/* 🌌 ЗВЁЗДЫ */
+for(let i=0;i<60;i++){
+  let s=document.createElement("div");
+  s.className="star";
+  s.style.left=Math.random()*100+"%";
+  s.style.top=Math.random()*100+"%";
+  document.getElementById("bg").appendChild(s);
+}
+
+/* КНИГА */
 let pages = [
 
 `<h2>Слова — это следы души</h2>
 <p style="text-align:center;">Вера Климошенко</p>`,
 
 `<h3>А ты пойдёшь с нами, Господи?</h3>
-<p>
-Этот день я вспоминаю всегда, когда проезжаю по мосту.
-Этот день навсегда остался в моей памяти.
-</p>`,
+<p>Этот день я вспоминаю всегда, когда проезжаю по мосту...</p>`,
 
-`<p>
-Прямого поезда на Брест не было.  
-Поэтому нам нужно было торопиться.
-</p>`,
+`<p>Прямого поезда не было. Нам нужно было торопиться.</p>`,
 
-`<p>
-Оставив вещи, мы поспешили в город.  
-Ранняя весна наполняла душу радостью.
-</p>`,
+`<p>Мы шли по льду. Каждый шаг был испытанием.</p>`,
 
-`<p>
-Но вот электричка...  
-Господь идёт впереди нас.
-</p>`,
-
-`<p>
-И вдруг — ошибка...  
-Мы оказались не на том берегу.
-</p>`,
-
-`<p>
-Господи, что делать?  
-И вдруг мысль — идти по льду.
-</p>`,
-
-`<p>
-Первый шаг был самым трудным.  
-Сердце билось всё сильнее.
-</p>`,
-
-`<p>
-Мы шли по льду...  
-Каждый шаг был испытанием.
-</p>`,
-
-`<p>
-И вот берег...  
-Мы дошли.
-</p>`,
-
-`<p>
-Но чудо только начиналось...  
-Мы оказались в нужном доме.
-</p>`,
-
-`<p>
-А затем бег к поезду...  
-И последние секунды.
-</p>`,
-
-`<p>
-Мы успели.  
-Слава Богу.
-</p>`,
-
-`<p>
-Этот день навсегда остался в моей душе —  
-как свидетельство Божьей помощи.
-</p>`
+`<p>Мы успели. Слава Богу.</p>`
 
 ];
 
 let current = 0;
 
 function render(){
-  document.getElementById("content").innerHTML = pages[current];
+  content.innerHTML = pages[current];
   localStorage.setItem("page", current);
 }
 
 function next(){
-  if(current < pages.length-1){
-    current++;
-    render();
-  }
+  if(current < pages.length-1){current++; render();}
 }
 
 function prev(){
-  if(current > 0){
-    current--;
-    render();
-  }
+  if(current > 0){current--; render();}
 }
 
-function scrollToBook(){
+function go(){
   document.getElementById("book").scrollIntoView({behavior:"smooth"});
 }
 
@@ -241,7 +192,6 @@ window.onload = () => {
   current = parseInt(localStorage.getItem("page")) || 0;
   render();
 };
-
 </script>
 
 </body>
