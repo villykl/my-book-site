@@ -5,8 +5,6 @@
 <title>Слова — это следы души</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="manifest" href="manifest.json">
-
 <style>
 body {
   margin:0;
@@ -25,15 +23,17 @@ body {
   width:220px;
   display:block;
   margin:20px auto;
+  border-radius:12px;
 }
 
 .controls {
   position:fixed;
   bottom:0;
   width:100%;
+  background:white;
   display:flex;
   justify-content:space-around;
-  background:white;
+  padding:10px;
 }
 
 button {
@@ -54,54 +54,36 @@ p {
 
 <div class="controls">
   <button onclick="prev()">⬅️</button>
-  <button onclick="installApp()">📲</button>
   <button onclick="next()">➡️</button>
 </div>
 
 <script>
 
-/* регистрация PWA */
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
-}
-
-let deferredPrompt;
-
-window.addEventListener("beforeinstallprompt", (e)=>{
-  e.preventDefault();
-  deferredPrompt = e;
-});
-
-/* установка */
-function installApp(){
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(()=> deferredPrompt=null);
-  } else {
-    alert("Нажми 'Добавить на экран' в браузере 📲");
-  }
-}
-
-/* обложка */
+/* 🔥 РАБОЧАЯ ОБЛОЖКА */
 const COVER = "https://i.imgur.com/8QZ7Z8T.png";
 
 /* текст */
 let text = `
 А ты пойдёшь с нами, Господи?
 
-Этот день я вспоминаю всегда...
+Этот день я вспоминаю всегда, когда проезжаю по мосту.
+
+Прямого поезда не было. Нам нужно было торопиться.
+
+Мы оказались не на том берегу...
 
 Мы шли по льду...
 
 Мы успели. Слава Богу.
 `;
 
+/* разбивка */
 function splitText(t){
   let words = t.split(" ");
   let pages=[],page="";
   words.forEach(w=>{
     page+=w+" ";
-    if(page.length>900){
+    if(page.length>800){
       pages.push(page);
       page="";
     }
@@ -111,7 +93,7 @@ function splitText(t){
 }
 
 let pages = splitText(text);
-let page = 0;
+let page = -1;
 
 /* рендер */
 function render(){
@@ -128,11 +110,12 @@ function render(){
   app.innerHTML = `<p>${pages[page]}</p>`;
 }
 
+/* кнопки */
 function next(){
   if(page < pages.length-1){
     page++;
-    render();
   }
+  render();
 }
 
 function prev(){
