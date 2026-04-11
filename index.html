@@ -25,12 +25,22 @@ body {
   text-align:center;
 }
 
-.hero img {
-  width:140px;
-  border-radius:50%;
-  margin-top:20px;
+/* ОБЛОЖКА */
+.cover {
+  width:220px;
+  margin:20px auto;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
+/* АВТОР */
+.author img {
+  width:120px;
+  border-radius:50%;
+  margin-top:15px;
+}
+
+/* ТЕКСТ */
 p {
   font-size:20px;
   line-height:1.8;
@@ -38,6 +48,7 @@ p {
   text-indent:2em;
 }
 
+/* КНОПКИ */
 button {
   padding:12px;
   margin:10px;
@@ -46,7 +57,6 @@ button {
   border-radius:10px;
   background:black;
   color:white;
-  cursor:pointer;
 }
 
 .dark button {
@@ -54,14 +64,7 @@ button {
   color:black;
 }
 
-.controls {
-  position:fixed;
-  bottom:10px;
-  width:100%;
-  display:flex;
-  justify-content:space-around;
-}
-
+/* ПРОГРЕСС */
 .progress {
   position:fixed;
   top:0;
@@ -73,6 +76,15 @@ button {
 
 .dark .progress {
   background:white;
+}
+
+/* ПАНЕЛЬ */
+.controls {
+  position:fixed;
+  bottom:10px;
+  width:100%;
+  display:flex;
+  justify-content:space-around;
 }
 </style>
 </head>
@@ -103,7 +115,7 @@ let state = {
 let text = `
 А ты пойдёшь с нами, Господи?
 
-Этот день я вспоминаю всегда...
+Этот день я вспоминаю всегда, когда проезжаю по мосту.
 
 Мы шли по льду...
 
@@ -130,21 +142,23 @@ let pages = splitText(text);
 /* ГЛАВНАЯ */
 function showHome(){
   app.innerHTML = `
-  <div class="hero">
-    <h1>Вера Климошенко</h1>
-    <p style="opacity:0.7;">Автор книги</p>
+  <h1>Вера Климошенко</h1>
 
+  <div class="author">
     <img src="https://i.postimg.cc/8z0t9b2T/author.jpg">
-
-    <h2 style="margin-top:30px;">Слова — это следы души</h2>
-
-    <p style="opacity:0.8; max-width:500px; margin:auto;">
-    Живые истории о вере, надежде и Божьей помощи
-    </p>
-
-    <button onclick="openBook()">📖 Читать</button>
-    <button onclick="buyBook()">💳 Купить</button>
   </div>
+
+  <h2>Слова — это следы души</h2>
+
+  <!-- ОБЛОЖКА -->
+  <img class="cover" src="https://images.unsplash.com/photo-1519681393784-d120267933ba">
+
+  <p style="opacity:0.8; max-width:500px; margin:auto;">
+  Эта книга — живые истории о вере, надежде и Божьей помощи.
+  </p>
+
+  <button onclick="openBook()">📖 Читать</button>
+  <button onclick="buyBook()">💳 Купить</button>
   `;
 }
 
@@ -155,7 +169,7 @@ function openBook(){
   render();
 }
 
-/* 💰 ПОКУПКА */
+/* ПОКУПКА */
 function buyBook(){
   window.open(BUY_LINK, "_blank");
 }
@@ -180,7 +194,7 @@ function render(){
   progress.style.width = percent+"%";
 }
 
-/* навигация */
+/* НАВИГАЦИЯ */
 function next(){
   if(state.screen!=="read") return;
   if(state.page < pages.length-1){
@@ -200,12 +214,12 @@ function prev(){
   }
 }
 
-/* тема */
+/* ТЕМА */
 function toggleTheme(){
   document.body.classList.toggle("dark");
 }
 
-/* старт */
+/* СТАРТ */
 window.onload = showHome;
 
 </script>
