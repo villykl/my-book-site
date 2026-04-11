@@ -11,55 +11,79 @@ body {
   font-family: Georgia, serif;
   background:#fdfbf7;
   color:#222;
-  overflow:hidden;
 }
 
-#book {
-  display:flex;
-  width:100vw;
-  height:100vh;
-  transition:transform 0.4s ease;
+#app {
+  max-width:700px;
+  margin:auto;
+  padding:20px;
 }
 
-.page {
-  min-width:100vw;
-  height:100vh;
-  padding:30px;
-  box-sizing:border-box;
-  overflow-y:auto;
-}
-
-.cover {
+h1, h2 {
   text-align:center;
 }
 
 .cover img {
-  width:200px;
-  margin:20px;
+  width:220px;
+  display:block;
+  margin:20px auto;
   border-radius:12px;
+}
+
+.menu {
+  text-align:center;
+  margin:20px 0;
+}
+
+.menu button {
+  padding:10px;
+  margin:5px;
+  font-size:16px;
 }
 
 p {
   line-height:1.8;
   text-indent:2em;
-  font-size:20px;
+  margin-bottom:20px;
+}
+
+.poem {
+  text-indent:0;
+  white-space:pre-line;
+  text-align:center;
 }
 </style>
 </head>
 
 <body>
 
-<div id="book"></div>
+<div id="app"></div>
 
 <script>
 
-/* обложка */
+/* 📕 ОБЛОЖКА */
 const COVER = "https://i.imgur.com/8QZ7Z8T.png";
 
-/* текст */
-let text = `
-А ты пойдёшь с нами, Господи?
+/* 📚 КНИГА */
+let book = [
 
+{
+  type: "cover"
+},
+
+{
+  type: "menu",
+  title: "Оглавление",
+  items: [
+    "Рассказ 1",
+    "Стих 1"
+  ]
+},
+
+{
+  type: "story",
+  title: "А ты пойдёшь с нами, Господи?",
+  text: `
 Этот день я вспоминаю всегда, когда проезжаю по мосту.
 
 Прямого поезда не было. Нам нужно было торопиться.
@@ -69,46 +93,89 @@ let text = `
 Мы шли по льду...
 
 Мы успели. Слава Богу.
-`;
+`
+},
 
-/* разбивка */
-function splitText(t){
-  let words = t.split(" ");
-  let pages=[],page="";
-  words.forEach(w=>{
-    page+=w+" ";
-    if(page.length>800){
-      pages.push(page);
-      page="";
-    }
-  });
-  if(page) pages.push(page);
-  return pages;
+{
+  type: "poem",
+  title: "О Небе",
+  text: `
+А о Небе я с детства мечтала
+Я мечтала о нём и тогда
+Когда буря кругом завывала
+И когда в дом врывалась беда
+`
 }
 
-let content = splitText(text);
-
-/* создаём страницы */
-let pages = [
-  `<div class="cover">
-     <h1>Слова — это следы души</h1>
-     <img src="${COVER}">
-     <h3>Вера Климошенко</h3>
-   </div>`,
-  ...content.map(p => `<p>${p}</p>`)
 ];
 
 let current = 0;
 
 /* рендер */
 function render(){
-  book.innerHTML = pages.map(p => `<div class="page">${p}</div>`).join("");
-  update();
+
+  let page = book[current];
+
+  if(page.type === "cover"){
+    app.innerHTML = `
+      <h1>Слова — это следы души</h1>
+      <div class="cover">
+        <img src="${COVER}">
+      </div>
+      <h3 style="text-align:center;">Вера Климошенко</h3>
+      <div class="menu">
+        <button onclick="next()">Открыть книгу</button>
+      </div>
+    `;
+    return;
+  }
+
+  if(page.type === "menu"){
+    app.innerHTML = `
+      <h2>${page.title}</h2>
+      <div class="menu">
+        ${page.items.map((item,i)=>`
+          <button onclick="go(${i+2})">${item}</button>
+        `).join("")}
+      </div>
+    `;
+    return;
+  }
+
+  if(page.type === "story"){
+    app.innerHTML = `
+      <h2>${page.title}</h2>
+      <p>${page.text}</p>
+    `;
+  }
+
+  if(page.type === "poem"){
+    app.innerHTML = `
+      <h2>${page.title}</h2>
+      <p class="poem">${page.text}</p>
+    `;
+  }
+
 }
 
-/* движение */
-function update(){
-  book.style.transform = `translateX(-${current * 100}vw)`;
+/* управление */
+function next(){
+  if(current < book.length-1){
+    current++;
+    render();
+  }
+}
+
+function prev(){
+  if(current > 0){
+    current--;
+    render();
+  }
+}
+
+function go(i){
+  current = i;
+  render();
 }
 
 /* свайп */
@@ -121,25 +188,8 @@ document.addEventListener("touchstart", e=>{
 document.addEventListener("touchend", e=>{
   let endX = e.changedTouches[0].clientX;
 
-  if(startX - endX > 50 && current < pages.length-1){
-    current++;
-  }
-
-  if(endX - startX > 50 && current > 0){
-    current--;
-  }
-
-  update();
-});
-
-/* клик (ПК) */
-document.addEventListener("click", e=>{
-  if(e.clientX > window.innerWidth/2 && current < pages.length-1){
-    current++;
-  } else if(current > 0){
-    current--;
-  }
-  update();
+  if(startX - endX > 50) next();
+  if(endX - startX > 50) prev();
 });
 
 render();
