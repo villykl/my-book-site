@@ -57,14 +57,14 @@ p {
 
 <script>
 
-/* 🔥 ОБЛОЖКА (УЖЕ ГОТОВАЯ — РАБОТАЕТ СРАЗУ) */
-const COVER = "https://images.unsplash.com/photo-1519681393784-d120267933ba";
+/* 🔥 ТВОЯ ОБЛОЖКА (УЖЕ РАБОТАЕТ) */
+const COVER = "https://i.postimg.cc/8z0t9b2T/author.jpg";
 
 /* текст */
 let text = `
 А ты пойдёшь с нами, Господи?
 
-Этот день я вспоминаю всегда...
+Этот день я вспоминаю всегда, когда проезжаю по мосту.
 
 Мы шли по льду...
 
@@ -94,11 +94,12 @@ function showHome(){
   <h1>Вера Климошенко</h1>
 
   <div class="author">
-    <img src="https://i.postimg.cc/8z0t9b2T/author.jpg">
+    <img src="${COVER}">
   </div>
 
   <h2>Слова — это следы души</h2>
 
+  <!-- ОБЛОЖКА -->
   <img class="cover" src="${COVER}">
 
   <p style="opacity:0.8; max-width:500px; margin:auto;">
