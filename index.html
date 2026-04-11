@@ -18,17 +18,11 @@ body {
   color:#eee;
 }
 
-/* контейнер */
 .container {
   max-width:700px;
   margin:auto;
   padding:20px;
-}
-
-/* главная */
-.hero {
   text-align:center;
-  padding:40px 20px;
 }
 
 .hero img {
@@ -37,14 +31,6 @@ body {
   margin-top:20px;
 }
 
-/* книга */
-.book-cover {
-  width:200px;
-  display:block;
-  margin:20px auto;
-}
-
-/* текст */
 p {
   font-size:20px;
   line-height:1.8;
@@ -52,15 +38,22 @@ p {
   text-indent:2em;
 }
 
-/* кнопки */
 button {
   padding:12px;
-  margin:10px 0;
-  width:100%;
+  margin:10px;
   font-size:18px;
+  border:none;
+  border-radius:10px;
+  background:black;
+  color:white;
+  cursor:pointer;
 }
 
-/* панель */
+.dark button {
+  background:white;
+  color:black;
+}
+
 .controls {
   position:fixed;
   bottom:10px;
@@ -69,11 +62,6 @@ button {
   justify-content:space-around;
 }
 
-.controls button {
-  width:auto;
-}
-
-/* прогресс */
 .progress {
   position:fixed;
   top:0;
@@ -97,42 +85,32 @@ button {
 <div class="controls">
   <button onclick="prev()">⬅️</button>
   <button onclick="toggleTheme()">🌙</button>
-  <button onclick="downloadPDF()">📄</button>
   <button onclick="next()">➡️</button>
 </div>
 
 <script>
 
+/* 👉 ВСТАВЬ СЮДА СВОЮ ССЫЛКУ Gumroad */
+const BUY_LINK = "https://ВАША_ССЫЛКА.gumroad.com/l/book";
+
 /* состояние */
 let state = {
   screen: "home",
-  book: 0,
   page: 0
 };
 
-/* текст книги */
+/* текст */
 let text = `
 А ты пойдёшь с нами, Господи?
 
-Этот день я вспоминаю всегда, когда проезжаю по мосту.
-Этот день навсегда остался в моей памяти.
-
-Прямого поезда не было.
-Поэтому нам нужно было торопиться.
-
-Оставив вещи, мы поспешили в город.
-
-И вдруг — ошибка...
-Мы оказались не на том берегу.
-
-Господи, что делать?
+Этот день я вспоминаю всегда...
 
 Мы шли по льду...
 
 Мы успели. Слава Богу.
 `;
 
-/* авто страницы */
+/* страницы */
 function splitText(t){
   let words = t.split(" ");
   let pages=[],page="";
@@ -149,8 +127,7 @@ function splitText(t){
 
 let pages = splitText(text);
 
-/* ЭКРАНЫ */
-
+/* ГЛАВНАЯ */
 function showHome(){
   app.innerHTML = `
   <div class="hero">
@@ -162,39 +139,34 @@ function showHome(){
     <h2 style="margin-top:30px;">Слова — это следы души</h2>
 
     <p style="opacity:0.8; max-width:500px; margin:auto;">
-    Эта книга — живые истории о вере, надежде и Божьей помощи.
+    Живые истории о вере, надежде и Божьей помощи
     </p>
 
     <button onclick="openBook()">📖 Читать</button>
-    <button onclick="showBuy()">💰 Купить</button>
+    <button onclick="buyBook()">💳 Купить</button>
   </div>
   `;
 }
 
+/* ЧТЕНИЕ */
 function openBook(){
   state.screen="read";
   state.page=0;
   render();
 }
 
-function showBuy(){
-  app.innerHTML = `
-  <h1>Купить книгу</h1>
-
-  <img class="book-cover" src="https://i.postimg.cc/8z0t9b2T/author.jpg">
-
-  <p style="text-align:center;">
-  Книга доступна в электронном формате (PDF)
-  </p>
-
-  <button onclick="downloadPDF()">📄 Скачать PDF</button>
-  <button onclick="showHome()">⬅️ Назад</button>
-  `;
+/* 💰 ПОКУПКА */
+function buyBook(){
+  window.open(BUY_LINK, "_blank");
 }
 
+/* РЕНДЕР */
 function render(){
 
-  if(state.screen==="home") return showHome();
+  if(state.screen==="home"){
+    showHome();
+    return;
+  }
 
   let page = pages[state.page];
 
@@ -226,11 +198,6 @@ function prev(){
       showHome();
     }
   }
-}
-
-/* PDF */
-function downloadPDF(){
-  window.print();
 }
 
 /* тема */
