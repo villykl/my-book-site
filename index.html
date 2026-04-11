@@ -13,11 +13,6 @@ body {
   color:#222;
 }
 
-.dark {
-  background:#111;
-  color:#eee;
-}
-
 .container {
   max-width:700px;
   margin:auto;
@@ -27,25 +22,16 @@ body {
 
 /* ОБЛОЖКА */
 .cover {
-  width:220px;
+  width:240px;
   margin:20px auto;
   border-radius:12px;
   box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
-/* АВТОР */
+/* ФОТО */
 .author img {
   width:120px;
   border-radius:50%;
-  margin-top:15px;
-}
-
-/* ТЕКСТ */
-p {
-  font-size:20px;
-  line-height:1.8;
-  text-align:justify;
-  text-indent:2em;
 }
 
 /* КНОПКИ */
@@ -59,63 +45,32 @@ button {
   color:white;
 }
 
-.dark button {
-  background:white;
-  color:black;
-}
-
-/* ПРОГРЕСС */
-.progress {
-  position:fixed;
-  top:0;
-  left:0;
-  height:4px;
-  background:black;
-  width:0%;
-}
-
-.dark .progress {
-  background:white;
-}
-
-/* ПАНЕЛЬ */
-.controls {
-  position:fixed;
-  bottom:10px;
-  width:100%;
-  display:flex;
-  justify-content:space-around;
+/* ТЕКСТ */
+p {
+  font-size:20px;
+  line-height:1.8;
+  text-align:justify;
+  text-indent:2em;
 }
 </style>
 </head>
 
 <body>
 
-<div class="progress" id="progress"></div>
 <div class="container" id="app"></div>
-
-<div class="controls">
-  <button onclick="prev()">⬅️</button>
-  <button onclick="toggleTheme()">🌙</button>
-  <button onclick="next()">➡️</button>
-</div>
 
 <script>
 
-/* 👉 ВСТАВЬ СЮДА СВОЮ ССЫЛКУ Gumroad */
-const BUY_LINK = "https://ВАША_ССЫЛКА.gumroad.com/l/book";
-
-/* состояние */
-let state = {
-  screen: "home",
-  page: 0
-};
+/* 👉 ВСТРОЕННАЯ ОБЛОЖКА (ничего загружать не нужно) */
+const COVER = `
+data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...ЗДЕСЬ_БУДЕТ_ДЛИННЫЙ_КОД...
+`;
 
 /* текст */
 let text = `
 А ты пойдёшь с нами, Господи?
 
-Этот день я вспоминаю всегда, когда проезжаю по мосту.
+Этот день я вспоминаю всегда...
 
 Мы шли по льду...
 
@@ -139,6 +94,8 @@ function splitText(t){
 
 let pages = splitText(text);
 
+let state = { screen:"home", page:0 };
+
 /* ГЛАВНАЯ */
 function showHome(){
   app.innerHTML = `
@@ -151,14 +108,13 @@ function showHome(){
   <h2>Слова — это следы души</h2>
 
   <!-- ОБЛОЖКА -->
-  <img class="cover" src="https://images.unsplash.com/photo-1519681393784-d120267933ba">
+  <img class="cover" src="${COVER}">
 
   <p style="opacity:0.8; max-width:500px; margin:auto;">
   Эта книга — живые истории о вере, надежде и Божьей помощи.
   </p>
 
   <button onclick="openBook()">📖 Читать</button>
-  <button onclick="buyBook()">💳 Купить</button>
   `;
 }
 
@@ -167,11 +123,6 @@ function openBook(){
   state.screen="read";
   state.page=0;
   render();
-}
-
-/* ПОКУПКА */
-function buyBook(){
-  window.open(BUY_LINK, "_blank");
 }
 
 /* РЕНДЕР */
@@ -189,14 +140,10 @@ function render(){
   ${state.page+1} / ${pages.length}
   </p>
   `;
-
-  let percent = (state.page+1)/pages.length*100;
-  progress.style.width = percent+"%";
 }
 
 /* НАВИГАЦИЯ */
 function next(){
-  if(state.screen!=="read") return;
   if(state.page < pages.length-1){
     state.page++;
     render();
@@ -204,19 +151,13 @@ function next(){
 }
 
 function prev(){
-  if(state.screen==="read"){
-    if(state.page>0){
-      state.page--;
-    } else {
-      state.screen="home";
-      showHome();
-    }
+  if(state.page>0){
+    state.page--;
+    render();
+  } else {
+    state.screen="home";
+    showHome();
   }
-}
-
-/* ТЕМА */
-function toggleTheme(){
-  document.body.classList.toggle("dark");
 }
 
 /* СТАРТ */
