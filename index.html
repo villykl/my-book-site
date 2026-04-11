@@ -11,55 +11,49 @@ body {
   font-family: Georgia, serif;
   background:#fdfbf7;
   color:#222;
+  overflow:hidden;
 }
 
-#app {
-  max-width:700px;
-  margin:auto;
-  padding:20px;
+#book {
+  display:flex;
+  width:100vw;
+  height:100vh;
+  transition:transform 0.4s ease;
+}
+
+.page {
+  min-width:100vw;
+  height:100vh;
+  padding:30px;
+  box-sizing:border-box;
+  overflow-y:auto;
 }
 
 .cover {
-  width:220px;
-  display:block;
-  margin:20px auto;
+  text-align:center;
+}
+
+.cover img {
+  width:200px;
+  margin:20px;
   border-radius:12px;
-}
-
-.controls {
-  position:fixed;
-  bottom:0;
-  width:100%;
-  background:white;
-  display:flex;
-  justify-content:space-around;
-  padding:10px;
-}
-
-button {
-  padding:10px;
-  font-size:16px;
 }
 
 p {
   line-height:1.8;
   text-indent:2em;
+  font-size:20px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="app"></div>
-
-<div class="controls">
-  <button onclick="prev()">⬅️</button>
-  <button onclick="next()">➡️</button>
-</div>
+<div id="book"></div>
 
 <script>
 
-/* 🔥 РАБОЧАЯ ОБЛОЖКА */
+/* обложка */
 const COVER = "https://i.imgur.com/8QZ7Z8T.png";
 
 /* текст */
@@ -92,40 +86,61 @@ function splitText(t){
   return pages;
 }
 
-let pages = splitText(text);
-let page = -1;
+let content = splitText(text);
+
+/* создаём страницы */
+let pages = [
+  `<div class="cover">
+     <h1>Слова — это следы души</h1>
+     <img src="${COVER}">
+     <h3>Вера Климошенко</h3>
+   </div>`,
+  ...content.map(p => `<p>${p}</p>`)
+];
+
+let current = 0;
 
 /* рендер */
 function render(){
-
-  if(page === -1){
-    app.innerHTML = `
-    <h1 style="text-align:center;">Слова — это следы души</h1>
-    <img class="cover" src="${COVER}">
-    <h3 style="text-align:center;">Вера Климошенко</h3>
-    `;
-    return;
-  }
-
-  app.innerHTML = `<p>${pages[page]}</p>`;
+  book.innerHTML = pages.map(p => `<div class="page">${p}</div>`).join("");
+  update();
 }
 
-/* кнопки */
-function next(){
-  if(page < pages.length-1){
-    page++;
-  }
-  render();
+/* движение */
+function update(){
+  book.style.transform = `translateX(-${current * 100}vw)`;
 }
 
-function prev(){
-  if(page > 0){
-    page--;
-  } else {
-    page = -1;
+/* свайп */
+let startX = 0;
+
+document.addEventListener("touchstart", e=>{
+  startX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchend", e=>{
+  let endX = e.changedTouches[0].clientX;
+
+  if(startX - endX > 50 && current < pages.length-1){
+    current++;
   }
-  render();
-}
+
+  if(endX - startX > 50 && current > 0){
+    current--;
+  }
+
+  update();
+});
+
+/* клик (ПК) */
+document.addEventListener("click", e=>{
+  if(e.clientX > window.innerWidth/2 && current < pages.length-1){
+    current++;
+  } else if(current > 0){
+    current--;
+  }
+  update();
+});
 
 render();
 
