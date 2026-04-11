@@ -2,182 +2,102 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Вера Климошенко — Книга</title>
+<title>Книга — Вера Климошенко</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
   margin:0;
-  background:#2c2c2c;
-  font-family: Georgia, serif;
+  background:#1e1e1e;
   display:flex;
   justify-content:center;
   align-items:center;
   height:100vh;
+  overflow:hidden;
+  font-family: Georgia, serif;
 }
 
-.book {
+#book {
   width:90%;
-  max-width:800px;
+  max-width:900px;
   height:90vh;
-  perspective:2000px;
-  position:relative;
 }
 
 .page {
-  width:100%;
-  height:100%;
   background:#fdfbf7;
-  position:absolute;
-  left:0;
-  top:0;
-  transform-origin:left;
-  transition:transform 0.8s ease;
-  box-shadow:0 10px 30px rgba(0,0,0,0.5);
-  padding:30px;
-  box-sizing:border-box;
-  overflow:auto;
 }
 
-.page p {
+.page-content {
+  padding:30px;
   font-size:20px;
   line-height:1.8;
   text-indent:2em;
 }
 
-.page.flipped {
-  transform:rotateY(-180deg);
-}
-
-.controls {
-  position:fixed;
-  bottom:20px;
-  width:100%;
+.cover {
   display:flex;
+  flex-direction:column;
+  align-items:center;
   justify-content:center;
-  gap:20px;
+  height:100%;
 }
 
-button {
-  padding:12px 20px;
-  font-size:18px;
-  border:none;
+.cover img {
+  width:220px;
+  margin:20px;
   border-radius:10px;
-  background:white;
-  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="book" id="book"></div>
+<div id="book">
+  <div class="page">
+    <div class="page-content cover">
+      <h1>Слова — это следы души</h1>
+      <img src="https://i.imgur.com/8QZ7Z8T.png">
+      <h3>Вера Климошенко</h3>
+    </div>
+  </div>
 
-<div class="controls">
-  <button onclick="prev()">⬅️</button>
-  <button onclick="next()">➡️</button>
+  <div class="page">
+    <div class="page-content">
+      А ты пойдёшь с нами, Господи?
+
+      Этот день я вспоминаю всегда, когда проезжаю по мосту.
+
+      Прямого поезда не было. Нам нужно было торопиться.
+
+      Мы оказались не на том берегу...
+
+      Мы шли по льду...
+
+      Мы успели. Слава Богу.
+    </div>
+  </div>
+
 </div>
+
+<!-- 🔥 БИБЛИОТЕКА КАК В iBooks -->
+<script src="https://cdn.jsdelivr.net/npm/turn.js@4/turn.min.js"></script>
 
 <script>
+document.addEventListener("DOMContentLoaded", function(){
 
-/* 📕 ОБЛОЖКА */
-const cover = `
-<div style="text-align:center">
-<h1>Слова — это следы души</h1>
-<img src="https://i.imgur.com/8QZ7Z8T.png" style="width:200px; margin:20px;">
-<h3>Вера Климошенко</h3>
-</div>
-`;
+  let book = document.getElementById("book");
 
-/* 📖 ТЕКСТ */
-let text = `
-А ты пойдёшь с нами, Господи?
-
-Этот день я вспоминаю всегда, когда проезжаю по мосту.
-
-Прямого поезда не было. Нам нужно было торопиться.
-
-Мы оказались не на том берегу...
-
-Мы шли по льду...
-
-Мы успели. Слава Богу.
-`;
-
-/* разбивка */
-function splitText(t){
-  let words = t.split(" ");
-  let pages=[],page="";
-  words.forEach(w=>{
-    page+=w+" ";
-    if(page.length>700){
-      pages.push("<p>"+page+"</p>");
-      page="";
-    }
-  });
-  if(page) pages.push("<p>"+page+"</p>");
-  return pages;
-}
-
-let contentPages = splitText(text);
-
-/* страницы */
-let pages = [cover, ...contentPages];
-
-let current = 0;
-
-/* создание */
-function render(){
-  book.innerHTML = "";
-
-  pages.forEach((p,i)=>{
-    let div = document.createElement("div");
-    div.className = "page";
-    div.innerHTML = p;
-
-    if(i < current){
-      div.classList.add("flipped");
-    }
-
-    book.appendChild(div);
-  });
-}
-
-/* перелистывание */
-function next(){
-  if(current < pages.length){
-    current++;
-    render();
+  if (typeof $(book).turn === "function") {
+    $(book).turn({
+      width: window.innerWidth * 0.9,
+      height: window.innerHeight * 0.9,
+      autoCenter: true,
+      gradients: true,
+      elevation: 50
+    });
   }
-}
 
-function prev(){
-  if(current > 0){
-    current--;
-    render();
-  }
-}
-
-/* свайп */
-let startX = 0;
-
-document.addEventListener("touchstart", e=>{
-  startX = e.touches[0].clientX;
 });
-
-document.addEventListener("touchend", e=>{
-  let endX = e.changedTouches[0].clientX;
-
-  if(startX - endX > 50){
-    next();
-  } else if(endX - startX > 50){
-    prev();
-  }
-});
-
-/* старт */
-render();
-
 </script>
 
 </body>
