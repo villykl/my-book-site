@@ -8,195 +8,156 @@
 <style>
 body{
   margin:0;
+  background:#e8e4dc;
   font-family: Georgia, serif;
-  background:#f5f3ef;
-  color:#222;
 }
 
-#app{
-  max-width:700px;
-  margin:auto;
-  padding:30px;
-  transition:0.3s;
+/* сцена */
+.scene{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
 
-.cover{
-  text-align:center;
-  margin-top:50px;
+/* книга */
+.book{
+  width:800px;
+  height:500px;
+  display:flex;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  border-radius:10px;
+  overflow:hidden;
+  background:#d6d1c7;
 }
 
-.cover img{
-  width:260px;
-  border-radius:14px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+/* страницы */
+.page{
+  width:50%;
+  padding:40px;
+  background:#fdfbf7;
+  overflow-y:auto;
+  position:relative;
 }
 
+.left{
+  border-right:1px solid #ddd;
+  background:linear-gradient(to right,#f3f0ea,#fdfbf7);
+}
+
+.right{
+  background:linear-gradient(to left,#f3f0ea,#fdfbf7);
+}
+
+/* текст */
 h1{
   text-align:center;
-  font-size:28px;
-  margin-top:30px;
 }
 
 h2{
   text-align:center;
-  margin-top:40px;
+  margin-top:0;
 }
 
-h3{
+p{
+  line-height:1.8;
+  text-align:justify;
+  white-space:pre-line;
+}
+
+.poem{
   text-align:center;
-  color:#666;
 }
 
-.menu{
+/* кнопки */
+.controls{
+  position:fixed;
+  bottom:20px;
+  width:100%;
   text-align:center;
-  margin-top:30px;
 }
 
-.menu button{
-  padding:12px 18px;
-  margin:6px;
-  font-size:16px;
+button{
+  padding:10px 20px;
+  margin:5px;
   border:none;
-  border-radius:8px;
+  border-radius:6px;
   background:#222;
   color:white;
   cursor:pointer;
 }
 
-.menu button:hover{
+button:hover{
   background:#444;
-}
-
-p{
-  line-height:1.9;
-  font-size:18px;
-  white-space:pre-line; /* фикс текста */
-}
-
-.poem{
-  text-align:center;
-  white-space:pre-line;
-  text-indent:0;
-}
-
-.nav{
-  position:fixed;
-  bottom:20px;
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  padding:0 20px;
-}
-
-.nav button{
-  padding:10px 16px;
-  font-size:16px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="app"></div>
+<div class="scene">
+  <div class="book">
+    <div class="page left" id="left"></div>
+    <div class="page right" id="right"></div>
+  </div>
+</div>
 
-<div class="nav">
-  <button onclick="prev()">←</button>
-  <button onclick="next()">→</button>
+<div class="controls">
+  <button onclick="prev()">← Назад</button>
+  <button onclick="next()">Вперёд →</button>
 </div>
 
 <script>
 
-const app = document.getElementById("app");
+let pages = [
 
-const COVER = "https://i.imgur.com/8QZ7Z8T.png";
+`<h1>Слова — это следы души</h1>
+<p style="text-align:center;">Вера Климошенко</p>`,
 
-let book = [
+`<h2>Оглавление</h2>
+<p style="text-align:center;">
+📚 Рассказы<br><br>
+✨ Стихи
+</p>`,
 
-{type:"cover"},
+`<h2>📚 Рассказы</h2>`,
 
-{
-type:"menu",
-title:"Оглавление",
-items:[
-  {title:"📚 Рассказы", index:2},
-  {title:"✨ Стихи", index:4}
-]
-},
+`<h2>А ты пойдёшь с нами, Господи?</h2>
+<p>
+Вставь сюда полный текст рассказа...
 
-{type:"section", title:"📚 Рассказы"},
+С новой строки текст будет красиво разбит.
+</p>`,
 
-{
-type:"story",
-title:"А ты пойдёшь с нами, Господи?",
-text:`Вставь сюда полный текст рассказа...
+`<h2>✨ Стихи</h2>`,
 
-С новой строки — абзац будет отображаться красиво.`
-},
-
-{type:"section", title:"✨ Стихи"},
-
-{
-type:"poem",
-title:"Гимн весны",
-text:`Вставь сюда стих полностью...`
-}
+`<h2>Гимн весны</h2>
+<p class="poem">
+Вставь сюда стих полностью...
+</p>`
 
 ];
 
-let current=0;
+let index = 0;
 
 function render(){
-let p=book[current];
-
-if(p.type==="cover"){
-app.innerHTML=`
-<div class="cover">
-<img src="${COVER}">
-<h1>Слова — это следы души</h1>
-<h3>Вера Климошенко</h3>
-<div class="menu">
-<button onclick="next()">Открыть книгу</button>
-</div>
-</div>`;
-return;
+document.getElementById("left").innerHTML = pages[index] || "";
+document.getElementById("right").innerHTML = pages[index+1] || "";
 }
 
-if(p.type==="menu"){
-app.innerHTML=`
-<h2>${p.title}</h2>
-<div class="menu">
-${p.items.map(item=>`<button onclick="go(${item.index})">${item.title}</button>`).join("")}
-</div>`;
-return;
-}
-
-if(p.type==="section"){
-app.innerHTML=`<h2>${p.title}</h2>`;
-return;
-}
-
-if(p.type==="story"){
-app.innerHTML=`<h2>${p.title}</h2><p>${p.text}</p>`;
-return;
-}
-
-if(p.type==="poem"){
-app.innerHTML=`<h2>${p.title}</h2><p class="poem">${p.text}</p>`;
-return;
+function next(){
+if(index < pages.length-2){
+index += 2;
+render();
 }
 }
 
-function next(){if(current<book.length-1){current++;render();}}
-function prev(){if(current>0){current--;render();}}
-function go(i){current=i;render();}
-
-/* фикс: не перелистывать при клике по кнопкам */
-document.addEventListener("click", e=>{
-if(e.target.tagName === "BUTTON") return;
-
-if(e.clientX>window.innerWidth/2) next();
-else prev();
-});
+function prev(){
+if(index > 0){
+index -= 2;
+render();
+}
+}
 
 render();
 
