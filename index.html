@@ -9,43 +9,94 @@
 body{
   margin:0;
   font-family: Georgia, serif;
-  background:#fdfbf7;
+  background:#f5f3ef;
+  color:#222;
 }
 
+/* контейнер */
 #app{
   max-width:700px;
   margin:auto;
-  padding:20px;
+  padding:30px;
 }
 
-h1,h2{
+/* обложка */
+.cover{
   text-align:center;
+  margin-top:50px;
 }
 
 .cover img{
-  width:220px;
-  display:block;
-  margin:20px auto;
+  width:260px;
+  border-radius:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
 }
 
+h1{
+  text-align:center;
+  font-size:28px;
+  margin-top:30px;
+}
+
+h2{
+  text-align:center;
+  margin-top:40px;
+}
+
+h3{
+  text-align:center;
+  color:#666;
+}
+
+/* кнопки */
 .menu{
   text-align:center;
+  margin-top:30px;
 }
 
 .menu button{
-  margin:5px;
-  padding:10px;
+  padding:12px 18px;
+  margin:6px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  background:#222;
+  color:white;
+  cursor:pointer;
 }
 
+.menu button:hover{
+  background:#444;
+}
+
+/* текст */
 p{
-  line-height:1.8;
+  line-height:1.9;
+  font-size:18px;
   text-indent:2em;
 }
 
+/* стихи */
 .poem{
-  white-space:pre-line;
   text-align:center;
+  white-space:pre-line;
   text-indent:0;
+  font-size:18px;
+}
+
+/* перелистывание */
+.nav{
+  position:fixed;
+  bottom:20px;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  padding:0 20px;
+}
+
+.nav button{
+  padding:10px 16px;
+  font-size:16px;
 }
 </style>
 </head>
@@ -53,6 +104,11 @@ p{
 <body>
 
 <div id="app"></div>
+
+<div class="nav">
+  <button onclick="prev()">←</button>
+  <button onclick="next()">→</button>
+</div>
 
 <script>
 
@@ -65,51 +121,24 @@ let book = [
 {
 type:"menu",
 title:"Оглавление",
-items:[
-"📚 Рассказы",
-"✨ Стихи"
-]
+items:["📚 Рассказы","✨ Стихи"]
 },
 
-/* ===== РАССКАЗЫ ===== */
-
-{
-type:"section",
-title:"📚 Рассказы"
-},
+{type:"section", title:"📚 Рассказы"},
 
 {
 type:"story",
-title:"Валяй-бригада",
-text:`ВСТАВЬ СЮДА ПОЛНЫЙ ТЕКСТ РАССКАЗА`
+title:"А ты пойдёшь с нами, Господи?",
+text:`Вставь сюда полный текст рассказа...`
 },
 
-/* ===== СТИХИ ===== */
-
-{
-type:"section",
-title:"✨ Стихи"
-},
-
-{
-type:"poem",
-title:"Спасибо за Молитвы Дом",
-text:`ВСТАВЬ ПОЛНЫЙ ТЕКСТ`
-},
+{type:"section", title:"✨ Стихи"},
 
 {
 type:"poem",
 title:"Гимн весны",
-text:`ВСТАВЬ ПОЛНЫЙ ТЕКСТ`
-},
-
-{
-type:"poem",
-title:"Направляйте взор на Христа",
-text:`ВСТАВЬ ПОЛНЫЙ ТЕКСТ`
+text:`Вставь сюда стих полностью...`
 }
-
-/* ➕ ДОБАВЛЯЙ СКОЛЬКО ХОЧЕШЬ */
 
 ];
 
@@ -120,11 +149,13 @@ let p=book[current];
 
 if(p.type==="cover"){
 app.innerHTML=`
-<h1>Слова — это следы души</h1>
+<div class="cover">
 <img src="${COVER}">
-<h3 style="text-align:center;">Вера Климошенко</h3>
+<h1>Слова — это следы души</h1>
+<h3>Вера Климошенко</h3>
 <div class="menu">
 <button onclick="next()">Открыть книгу</button>
+</div>
 </div>`;
 return;
 }
@@ -152,9 +183,9 @@ app.innerHTML=`<h2>${p.title}</h2><p class="poem">${p.text}</p>`;
 }
 }
 
-function next(){ if(current<book.length-1){current++;render();}}
-function prev(){ if(current>0){current--;render();}}
-function go(i){ current=i; render(); }
+function next(){if(current<book.length-1){current++;render();}}
+function prev(){if(current>0){current--;render();}}
+function go(i){current=i;render();}
 
 document.addEventListener("click", e=>{
 if(e.clientX>window.innerWidth/2) next();
