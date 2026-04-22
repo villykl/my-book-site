@@ -12,7 +12,6 @@ body{
   font-family: Georgia, serif;
 }
 
-/* сцена */
 .scene{
   display:flex;
   justify-content:center;
@@ -20,7 +19,6 @@ body{
   height:100vh;
 }
 
-/* книга */
 .book{
   width:800px;
   height:500px;
@@ -31,45 +29,22 @@ body{
   background:#d6d1c7;
 }
 
-/* страницы */
 .page{
   width:50%;
   padding:40px;
   background:#fdfbf7;
   overflow-y:auto;
-  position:relative;
 }
 
 .left{
   border-right:1px solid #ddd;
-  background:linear-gradient(to right,#f3f0ea,#fdfbf7);
-}
-
-.right{
-  background:linear-gradient(to left,#f3f0ea,#fdfbf7);
-}
-
-/* текст */
-h1{
-  text-align:center;
-}
-
-h2{
-  text-align:center;
-  margin-top:0;
 }
 
 p{
   line-height:1.8;
-  text-align:justify;
   white-space:pre-line;
 }
 
-.poem{
-  text-align:center;
-}
-
-/* кнопки */
 .controls{
   position:fixed;
   bottom:20px;
@@ -84,11 +59,6 @@ button{
   border-radius:6px;
   background:#222;
   color:white;
-  cursor:pointer;
-}
-
-button:hover{
-  background:#444;
 }
 </style>
 </head>
@@ -110,14 +80,8 @@ button:hover{
 <script>
 
 let pages = [
-  `<div style="display:flex;flex-direction:column;justify-content:center;height:100%;text-align:center;">
-  <img src="https://i.imgur.com/8QZ7Z8T.png" style="width:100%;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.3);">
-  <h2 style="margin-top:20px;">Слова — это следы души</h2>
-  <p style="text-align:center;">Вера Климошенко</p>
-</div>`,
 
-`<h1>Слова — это следы души</h1>
-<p style="text-align:center;">Вера Климошенко</p>`,
+`<img src="https://i.imgur.com/8QZ7Z8T.png" style="width:100%;border-radius:8px;">`,
 
 `<h2>Оглавление</h2>
 <p style="text-align:center;">
@@ -128,18 +92,12 @@ let pages = [
 `<h2>📚 Рассказы</h2>`,
 
 `<h2>А ты пойдёшь с нами, Господи?</h2>
-<p>
-Вставь сюда полный текст рассказа...
-
-С новой строки текст будет красиво разбит.
-</p>`,
+<p>Вставь сюда текст...</p>`,
 
 `<h2>✨ Стихи</h2>`,
 
 `<h2>Гимн весны</h2>
-<p class="poem">
-Вставь сюда стих полностью...
-</p>`
+<p style="text-align:center;">Вставь стих...</p>`
 
 ];
 
