@@ -15,7 +15,6 @@ body {
     line-height: 1.8;
 }
 
-/* Book container */
 .book {
     max-width: 800px;
     margin: 60px auto;
@@ -25,16 +24,21 @@ body {
     border-radius: 8px;
 }
 
-/* Cover page */
 .cover {
     height: 90vh;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    background: linear-gradient(135deg, #fff, #f7f3ec);
-    border-bottom: 1px solid #ddd;
+    background: url('images/cover.jpg') center/cover no-repeat;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+}
+
+.cover-inner {
+    background: rgba(0,0,0,0.35);
+    padding: 60px 40px;
+    border-radius: 12px;
 }
 
 .cover h1 {
@@ -45,10 +49,9 @@ body {
 
 .cover p {
     font-size: 20px;
-    opacity: 0.7;
+    opacity: 0.9;
 }
 
-/* Chapter styles */
 .chapter {
     margin-top: 80px;
     page-break-before: always;
@@ -66,16 +69,11 @@ p {
     font-size: 18px;
 }
 
-/* Table of contents */
 .toc {
     margin: 40px 0;
     padding: 20px;
     border: 1px solid #ddd;
     background: #fafafa;
-}
-
-.toc h3 {
-    margin-top: 0;
 }
 
 .toc a {
@@ -89,24 +87,18 @@ p {
     text-decoration: underline;
 }
 
-/* Print style */
 @media print {
-    body {
-        background: white;
-    }
-    .book {
-        box-shadow: none;
-        margin: 0;
-        padding: 0;
-    }
+    body { background: white; }
+    .book { box-shadow: none; margin: 0; padding: 0; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="cover" style="background: url('cover.jpg') center/cover no-repeat; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.6);">
-    <div style="background: rgba(0,0,0,0.35); padding: 60px 40px; border-radius: 12px;">
+<!-- ОБЛОЖКА -->
+<div class="cover">
+    <div class="cover-inner">
         <h1>Слова — это следы души</h1>
         <p>Вера Климошенко</p>
     </div>
@@ -122,15 +114,15 @@ p {
 
 <div id="ch1" class="chapter">
     <h2>Глава 1</h2>
-    <p>Здесь будет твой текст первой главы. Ты можешь вставить сюда свои рассказы полностью, без сокращений.</p>
+    <p>Твой текст первой главы здесь...</p>
 </div>
 
 <div id="ch2" class="chapter">
     <h2>Глава 2</h2>
-    <p>Здесь будет вторая глава твоей книги. Текст автоматически выглядит как печатная книга.</p>
+    <p>Твой текст второй главы здесь...</p>
 </div>
 
 </div>
 
 </body>
-</html>
+</html
