@@ -16,7 +16,7 @@ html, body {
     font-family: Georgia, serif;
 }
 
-/* 📱 APP SHELL (iPad feel) */
+/* 📱 APP SHELL */
 .app {
     position: fixed;
     inset: 0;
@@ -24,37 +24,30 @@ html, body {
     justify-content: center;
     align-items: center;
     background: radial-gradient(circle at center, #151515, #000);
-    animation: boot 1.1s ease;
-}
-
-@keyframes boot {
-    from { opacity: 0; transform: scale(0.98); }
-    to { opacity: 1; transform: scale(1); }
 }
 
 /* 📖 BOOK */
 #book {
     width: 980px;
     height: 640px;
-    transform: scale(0.93);
-    transition: transform 0.9s cubic-bezier(.2,.8,.2,1);
+    transform: scale(0.92);
+    transition: 0.9s cubic-bezier(.2,.8,.2,1);
 }
 
 body.loaded #book {
     transform: scale(1);
 }
 
-/* 📄 PAGES */
+/* 📄 PAGE */
 .page {
     background: #fffdf7;
     padding: 60px;
     box-sizing: border-box;
     font-size: 20px;
     line-height: 1.7;
-    position: relative;
 }
 
-/* 📘 COVER (Apple Books style) */
+/* 📘 COVER */
 .cover {
     background:
         linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.85)),
@@ -67,18 +60,11 @@ body.loaded #book {
     justify-content: center;
     align-items: center;
     text-align: center;
-
-    box-shadow: inset 0 0 90px rgba(0,0,0,0.8);
 }
 
 .cover h1 {
     font-size: 46px;
     margin: 0;
-}
-
-.cover p {
-    opacity: 0.85;
-    margin-top: 10px;
 }
 
 /* subtle paper depth */
@@ -98,47 +84,29 @@ body.loaded #book {
 
 <div id="book">
 
-    <!-- 📖 ОБЛОЖКА -->
     <div class="page cover">
         <h1>Слова — это следы души</h1>
         <p>Вера Климошенко</p>
-        <p style="margin-top:20px;">tap to open</p>
     </div>
 
-    <!-- 📄 СТРАНИЦЫ -->
     <div class="page">
         <h2 style="text-align:center;">Вступление</h2>
-        <p>
-            Слова сопровождают нас всю жизнь.
-            Иногда они становятся домом,
-            иногда — дыханием памяти,
-            которое невозможно забыть.
-        </p>
+        <p>Слова сопровождают нас всю жизнь...</p>
     </div>
 
     <div class="page">
         <h2 style="text-align:center;">Глава I</h2>
-        <p>
-            Каждое слово — это след души.
-            Оно остаётся даже тогда,
-            когда мы перестаём его слышать.
-        </p>
+        <p>Каждое слово — это след души...</p>
     </div>
 
     <div class="page">
         <h2 style="text-align:center;">Глава II</h2>
-        <p>
-            Иногда слова становятся светом,
-            который невозможно погасить.
-        </p>
+        <p>Иногда слова становятся светом...</p>
     </div>
 
     <div class="page">
         <h2 style="text-align:center;">Эпилог</h2>
-        <p>
-            Всё сказанное остаётся.
-            Даже если исчезает голос.
-        </p>
+        <p>Всё сказанное остаётся...</p>
     </div>
 
 </div>
@@ -147,31 +115,32 @@ body.loaded #book {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+
+    const book = new St.PageFlip(document.getElementById("book"), {
+
+        width: 490,
+        height: 640,
+
+        size: "stretch",
+
+        showCover: true,
+        maxShadowOpacity: 0.75,
+
+        flippingTime: 950,
+
+        drawShadow: true,
+
+        useMouseEvents: true,
+        swipeDistance: 20,
+        mobileScrollSupport: true
+    });
+
+    book.loadFromHTML(document.querySelectorAll(".page"));
+
     setTimeout(() => {
         document.body.classList.add("loaded");
-    }, 500);
+    }, 400);
 });
-
-const book = new St.PageFlip(document.getElementById("book"), {
-
-    width: 490,
-    height: 640,
-
-    size: "stretch",
-
-    showCover: true,
-    maxShadowOpacity: 0.75,
-
-    flippingTime: 950,
-
-    drawShadow: true,
-
-    useMouseEvents: true,
-    swipeDistance: 20,
-    mobileScrollSupport: true
-});
-
-book.loadFromHTML(document.querySelectorAll(".page"));
 </script>
 
 </body>
