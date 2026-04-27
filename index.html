@@ -10,42 +10,53 @@
 <style>
 body {
     margin: 0;
-    background: radial-gradient(circle at center, #0f0f0f, #000);
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background: #000;
     overflow: hidden;
     font-family: Georgia, serif;
 }
 
-/* затемнение как в iBooks */
-.overlay {
+/* ===== LOADING SCREEN (APP FEEL) ===== */
+#loader {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.65);
+    background: radial-gradient(circle at center, #1a1a1a, #000);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #f5e7d3;
+    transition: 1s;
+    z-index: 999;
+}
+
+#loader h1 {
+    font-size: 28px;
+    letter-spacing: 2px;
+    opacity: 0.9;
+}
+
+/* исчезает как приложение */
+.loaded #loader {
     opacity: 0;
-    transition: 0.8s;
     pointer-events: none;
 }
 
-.opened .overlay {
-    opacity: 1;
-}
-
-/* КНИГА */
+/* ===== BOOK CONTAINER ===== */
 #book {
     width: 980px;
     height: 640px;
-    transform: scale(0.98);
-    transition: 0.6s ease;
+    margin: auto;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: 1.2s;
 }
 
-.opened #book {
+.loaded #book {
+    opacity: 1;
     transform: scale(1);
 }
 
-/* СТРАНИЦЫ */
+/* ===== PAGES ===== */
 .page {
     background: #fffdf7;
     padding: 60px;
@@ -54,7 +65,7 @@ body {
     line-height: 1.7;
 }
 
-/* 📖 ОБЛОЖКА (ULTRA iPad style) */
+/* ===== COVER ===== */
 .cover {
     background:
         linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.85)),
@@ -66,9 +77,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     text-align: center;
-    box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
 }
 
 .cover h1 {
@@ -80,91 +89,60 @@ body {
     opacity: 0.85;
 }
 
-/* мягкая бумага */
+/* subtle paper */
 .page::after {
     content: "";
     position: absolute;
     inset: 0;
-    box-shadow: inset 0 0 40px rgba(0,0,0,0.04);
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.05);
     pointer-events: none;
-}
-
-/* кнопка открытия */
-.open-btn {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 12px 22px;
-    border: 1px solid #fff;
-    color: #fff;
-    background: transparent;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.open-btn:hover {
-    background: #fff;
-    color: #000;
 }
 </style>
 </head>
 
 <body>
 
-<div class="overlay"></div>
+<!-- APP LOADING -->
+<div id="loader">
+    <h1>Слова — это следы души</h1>
+    <p>opening book…</p>
+</div>
 
-<button class="open-btn" onclick="openBook()">📖 Открыть книгу</button>
-
+<!-- BOOK -->
 <div id="book">
 
-    <!-- ОБЛОЖКА -->
     <div class="page cover">
         <h1>Слова — это следы души</h1>
         <p>Вера Климошенко</p>
         <p style="margin-top:20px;">tap to open</p>
     </div>
 
-    <!-- СТРАНИЦЫ -->
     <div class="page">
         <h2 style="text-align:center;">Вступление</h2>
-        <p>
-            Слова сопровождают нас всю жизнь.
-            Иногда они становятся домом,
-            иногда — дыханием памяти,
-            которое невозможно забыть.
-        </p>
+        <p>Слова сопровождают нас всю жизнь...</p>
     </div>
 
     <div class="page">
         <h2 style="text-align:center;">Глава I</h2>
-        <p>
-            Каждое слово — это след души.
-            Оно остаётся даже тогда,
-            когда мы уже перестаём его слышать.
-        </p>
+        <p>Каждое слово — это след души...</p>
     </div>
 
     <div class="page">
         <h2 style="text-align:center;">Глава II</h2>
-        <p>
-            Иногда слова становятся тем,
-            что удерживает нас внутри света.
-        </p>
+        <p>Иногда слова становятся светом...</p>
     </div>
 
     <div class="page">
         <h2 style="text-align:center;">Эпилог</h2>
-        <p>
-            Всё сказанное остаётся.
-            Даже если исчезает голос.
-        </p>
+        <p>Всё сказанное остаётся...</p>
     </div>
 
 </div>
 
 <script>
-let opened = false;
+setTimeout(() => {
+    document.body.classList.add("loaded");
+}, 1200);
 
 const book = new St.PageFlip(document.getElementById("book"), {
 
@@ -173,35 +151,17 @@ const book = new St.PageFlip(document.getElementById("book"), {
 
     size: "stretch",
 
-    minWidth: 320,
-    maxWidth: 1100,
-    minHeight: 400,
-    maxHeight: 1600,
-
     showCover: true,
     maxShadowOpacity: 0.7,
 
-    flippingTime: 950,
+    flippingTime: 1000,   // iPad-like smoothness
     useMouseEvents: true,
-    swipeDistance: 25,
+    swipeDistance: 20,
     drawShadow: true,
     mobileScrollSupport: true
 });
 
 book.loadFromHTML(document.querySelectorAll(".page"));
-
-function openBook() {
-    if (opened) return;
-
-    opened = true;
-
-    document.body.classList.add("opened");
-
-    // эффект "открытия как iPad Books"
-    setTimeout(() => {
-        book.flipNext(); // лёгкое "оживание" книги
-    }, 600);
-}
 </script>
 
 </body>
