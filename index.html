@@ -16,7 +16,7 @@ html, body {
     font-family: Georgia, serif;
 }
 
-/* 📱 iPad APP LAYER */
+/* 📱 APP FRAME */
 .app {
     position: fixed;
     inset: 0;
@@ -26,7 +26,7 @@ html, body {
     background: radial-gradient(circle at center, #151515, #000);
 }
 
-/* 📖 BOOK STAGE */
+/* 📖 BOOK */
 #book {
     width: 980px;
     height: 640px;
@@ -34,7 +34,6 @@ html, body {
     transition: 0.9s cubic-bezier(.2,.8,.2,1);
 }
 
-/* APP OPEN EFFECT */
 body.ready #book {
     transform: scale(1);
 }
@@ -63,12 +62,7 @@ body.ready #book {
     text-align: center;
 }
 
-.cover h1 {
-    font-size: 46px;
-    margin: 0;
-}
-
-/* soft depth */
+/* soft paper */
 .page::after {
     content: "";
     position: absolute;
@@ -81,34 +75,34 @@ body.ready #book {
 <body>
 
 <div class="app">
-    <div id="book">
+<div id="book">
 
-        <div class="page cover">
-            <h1>Слова — это следы души</h1>
-            <p>Вера Климошенко</p>
-        </div>
-
-        <div class="page">
-            <h2 style="text-align:center;">Вступление</h2>
-            <p>Слова сопровождают нас всю жизнь...</p>
-        </div>
-
-        <div class="page">
-            <h2 style="text-align:center;">Глава I</h2>
-            <p>Каждое слово — это след души...</p>
-        </div>
-
-        <div class="page">
-            <h2 style="text-align:center;">Глава II</h2>
-            <p>Иногда слова становятся светом...</p>
-        </div>
-
-        <div class="page">
-            <h2 style="text-align:center;">Эпилог</h2>
-            <p>Всё сказанное остаётся...</p>
-        </div>
-
+    <div class="page cover">
+        <h1>Слова — это следы души</h1>
+        <p>Вера Климошенко</p>
     </div>
+
+    <div class="page">
+        <h2 style="text-align:center;">Вступление</h2>
+        <p>Слова сопровождают нас всю жизнь...</p>
+    </div>
+
+    <div class="page">
+        <h2 style="text-align:center;">Глава I</h2>
+        <p>Каждое слово — это след души...</p>
+    </div>
+
+    <div class="page">
+        <h2 style="text-align:center;">Глава II</h2>
+        <p>Иногда слова становятся светом...</p>
+    </div>
+
+    <div class="page">
+        <h2 style="text-align:center;">Эпилог</h2>
+        <p>Всё сказанное остаётся...</p>
+    </div>
+
+</div>
 </div>
 
 <script>
@@ -135,10 +129,12 @@ window.onload = function () {
 
     book.loadFromHTML(document.querySelectorAll(".page"));
 
-    // 📱 iPad APP OPEN EFFECT
-    setTimeout(() => {
-        document.body.classList.add("ready");
-    }, 400);
+    // 📱 гарантированный iPad APP START
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            document.body.classList.add("ready");
+        }, 500);
+    });
 };
 </script>
 
