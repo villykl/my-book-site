@@ -1,74 +1,69 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Слова — это следы души</title>
-
 <style>
 body {
     margin: 0;
-    background: #0e0e0e;
-    font-family: Georgia, serif;
+    background: #111;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    font-family: Georgia, serif;
 }
 
-/* ===== КНИГА ===== */
+/* КНИГА */
 .book {
-    width: 800px;
-    height: 500px;
-    perspective: 2000px;
+    width: 900px;
+    height: 520px;
     position: relative;
+    perspective: 2000px;
 }
 
-/* страница */
-.page {
+/* РАЗВОРОТ */
+.spread {
     width: 100%;
     height: 100%;
     position: absolute;
+    display: flex;
+}
+
+/* СТРАНИЦА */
+.page {
+    width: 50%;
+    height: 100%;
     background: #fffdf7;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
     padding: 60px;
     box-sizing: border-box;
-
-    transform-origin: left;
-    transition: transform 1s ease;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.08);
+    transition: transform 1s;
     backface-visibility: hidden;
 }
 
-/* левая и правая страницы */
-.page.left {
-    transform: rotateY(0deg);
-    z-index: 2;
+/* левая и правая */
+.left {
+    transform-origin: right;
 }
 
-.page.right {
-    transform: rotateY(180deg);
-    z-index: 1;
+.right {
+    transform-origin: left;
 }
 
-/* активная анимация */
-.flipped {
+/* эффект перелистывания */
+.flipped .left {
     transform: rotateY(-180deg);
 }
 
+.flipped .right {
+    transform: rotateY(180deg);
+}
+
 /* текст */
-h1, h2 {
+h2 {
     text-align: center;
 }
 
-p {
-    font-size: 20px;
-    line-height: 1.7;
-}
-
 /* кнопки */
-.buttons {
+.controls {
     position: absolute;
-    bottom: -70px;
+    bottom: -60px;
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -76,12 +71,10 @@ p {
 
 button {
     padding: 10px 20px;
-    font-size: 16px;
-    border: 1px solid #fff;
     background: transparent;
+    border: 1px solid #fff;
     color: white;
     cursor: pointer;
-    transition: 0.3s;
 }
 
 button:hover {
@@ -90,58 +83,57 @@ button:hover {
 }
 </style>
 
-</head>
-
-<body>
-
 <div class="book">
 
-    <!-- ОБЛОЖКА -->
-    <div class="page left" id="cover">
-        <h1>Слова — это следы души</h1>
-        <p style="text-align:center;">Вера Климошенко</p>
-        <p style="text-align:center; margin-top:40px;">📖 нажмите "далее"</p>
+    <!-- ОБЛОЖКА / СПРЕД 1 -->
+    <div class="spread" id="p1">
+        <div class="page left">
+            <h2>Слова — это следы души</h2>
+            <p style="text-align:center;">Вера Климошенко</p>
+        </div>
+        <div class="page right">
+            <h2>Вступление</h2>
+            <p>
+                Слова сопровождают нас всю жизнь.
+                Они могут быть домом или ветром,
+                который меняет направление судьбы.
+            </p>
+        </div>
     </div>
 
-    <!-- СТРАНИЦА 1 -->
-    <div class="page right" id="page1">
-        <h2>Вступление</h2>
-        <p>
-            Слова сопровождают нас всю жизнь.
-            Иногда они становятся домом, иногда — ветром,
-            который уносит нас вглубь воспоминаний.
-        </p>
-    </div>
-
-    <!-- СТРАНИЦА 2 -->
-    <div class="page right" id="page2">
-        <h2>Глава I</h2>
-        <p>
-            Каждое слово — это след, оставленный душой.
-            Мы не всегда осознаём их силу,
-            но именно они формируют нашу реальность.
-        </p>
-    </div>
-
-    <!-- кнопки -->
-    <div class="buttons">
-        <button onclick="prevPage()">← Назад</button>
-        <button onclick="nextPage()">Вперёд →</button>
+    <!-- СПРЕД 2 -->
+    <div class="spread" id="p2">
+        <div class="page left">
+            <h2>Глава I</h2>
+            <p>
+                Каждое слово — это след души.
+                Оно остаётся в нас даже тогда,
+                когда мы его забываем.
+            </p>
+        </div>
+        <div class="page right">
+            <h2>Продолжение</h2>
+            <p>
+                И иногда именно слова
+                становятся единственным, что нас удерживает.
+            </p>
+        </div>
     </div>
 
 </div>
 
+<div class="controls">
+    <button onclick="prev()">← Назад</button>
+    <button onclick="next()">Вперёд →</button>
+</div>
+
 <script>
-let current = 0;
-const pages = [
-    document.getElementById("cover"),
-    document.getElementById("page1"),
-    document.getElementById("page2")
-];
+let pages = document.querySelectorAll(".spread");
+let index = 0;
 
 function update() {
     pages.forEach((p, i) => {
-        if (i <= current) {
+        if (i <= index) {
             p.classList.add("flipped");
         } else {
             p.classList.remove("flipped");
@@ -149,22 +141,19 @@ function update() {
     });
 }
 
-function nextPage() {
-    if (current < pages.length - 1) {
-        current++;
+function next() {
+    if (index < pages.length - 1) {
+        index++;
         update();
     }
 }
 
-function prevPage() {
-    if (current > 0) {
-        current--;
+function prev() {
+    if (index > 0) {
+        index--;
         update();
     }
 }
 
 update();
 </script>
-
-</body>
-</html>
