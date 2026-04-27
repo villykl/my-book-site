@@ -5,118 +5,88 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Слова — это следы души</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
-
 <style>
 body {
     margin: 0;
-    font-family: 'Cormorant Garamond', serif;
     background: #0e0e0e;
-    color: #2b2b2b;
-}
-
-/* ===== ОБЛОЖКА КНИГИ ===== */
-.hero {
-    height: 100vh;
+    font-family: Georgia, serif;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    background:
-        radial-gradient(circle at center, rgba(0,0,0,0.2), rgba(0,0,0,0.9)),
-        url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f') center/cover no-repeat;
-
-    color: #f3e7d3;
-    text-align: center;
-    position: relative;
-}
-
-/* лёгкое "свечение книги" */
-.hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    box-shadow: inset 0 0 120px rgba(0,0,0,0.8);
-}
-
-.hero h1 {
-    font-size: 64px;
-    letter-spacing: 2px;
-    z-index: 1;
-    margin: 0;
-}
-
-.hero p {
-    font-size: 22px;
-    margin-top: 10px;
-    opacity: 0.85;
-    z-index: 1;
-}
-
-/* кнопка как книжная закладка */
-.btn {
-    margin-top: 40px;
-    padding: 12px 28px;
-    border: 1px solid #f3e7d3;
-    color: #f3e7d3;
-    text-decoration: none;
-    font-size: 18px;
-    transition: 0.3s;
-    z-index: 1;
-}
-
-.btn:hover {
-    background: #f3e7d3;
-    color: #111;
+    height: 100vh;
 }
 
 /* ===== КНИГА ===== */
 .book {
-    background: linear-gradient(#f6f1e8, #efe6d6);
-    padding: 100px 20px;
-}
-
-/* эффект страницы */
-.page {
-    max-width: 800px;
-    margin: auto;
-    background: #fffdf9;
-    padding: 80px 70px;
-    box-shadow:
-        0 20px 60px rgba(0,0,0,0.25),
-        inset 0 0 60px rgba(0,0,0,0.05);
-
-    border-radius: 6px;
+    width: 800px;
+    height: 500px;
+    perspective: 2000px;
     position: relative;
 }
 
-/* "реальная книга" — тень по бокам */
-.page::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 8px;
+/* страница */
+.page {
+    width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.05);
+    position: absolute;
+    background: #fffdf7;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    padding: 60px;
+    box-sizing: border-box;
+
+    transform-origin: left;
+    transition: transform 1s ease;
+    backface-visibility: hidden;
 }
 
-/* текст как в печатной книге */
-h2 {
+/* левая и правая страницы */
+.page.left {
+    transform: rotateY(0deg);
+    z-index: 2;
+}
+
+.page.right {
+    transform: rotateY(180deg);
+    z-index: 1;
+}
+
+/* активная анимация */
+.flipped {
+    transform: rotateY(-180deg);
+}
+
+/* текст */
+h1, h2 {
     text-align: center;
-    font-size: 34px;
-    margin-bottom: 40px;
 }
 
 p {
     font-size: 20px;
-    line-height: 1.8;
+    line-height: 1.7;
 }
 
-/* плавный переход */
-html {
-    scroll-behavior: smooth;
+/* кнопки */
+.buttons {
+    position: absolute;
+    bottom: -70px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: 1px solid #fff;
+    background: transparent;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: white;
+    color: black;
 }
 </style>
 
@@ -124,24 +94,77 @@ html {
 
 <body>
 
-<div class="hero">
-    <h1>Слова — это следы души</h1>
-    <p>Вера Климошенко</p>
-    <a href="#book" class="btn">Открыть книгу</a>
-</div>
+<div class="book">
 
-<div id="book" class="book">
+    <!-- ОБЛОЖКА -->
+    <div class="page left" id="cover">
+        <h1>Слова — это следы души</h1>
+        <p style="text-align:center;">Вера Климошенко</p>
+        <p style="text-align:center; margin-top:40px;">📖 нажмите "далее"</p>
+    </div>
 
-    <div class="page">
+    <!-- СТРАНИЦА 1 -->
+    <div class="page right" id="page1">
         <h2>Вступление</h2>
         <p>
-            Слова... Они сопровождают нас всю жизнь. Иногда они лечат,
-            иногда ранят, но всегда остаются следами внутри нас,
-            как отпечатки на страницах судьбы.
+            Слова сопровождают нас всю жизнь.
+            Иногда они становятся домом, иногда — ветром,
+            который уносит нас вглубь воспоминаний.
         </p>
     </div>
 
+    <!-- СТРАНИЦА 2 -->
+    <div class="page right" id="page2">
+        <h2>Глава I</h2>
+        <p>
+            Каждое слово — это след, оставленный душой.
+            Мы не всегда осознаём их силу,
+            но именно они формируют нашу реальность.
+        </p>
+    </div>
+
+    <!-- кнопки -->
+    <div class="buttons">
+        <button onclick="prevPage()">← Назад</button>
+        <button onclick="nextPage()">Вперёд →</button>
+    </div>
+
 </div>
+
+<script>
+let current = 0;
+const pages = [
+    document.getElementById("cover"),
+    document.getElementById("page1"),
+    document.getElementById("page2")
+];
+
+function update() {
+    pages.forEach((p, i) => {
+        if (i <= current) {
+            p.classList.add("flipped");
+        } else {
+            p.classList.remove("flipped");
+        }
+    });
+}
+
+function nextPage() {
+    if (current < pages.length - 1) {
+        current++;
+        update();
+    }
+}
+
+function prevPage() {
+    if (current > 0) {
+        current--;
+        update();
+    }
+}
+
+update();
+</script>
 
 </body>
 </html>
