@@ -1,40 +1,41 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Canvas Apple Books Engine</title>
+<title>Apple Books ULTRA V4</title>
 
 <style>
 html, body {
-    margin: 0;
-    height: 100%;
-    overflow: hidden;
-    background: #000;
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #151515, #000);
 }
 
 /* 📱 APP STAGE */
 .stage {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: radial-gradient(circle at center, #151515, #000);
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* 📖 CANVAS BOOK */
 canvas {
-    border-radius: 12px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  border-radius: 14px;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.7);
+  cursor: grab;
 }
+canvas:active { cursor: grabbing; }
 </style>
 </head>
 
 <body>
 
 <div class="stage">
-    <canvas id="book" width="1000" height="650"></canvas>
+  <canvas id="book" width="1000" height="650"></canvas>
 </div>
 
 <script>
@@ -44,168 +45,166 @@ const ctx = canvas.getContext("2d");
 const W = canvas.width;
 const H = canvas.height;
 
-/* 📖 PAGES (твой контент) */
+/* 📖 YOUR BOOK */
 const pages = [
-    {
-        type: "cover",
-        title: "Слова — это следы души",
-        author: "Вера Климошенко",
-        image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80"
-    },
-    {
-        title: "Вступление",
-        text: "Слова сопровождают нас всю жизнь. Иногда они становятся домом, иногда — дыханием памяти."
-    },
-    {
-        title: "Глава I",
-        text: "Каждое слово — это след души. Оно остаётся даже тогда, когда мы его уже не слышим."
-    },
-    {
-        title: "Глава II",
-        text: "Иногда слова становятся светом, который невозможно погасить."
-    },
-    {
-        title: "Эпилог",
-        text: "Всё сказанное остаётся. Даже если исчезает голос."
-    }
+  {
+    cover: true,
+    title: "Слова — это следы души",
+    author: "Вера Климошенко",
+    img: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80"
+  },
+  {
+    title: "Вступление",
+    text: "Слова сопровождают нас всю жизнь. Они остаются даже тогда, когда мы молчим."
+  },
+  {
+    title: "Глава I",
+    text: "Каждое слово — это след души, который нельзя стереть временем."
+  },
+  {
+    title: "Глава II",
+    text: "Иногда слова становятся светом, который ведёт нас через темноту."
+  },
+  {
+    title: "Эпилог",
+    text: "Всё сказанное остаётся. Даже если исчезает голос."
+  }
 ];
 
-let pageIndex = 0;
-let anim = 0;
+let index = 0;
 let dragging = false;
 let startX = 0;
 let offset = 0;
 
-/* 📖 RENDER PAGE */
-function drawPage(i, xOffset = 0) {
-    const p = pages[i];
-    if (!p) return;
+/* 📄 DRAW PAGE */
+function drawPage(p, xShift = 0, next = false) {
+  ctx.save();
+  ctx.translate(xShift, 0);
 
-    ctx.save();
-    ctx.translate(xOffset, 0);
+  // background
+  if (p.cover) {
+    let img = new Image();
+    img.src = p.img;
 
-    // background
-    if (p.type === "cover") {
-        const img = new Image();
-        img.src = p.image;
+    ctx.drawImage(img, 0, 0, W, H);
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.fillRect(0,0,W,H);
 
-        ctx.drawImage(img, 0, 0, W, H);
+    ctx.fillStyle = "#f5e7d3";
+    ctx.textAlign = "center";
 
-        ctx.fillStyle = "rgba(0,0,0,0.55)";
-        ctx.fillRect(0, 0, W, H);
+    ctx.font = "48px Georgia";
+    ctx.fillText(p.title, W/2, H/2 - 20);
 
-        ctx.fillStyle = "#f5e7d3";
-        ctx.textAlign = "center";
+    ctx.font = "22px Georgia";
+    ctx.fillText(p.author, W/2, H/2 + 30);
 
-        ctx.font = "48px Georgia";
-        ctx.fillText(p.title, W/2, H/2 - 20);
+  } else {
+    ctx.fillStyle = "#fffdf7";
+    ctx.fillRect(0,0,W,H);
 
-        ctx.font = "22px Georgia";
-        ctx.fillText(p.author, W/2, H/2 + 30);
-    } else {
-        ctx.fillStyle = "#fffdf7";
-        ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#111";
+    ctx.textAlign = "center";
 
-        ctx.fillStyle = "#111";
-        ctx.textAlign = "center";
+    ctx.font = "28px Georgia";
+    ctx.fillText(p.title, W/2, 100);
 
-        ctx.font = "28px Georgia";
-        ctx.fillText(p.title, W/2, 100);
+    ctx.font = "20px Georgia";
 
-        ctx.font = "20px Georgia";
+    wrapText(p.text, W/2, 180, 700, 30);
+  }
 
-        wrapText(p.text, W/2, 180, 700, 30);
-    }
+  ctx.restore();
 
-    ctx.restore();
+  // 📌 shadow (page curl feel)
+  if (next) {
+    ctx.fillStyle = "rgba(0,0,0,0.25)";
+    ctx.fillRect(0,0,W,H);
+  }
 }
 
 /* 📄 TEXT WRAP */
 function wrapText(text, x, y, maxWidth, lineHeight) {
-    const words = text.split(" ");
-    let line = "";
+  let words = text.split(" ");
+  let line = "";
 
-    for (let n = 0; n < words.length; n++) {
-        let testLine = line + words[n] + " ";
-        let metrics = ctx.measureText(testLine);
-        let testWidth = metrics.width;
-
-        if (testWidth > maxWidth && n > 0) {
-            ctx.fillText(line, x, y);
-            line = words[n] + " ";
-            y += lineHeight;
-        } else {
-            line = testLine;
-        }
+  for (let n = 0; n < words.length; n++) {
+    let test = line + words[n] + " ";
+    if (ctx.measureText(test).width > maxWidth && n > 0) {
+      ctx.fillText(line, x, y);
+      line = words[n] + " ";
+      y += lineHeight;
+    } else {
+      line = test;
     }
-    ctx.fillText(line, x, y);
+  }
+  ctx.fillText(line, x, y);
 }
 
-/* 📖 MAIN DRAW LOOP */
+/* 📖 CURL EFFECT */
+function curlEffect(x) {
+  return Math.sin(x / 200) * 30;
+}
+
+/* 🎨 RENDER LOOP */
 function render() {
-    ctx.clearRect(0, 0, W, H);
+  ctx.clearRect(0,0,W,H);
 
-    let nextIndex = pageIndex + 1;
+  let next = pages[index + 1];
 
-    drawPage(pageIndex, offset);
-    drawPage(nextIndex, offset + W);
+  drawPage(pages[index], offset);
 
-    // flip shadow
-    ctx.fillStyle = "rgba(0,0,0," + Math.abs(offset)/800 + ")";
-    ctx.fillRect(0, 0, W, H);
+  if (next) {
+    let curl = curlEffect(offset);
+    drawPage(next, offset + W + curl, true);
+  }
 
-    requestAnimationFrame(render);
+  // shadow overlay
+  ctx.fillStyle = "rgba(0,0,0," + Math.min(Math.abs(offset)/800, 0.6) + ")";
+  ctx.fillRect(0,0,W,H);
+
+  requestAnimationFrame(render);
 }
 render();
 
-/* 📱 DRAG CONTROL */
+/* 📱 DRAG */
 canvas.addEventListener("mousedown", e => {
-    dragging = true;
-    startX = e.clientX;
-});
-
-canvas.addEventListener("mouseup", e => {
-    dragging = false;
-
-    if (offset < -150 && pageIndex < pages.length - 1) {
-        pageIndex++;
-    }
-
-    if (offset > 150 && pageIndex > 0) {
-        pageIndex--;
-    }
-
-    offset = 0;
+  dragging = true;
+  startX = e.clientX;
 });
 
 canvas.addEventListener("mousemove", e => {
-    if (!dragging) return;
-    offset = e.clientX - startX;
+  if (!dragging) return;
+  offset = e.clientX - startX;
+});
+
+canvas.addEventListener("mouseup", () => {
+  dragging = false;
+
+  if (offset < -150 && index < pages.length - 1) index++;
+  if (offset > 150 && index > 0) index--;
+
+  offset = 0;
 });
 
 /* 📱 TOUCH */
 canvas.addEventListener("touchstart", e => {
-    dragging = true;
-    startX = e.touches[0].clientX;
+  dragging = true;
+  startX = e.touches[0].clientX;
 });
 
 canvas.addEventListener("touchmove", e => {
-    if (!dragging) return;
-    offset = e.touches[0].clientX - startX;
+  if (!dragging) return;
+  offset = e.touches[0].clientX - startX;
 });
 
 canvas.addEventListener("touchend", () => {
-    dragging = false;
+  dragging = false;
 
-    if (offset < -150 && pageIndex < pages.length - 1) {
-        pageIndex++;
-    }
+  if (offset < -150 && index < pages.length - 1) index++;
+  if (offset > 150 && index > 0) index--;
 
-    if (offset > 150 && pageIndex > 0) {
-        pageIndex--;
-    }
-
-    offset = 0;
+  offset = 0;
 });
 </script>
 
