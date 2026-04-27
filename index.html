@@ -5,40 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Слова — это следы души</title>
 
-<link rel="manifest" href="manifest.json">
-
 <style>
 html, body {
   margin: 0;
   height: 100%;
-  background: #000;
+  background: #0b0b0b;
   font-family: Georgia, serif;
   overflow: hidden;
 }
 
-/* 📱 APP MODE (fullscreen PWA feel) */
-.app {
+/* 📱 APP STAGE */
+.stage {
   position: fixed;
   inset: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: radial-gradient(circle at center, #151515, #000);
+  background: radial-gradient(circle at center, #1a1a1a, #000);
 }
 
-/* 📖 READER */
-.reader {
+/* 📖 BOOK */
+.book {
   width: min(900px, 92vw);
-  height: min(650px, 80vh);
+  height: min(600px, 80vh);
   background: #fffdf7;
   border-radius: 14px;
   padding: 50px;
   box-sizing: border-box;
-  box-shadow: 0 30px 120px rgba(0,0,0,0.6);
-  overflow: hidden;
+  box-shadow: 0 30px 120px rgba(0,0,0,0.7);
+  transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
-/* text */
+/* TEXT */
 h1, h2 {
   text-align: center;
 }
@@ -47,7 +45,7 @@ p {
   line-height: 1.7;
 }
 
-/* nav */
+/* NAV */
 .nav {
   position: fixed;
   bottom: 18px;
@@ -58,30 +56,20 @@ p {
 }
 
 button {
-  border: none;
   padding: 10px 14px;
   border-radius: 10px;
+  border: none;
   background: rgba(255,255,255,0.1);
   color: white;
   backdrop-filter: blur(10px);
-}
-
-/* subtle fade animation */
-.fade {
-  animation: fade .25s ease;
-}
-
-@keyframes fade {
-  from { opacity: 0; transform: scale(0.98); }
-  to { opacity: 1; transform: scale(1); }
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
-  <div class="reader fade" id="reader"></div>
+<div class="stage">
+  <div class="book" id="book"></div>
 </div>
 
 <div class="nav">
@@ -90,44 +78,50 @@ button {
 </div>
 
 <script>
+/* 📖 BOOK CONTENT */
 const pages = [
 `<h1>Слова — это следы души</h1><p>Вера Климошенко</p>`,
 
-`<h2>Вступление</h2><p>Слова сопровождают нас всю жизнь...</p>`,
+`<h2>Вступление</h2><p>Слова сопровождают нас всю жизнь. Они остаются в памяти даже тогда, когда мы молчим.</p>`,
 
-`<h2>Глава I</h2><p>Каждое слово — это след души...</p>`,
+`<h2>Глава I</h2><p>Каждое слово — это след души, который нельзя стереть временем.</p>`,
 
-`<h2>Глава II</h2><p>Иногда слова становятся светом...</p>`,
+`<h2>Глава II</h2><p>Иногда слова становятся светом, который ведёт нас через темноту.</p>`,
 
-`<h2>Эпилог</h2><p>Всё сказанное остаётся...</p>`
+`<h2>Эпилог</h2><p>Всё сказанное остаётся. Даже если исчезает голос.</p>`
 ];
 
 let i = parseInt(localStorage.getItem("page") || "0");
-const el = document.getElementById("reader");
+const el = document.getElementById("book");
 
+/* 📄 RENDER */
 function render() {
-  el.classList.remove("fade");
-  void el.offsetWidth;
-  el.classList.add("fade");
-
-  el.innerHTML = pages[i];
-  localStorage.setItem("page", i);
+  el.style.opacity = 0;
+  setTimeout(() => {
+    el.innerHTML = pages[i];
+    el.style.opacity = 1;
+    localStorage.setItem("page", i);
+  }, 120);
 }
 
+/* ➡️ NEXT */
 function next() {
   if (i < pages.length - 1) i++;
   render();
 }
 
+/* ⬅️ PREV */
 function prev() {
   if (i > 0) i--;
   render();
 }
 
-/* 📱 swipe (iOS-like feel) */
+/* 📱 SWIPE */
 let startX = 0;
 
-document.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+document.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
 
 document.addEventListener("touchend", e => {
   let diff = e.changedTouches[0].clientX - startX;
@@ -136,13 +130,8 @@ document.addEventListener("touchend", e => {
   if (diff > 60) prev();
 });
 
-/* init */
+/* INIT */
 render();
-
-/* 📌 PWA register */
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
 </script>
 
 </body>
