@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Слова — это следы души</title>
-
-<script src="https://unpkg.com/page-flip/dist/js/page-flip.browser.min.js"></script>
+<title>Apple Books Engine</title>
 
 <style>
 html, body {
@@ -16,89 +14,54 @@ html, body {
     font-family: Georgia, serif;
 }
 
-/* ===== APP SHELL ===== */
-.app {
+/* 📱 APP STAGE */
+.stage {
     position: fixed;
     inset: 0;
     display: flex;
+    justify-content: center;
+    align-items: center;
     background: radial-gradient(circle at center, #151515, #000);
 }
 
-/* ===== SIDEBAR (Apple Books style) ===== */
-.sidebar {
-    width: 260px;
-    background: rgba(20,20,20,0.95);
-    color: #fff;
-    padding: 20px;
-    box-sizing: border-box;
-    border-right: 1px solid rgba(255,255,255,0.1);
-    overflow-y: auto;
-}
-
-.sidebar h2 {
-    font-size: 18px;
-    margin-bottom: 10px;
-}
-
-.toc-item {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 6px;
-    font-size: 14px;
-    opacity: 0.8;
-}
-
-.toc-item:hover {
-    background: rgba(255,255,255,0.1);
-    opacity: 1;
-}
-
-/* search */
-input {
-    width: 100%;
-    padding: 8px;
-    border-radius: 6px;
-    border: none;
-    margin-bottom: 15px;
-}
-
-/* ===== BOOK AREA ===== */
-.main {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* ===== BOOK ===== */
+/* 📖 BOOK SHELL */
 #book {
-    width: 980px;
-    height: 640px;
-    transform: scale(0.92);
-    transition: 0.8s cubic-bezier(.2,.8,.2,1);
-}
-
-body.ready #book {
-    transform: scale(1);
-}
-
-/* ===== PAGE ===== */
-.page {
-    background: #fffdf7;
-    padding: 60px;
-    box-sizing: border-box;
-    font-size: 20px;
-    line-height: 1.7;
+    width: 900px;
+    height: 600px;
+    perspective: 2000px;
     position: relative;
 }
 
-/* COVER */
+/* 📄 PAGE */
+.page {
+    width: 50%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    background: #fffdf7;
+    padding: 50px;
+    box-sizing: border-box;
+    transform-origin: left;
+    transition: transform 0.6s ease;
+    backface-visibility: hidden;
+}
+
+/* left & right pages */
+.page.left {
+    left: 0;
+}
+
+.page.right {
+    right: 0;
+    transform-origin: right;
+}
+
+/* cover */
 .cover {
     background:
-        linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.85)),
+        linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.85)),
         url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80')
-        center/cover no-repeat;
-
+        center/cover;
     color: #f5e7d3;
     display: flex;
     flex-direction: column;
@@ -107,7 +70,7 @@ body.ready #book {
     text-align: center;
 }
 
-/* soft paper */
+/* shadow realism */
 .page::after {
     content: "";
     position: absolute;
@@ -120,105 +83,107 @@ body.ready #book {
 
 <body>
 
-<div class="app">
+<div class="stage">
 
-    <!-- 📚 SIDEBAR -->
-    <div class="sidebar">
-        <h2>📖 Оглавление</h2>
+<div id="book">
 
-        <input id="search" placeholder="Поиск..." />
-
-        <div class="toc-item" onclick="goPage(0)">Обложка</div>
-        <div class="toc-item" onclick="goPage(1)">Вступление</div>
-        <div class="toc-item" onclick="goPage(2)">Глава I</div>
-        <div class="toc-item" onclick="goPage(3)">Глава II</div>
-        <div class="toc-item" onclick="goPage(4)">Эпилог</div>
+    <div class="page left cover" id="p0">
+        <h1>Слова — это следы души</h1>
+        <p>Вера Климошенко</p>
     </div>
 
-    <!-- 📖 BOOK -->
-    <div class="main">
-        <div id="book">
+    <div class="page right" id="p1">
+        <h2>Вступление</h2>
+        <p>Слова сопровождают нас всю жизнь...</p>
+    </div>
 
-            <div class="page cover">
-                <h1>Слова — это следы души</h1>
-                <p>Вера Климошенко</p>
-            </div>
+    <div class="page left" id="p2">
+        <h2>Глава I</h2>
+        <p>Каждое слово — это след души...</p>
+    </div>
 
-            <div class="page">
-                <h2 style="text-align:center;">Вступление</h2>
-                <p>Слова сопровождают нас всю жизнь...</p>
-            </div>
+    <div class="page right" id="p3">
+        <h2>Глава II</h2>
+        <p>Иногда слова становятся светом...</p>
+    </div>
 
-            <div class="page">
-                <h2 style="text-align:center;">Глава I</h2>
-                <p>Каждое слово — это след души...</p>
-            </div>
-
-            <div class="page">
-                <h2 style="text-align:center;">Глава II</h2>
-                <p>Иногда слова становятся светом...</p>
-            </div>
-
-            <div class="page">
-                <h2 style="text-align:center;">Эпилог</h2>
-                <p>Всё сказанное остаётся...</p>
-            </div>
-
-        </div>
+    <div class="page left" id="p4">
+        <h2>Эпилог</h2>
+        <p>Всё сказанное остаётся...</p>
     </div>
 
 </div>
 
+</div>
+
 <script>
-let book;
+let currentPage = 0;
+const pages = document.querySelectorAll(".page");
 
-window.onload = function () {
+let isDragging = false;
+let startX = 0;
 
-    book = new St.PageFlip(document.getElementById("book"), {
-
-        width: 490,
-        height: 640,
-
-        size: "stretch",
-
-        showCover: true,
-        maxShadowOpacity: 0.75,
-
-        flippingTime: 900,
-
-        drawShadow: true,
-        useMouseEvents: true,
-        swipeDistance: 20,
-        mobileScrollSupport: true
-    });
-
-    book.loadFromHTML(document.querySelectorAll(".page"));
-
-    setTimeout(() => {
-        document.body.classList.add("ready");
-    }, 400);
-};
-
-/* 📌 navigation */
-function goPage(n) {
-    book.flip(n);
+/* 📱 TOUCH / MOUSE CONTROL */
+function goNext() {
+    if (currentPage < pages.length - 1) {
+        flipPage(currentPage + 1);
+    }
 }
 
-/* 🔍 search (simple highlight) */
-document.addEventListener("input", (e) => {
-    if (e.target.id !== "search") return;
+function goPrev() {
+    if (currentPage > 0) {
+        flipPage(currentPage - 1);
+    }
+}
 
-    let value = e.target.value.toLowerCase();
-    let pages = document.querySelectorAll(".page");
+/* 📖 REAL BOOK FEEL */
+function flipPage(index) {
+    pages.forEach((p, i) => {
 
-    pages.forEach(p => {
-        if (p.innerText.toLowerCase().includes(value)) {
-            p.style.outline = "2px solid rgba(255,255,255,0.3)";
+        if (i < index) {
+            p.style.transform = "rotateY(-180deg)";
+            p.style.zIndex = i;
         } else {
-            p.style.outline = "none";
+            p.style.transform = "rotateY(0deg)";
+            p.style.zIndex = pages.length - i;
         }
+
     });
+
+    currentPage = index;
+}
+
+/* 🖱️ MOUSE */
+document.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    startX = e.clientX;
 });
+
+document.addEventListener("mouseup", (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+
+    let diff = e.clientX - startX;
+
+    if (diff < -50) goNext();
+    if (diff > 50) goPrev();
+});
+
+/* 📱 TOUCH */
+document.addEventListener("touchstart", (e) => {
+    startX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchend", (e) => {
+    let endX = e.changedTouches[0].clientX;
+    let diff = endX - startX;
+
+    if (diff < -50) goNext();
+    if (diff > 50) goPrev();
+});
+
+/* INIT */
+flipPage(0);
 </script>
 
 </body>
