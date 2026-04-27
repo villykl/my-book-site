@@ -10,53 +10,37 @@
 <style>
 body {
     margin: 0;
-    background: #000;
+    height: 100vh;
     overflow: hidden;
-    font-family: Georgia, serif;
-}
-
-/* ===== LOADING SCREEN (APP FEEL) ===== */
-#loader {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at center, #1a1a1a, #000);
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
-    color: #f5e7d3;
-    transition: 1s;
-    z-index: 999;
+    background: radial-gradient(circle at center, #111, #000);
+    font-family: Georgia, serif;
 }
 
-#loader h1 {
-    font-size: 28px;
-    letter-spacing: 2px;
-    opacity: 0.9;
+/* APP STAGE */
+.stage {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* исчезает как приложение */
-.loaded #loader {
-    opacity: 0;
-    pointer-events: none;
-}
-
-/* ===== BOOK CONTAINER ===== */
+/* BOOK */
 #book {
     width: 980px;
     height: 640px;
-    margin: auto;
-    transform: scale(0.95);
-    opacity: 0;
-    transition: 1.2s;
+    transform: scale(0.92);
+    transition: 0.8s ease;
 }
 
-.loaded #book {
-    opacity: 1;
+.opened #book {
     transform: scale(1);
 }
 
-/* ===== PAGES ===== */
+/* PAGES */
 .page {
     background: #fffdf7;
     padding: 60px;
@@ -65,11 +49,11 @@ body {
     line-height: 1.7;
 }
 
-/* ===== COVER ===== */
+/* COVER */
 .cover {
     background:
-        linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.85)),
-        url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1400&q=80')
+        linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.85)),
+        url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80')
         center/cover no-repeat;
 
     color: #f5e7d3;
@@ -81,7 +65,7 @@ body {
 }
 
 .cover h1 {
-    font-size: 46px;
+    font-size: 48px;
     margin: 0;
 }
 
@@ -89,7 +73,7 @@ body {
     opacity: 0.85;
 }
 
-/* subtle paper */
+/* paper depth */
 .page::after {
     content: "";
     position: absolute;
@@ -102,48 +86,55 @@ body {
 
 <body>
 
-<!-- APP LOADING -->
-<div id="loader">
-    <h1>Слова — это следы души</h1>
-    <p>opening book…</p>
-</div>
+<div class="stage">
+    <div id="book">
 
-<!-- BOOK -->
-<div id="book">
+        <!-- 📖 ОБЛОЖКА -->
+        <div class="page cover">
+            <h1>Слова — это следы души</h1>
+            <p>Вера Климошенко</p>
+            <p style="margin-top:20px;">tap to open</p>
+        </div>
 
-    <div class="page cover">
-        <h1>Слова — это следы души</h1>
-        <p>Вера Климошенко</p>
-        <p style="margin-top:20px;">tap to open</p>
+        <!-- 📄 СТРАНИЦЫ -->
+        <div class="page">
+            <h2 style="text-align:center;">Вступление</h2>
+            <p>
+                Слова сопровождают нас всю жизнь.
+                Иногда они становятся домом,
+                иногда — дыханием памяти.
+            </p>
+        </div>
+
+        <div class="page">
+            <h2 style="text-align:center;">Глава I</h2>
+            <p>
+                Каждое слово — это след души.
+                Оно остаётся даже тогда,
+                когда мы перестаём его слышать.
+            </p>
+        </div>
+
+        <div class="page">
+            <h2 style="text-align:center;">Глава II</h2>
+            <p>
+                Иногда слова становятся светом,
+                который невозможно погасить.
+            </p>
+        </div>
+
+        <div class="page">
+            <h2 style="text-align:center;">Эпилог</h2>
+            <p>
+                Всё сказанное остаётся.
+                Даже если исчезает голос.
+            </p>
+        </div>
+
     </div>
-
-    <div class="page">
-        <h2 style="text-align:center;">Вступление</h2>
-        <p>Слова сопровождают нас всю жизнь...</p>
-    </div>
-
-    <div class="page">
-        <h2 style="text-align:center;">Глава I</h2>
-        <p>Каждое слово — это след души...</p>
-    </div>
-
-    <div class="page">
-        <h2 style="text-align:center;">Глава II</h2>
-        <p>Иногда слова становятся светом...</p>
-    </div>
-
-    <div class="page">
-        <h2 style="text-align:center;">Эпилог</h2>
-        <p>Всё сказанное остаётся...</p>
-    </div>
-
 </div>
 
 <script>
-setTimeout(() => {
-    document.body.classList.add("loaded");
-}, 1200);
-
 const book = new St.PageFlip(document.getElementById("book"), {
 
     width: 490,
@@ -152,16 +143,26 @@ const book = new St.PageFlip(document.getElementById("book"), {
     size: "stretch",
 
     showCover: true,
-    maxShadowOpacity: 0.7,
 
-    flippingTime: 1000,   // iPad-like smoothness
-    useMouseEvents: true,
-    swipeDistance: 20,
+    maxShadowOpacity: 0.75,
+
+    flippingTime: 950,
+
     drawShadow: true,
+
+    useMouseEvents: true,
+
+    swipeDistance: 20,
+
     mobileScrollSupport: true
 });
 
 book.loadFromHTML(document.querySelectorAll(".page"));
+
+// 📱 APP OPEN EFFECT
+setTimeout(() => {
+    document.body.classList.add("opened");
+}, 600);
 </script>
 
 </body>
