@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Apple Books Engine</title>
+<title>Canvas Apple Books Engine</title>
 
 <style>
 html, body {
@@ -11,7 +11,6 @@ html, body {
     height: 100%;
     overflow: hidden;
     background: #000;
-    font-family: Georgia, serif;
 }
 
 /* 📱 APP STAGE */
@@ -24,59 +23,10 @@ html, body {
     background: radial-gradient(circle at center, #151515, #000);
 }
 
-/* 📖 BOOK SHELL */
-#book {
-    width: 900px;
-    height: 600px;
-    perspective: 2000px;
-    position: relative;
-}
-
-/* 📄 PAGE */
-.page {
-    width: 50%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    background: #fffdf7;
-    padding: 50px;
-    box-sizing: border-box;
-    transform-origin: left;
-    transition: transform 0.6s ease;
-    backface-visibility: hidden;
-}
-
-/* left & right pages */
-.page.left {
-    left: 0;
-}
-
-.page.right {
-    right: 0;
-    transform-origin: right;
-}
-
-/* cover */
-.cover {
-    background:
-        linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.85)),
-        url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80')
-        center/cover;
-    color: #f5e7d3;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-/* shadow realism */
-.page::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    box-shadow: inset 0 0 40px rgba(0,0,0,0.05);
-    pointer-events: none;
+/* 📖 CANVAS BOOK */
+canvas {
+    border-radius: 12px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
 }
 </style>
 </head>
@@ -84,106 +34,179 @@ html, body {
 <body>
 
 <div class="stage">
-
-<div id="book">
-
-    <div class="page left cover" id="p0">
-        <h1>Слова — это следы души</h1>
-        <p>Вера Климошенко</p>
-    </div>
-
-    <div class="page right" id="p1">
-        <h2>Вступление</h2>
-        <p>Слова сопровождают нас всю жизнь...</p>
-    </div>
-
-    <div class="page left" id="p2">
-        <h2>Глава I</h2>
-        <p>Каждое слово — это след души...</p>
-    </div>
-
-    <div class="page right" id="p3">
-        <h2>Глава II</h2>
-        <p>Иногда слова становятся светом...</p>
-    </div>
-
-    <div class="page left" id="p4">
-        <h2>Эпилог</h2>
-        <p>Всё сказанное остаётся...</p>
-    </div>
-
-</div>
-
+    <canvas id="book" width="1000" height="650"></canvas>
 </div>
 
 <script>
-let currentPage = 0;
-const pages = document.querySelectorAll(".page");
+const canvas = document.getElementById("book");
+const ctx = canvas.getContext("2d");
 
-let isDragging = false;
+const W = canvas.width;
+const H = canvas.height;
+
+/* 📖 PAGES (твой контент) */
+const pages = [
+    {
+        type: "cover",
+        title: "Слова — это следы души",
+        author: "Вера Климошенко",
+        image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80"
+    },
+    {
+        title: "Вступление",
+        text: "Слова сопровождают нас всю жизнь. Иногда они становятся домом, иногда — дыханием памяти."
+    },
+    {
+        title: "Глава I",
+        text: "Каждое слово — это след души. Оно остаётся даже тогда, когда мы его уже не слышим."
+    },
+    {
+        title: "Глава II",
+        text: "Иногда слова становятся светом, который невозможно погасить."
+    },
+    {
+        title: "Эпилог",
+        text: "Всё сказанное остаётся. Даже если исчезает голос."
+    }
+];
+
+let pageIndex = 0;
+let anim = 0;
+let dragging = false;
 let startX = 0;
+let offset = 0;
 
-/* 📱 TOUCH / MOUSE CONTROL */
-function goNext() {
-    if (currentPage < pages.length - 1) {
-        flipPage(currentPage + 1);
+/* 📖 RENDER PAGE */
+function drawPage(i, xOffset = 0) {
+    const p = pages[i];
+    if (!p) return;
+
+    ctx.save();
+    ctx.translate(xOffset, 0);
+
+    // background
+    if (p.type === "cover") {
+        const img = new Image();
+        img.src = p.image;
+
+        ctx.drawImage(img, 0, 0, W, H);
+
+        ctx.fillStyle = "rgba(0,0,0,0.55)";
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.fillStyle = "#f5e7d3";
+        ctx.textAlign = "center";
+
+        ctx.font = "48px Georgia";
+        ctx.fillText(p.title, W/2, H/2 - 20);
+
+        ctx.font = "22px Georgia";
+        ctx.fillText(p.author, W/2, H/2 + 30);
+    } else {
+        ctx.fillStyle = "#fffdf7";
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.fillStyle = "#111";
+        ctx.textAlign = "center";
+
+        ctx.font = "28px Georgia";
+        ctx.fillText(p.title, W/2, 100);
+
+        ctx.font = "20px Georgia";
+
+        wrapText(p.text, W/2, 180, 700, 30);
     }
+
+    ctx.restore();
 }
 
-function goPrev() {
-    if (currentPage > 0) {
-        flipPage(currentPage - 1);
-    }
-}
+/* 📄 TEXT WRAP */
+function wrapText(text, x, y, maxWidth, lineHeight) {
+    const words = text.split(" ");
+    let line = "";
 
-/* 📖 REAL BOOK FEEL */
-function flipPage(index) {
-    pages.forEach((p, i) => {
+    for (let n = 0; n < words.length; n++) {
+        let testLine = line + words[n] + " ";
+        let metrics = ctx.measureText(testLine);
+        let testWidth = metrics.width;
 
-        if (i < index) {
-            p.style.transform = "rotateY(-180deg)";
-            p.style.zIndex = i;
+        if (testWidth > maxWidth && n > 0) {
+            ctx.fillText(line, x, y);
+            line = words[n] + " ";
+            y += lineHeight;
         } else {
-            p.style.transform = "rotateY(0deg)";
-            p.style.zIndex = pages.length - i;
+            line = testLine;
         }
-
-    });
-
-    currentPage = index;
+    }
+    ctx.fillText(line, x, y);
 }
 
-/* 🖱️ MOUSE */
-document.addEventListener("mousedown", (e) => {
-    isDragging = true;
+/* 📖 MAIN DRAW LOOP */
+function render() {
+    ctx.clearRect(0, 0, W, H);
+
+    let nextIndex = pageIndex + 1;
+
+    drawPage(pageIndex, offset);
+    drawPage(nextIndex, offset + W);
+
+    // flip shadow
+    ctx.fillStyle = "rgba(0,0,0," + Math.abs(offset)/800 + ")";
+    ctx.fillRect(0, 0, W, H);
+
+    requestAnimationFrame(render);
+}
+render();
+
+/* 📱 DRAG CONTROL */
+canvas.addEventListener("mousedown", e => {
+    dragging = true;
     startX = e.clientX;
 });
 
-document.addEventListener("mouseup", (e) => {
-    if (!isDragging) return;
-    isDragging = false;
+canvas.addEventListener("mouseup", e => {
+    dragging = false;
 
-    let diff = e.clientX - startX;
+    if (offset < -150 && pageIndex < pages.length - 1) {
+        pageIndex++;
+    }
 
-    if (diff < -50) goNext();
-    if (diff > 50) goPrev();
+    if (offset > 150 && pageIndex > 0) {
+        pageIndex--;
+    }
+
+    offset = 0;
+});
+
+canvas.addEventListener("mousemove", e => {
+    if (!dragging) return;
+    offset = e.clientX - startX;
 });
 
 /* 📱 TOUCH */
-document.addEventListener("touchstart", (e) => {
+canvas.addEventListener("touchstart", e => {
+    dragging = true;
     startX = e.touches[0].clientX;
 });
 
-document.addEventListener("touchend", (e) => {
-    let endX = e.changedTouches[0].clientX;
-    let diff = endX - startX;
-
-    if (diff < -50) goNext();
-    if (diff > 50) goPrev();
+canvas.addEventListener("touchmove", e => {
+    if (!dragging) return;
+    offset = e.touches[0].clientX - startX;
 });
 
-/* INIT */
-flipPage(0);
+canvas.addEventListener("touchend", () => {
+    dragging = false;
+
+    if (offset < -150 && pageIndex < pages.length - 1) {
+        pageIndex++;
+    }
+
+    if (offset > 150 && pageIndex > 0) {
+        pageIndex--;
+    }
+
+    offset = 0;
+});
 </script>
 
 </body>
