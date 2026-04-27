@@ -1,29 +1,19 @@
-<script>
-function initBook() {
-    const book = new St.PageFlip(document.getElementById("book"), {
-        width: 490,
-        height: 640,
-        size: "stretch",
-        showCover: true,
-        maxShadowOpacity: 0.75,
-        flippingTime: 900,
-        drawShadow: true,
-        useMouseEvents: true,
-        swipeDistance: 20,
-        mobileScrollSupport: true
-    });
+const CACHE = "books-cache-v1";
 
-    book.loadFromHTML(document.querySelectorAll(".page"));
+const ASSETS = [
+  "./",
+  "./index.html",
+  "./manifest.json"
+];
 
-    setTimeout(() => {
-        document.body.classList.add("ready");
-    }, 400);
-}
+self.addEventListener("install", e => {
+  e.waitUntil(
+    caches.open(CACHE).then(cache => cache.addAll(ASSETS))
+  );
+});
 
-/* 🔥 ГЛАВНЫЙ ФИКС (ключевой момент) */
-if (document.readyState === "complete") {
-    initBook();
-} else {
-    window.addEventListener("load", initBook);
-}
-</script>
+self.addEventListener("fetch", e => {
+  e.respondWith(
+    caches.match(e.request).then(res => res || fetch(e.request))
+  );
+});
