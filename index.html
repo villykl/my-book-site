@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Слова — это следы души</title>
 
 <script src="https://unpkg.com/page-flip/dist/js/page-flip.browser.min.js"></script>
@@ -16,38 +16,83 @@ html, body {
     font-family: Georgia, serif;
 }
 
-/* 📱 APP FRAME */
+/* ===== APP SHELL ===== */
 .app {
     position: fixed;
     inset: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
     background: radial-gradient(circle at center, #151515, #000);
 }
 
-/* 📖 BOOK */
+/* ===== SIDEBAR (Apple Books style) ===== */
+.sidebar {
+    width: 260px;
+    background: rgba(20,20,20,0.95);
+    color: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    overflow-y: auto;
+}
+
+.sidebar h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.toc-item {
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.toc-item:hover {
+    background: rgba(255,255,255,0.1);
+    opacity: 1;
+}
+
+/* search */
+input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    margin-bottom: 15px;
+}
+
+/* ===== BOOK AREA ===== */
+.main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== BOOK ===== */
 #book {
     width: 980px;
     height: 640px;
     transform: scale(0.92);
-    transition: 0.9s cubic-bezier(.2,.8,.2,1);
+    transition: 0.8s cubic-bezier(.2,.8,.2,1);
 }
 
 body.ready #book {
     transform: scale(1);
 }
 
-/* 📄 PAGE */
+/* ===== PAGE ===== */
 .page {
     background: #fffdf7;
     padding: 60px;
     box-sizing: border-box;
     font-size: 20px;
     line-height: 1.7;
+    position: relative;
 }
 
-/* 📘 COVER */
+/* COVER */
 .cover {
     background:
         linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.85)),
@@ -68,6 +113,7 @@ body.ready #book {
     position: absolute;
     inset: 0;
     box-shadow: inset 0 0 40px rgba(0,0,0,0.05);
+    pointer-events: none;
 }
 </style>
 </head>
@@ -75,40 +121,60 @@ body.ready #book {
 <body>
 
 <div class="app">
-<div id="book">
 
-    <div class="page cover">
-        <h1>Слова — это следы души</h1>
-        <p>Вера Климошенко</p>
+    <!-- 📚 SIDEBAR -->
+    <div class="sidebar">
+        <h2>📖 Оглавление</h2>
+
+        <input id="search" placeholder="Поиск..." />
+
+        <div class="toc-item" onclick="goPage(0)">Обложка</div>
+        <div class="toc-item" onclick="goPage(1)">Вступление</div>
+        <div class="toc-item" onclick="goPage(2)">Глава I</div>
+        <div class="toc-item" onclick="goPage(3)">Глава II</div>
+        <div class="toc-item" onclick="goPage(4)">Эпилог</div>
     </div>
 
-    <div class="page">
-        <h2 style="text-align:center;">Вступление</h2>
-        <p>Слова сопровождают нас всю жизнь...</p>
+    <!-- 📖 BOOK -->
+    <div class="main">
+        <div id="book">
+
+            <div class="page cover">
+                <h1>Слова — это следы души</h1>
+                <p>Вера Климошенко</p>
+            </div>
+
+            <div class="page">
+                <h2 style="text-align:center;">Вступление</h2>
+                <p>Слова сопровождают нас всю жизнь...</p>
+            </div>
+
+            <div class="page">
+                <h2 style="text-align:center;">Глава I</h2>
+                <p>Каждое слово — это след души...</p>
+            </div>
+
+            <div class="page">
+                <h2 style="text-align:center;">Глава II</h2>
+                <p>Иногда слова становятся светом...</p>
+            </div>
+
+            <div class="page">
+                <h2 style="text-align:center;">Эпилог</h2>
+                <p>Всё сказанное остаётся...</p>
+            </div>
+
+        </div>
     </div>
 
-    <div class="page">
-        <h2 style="text-align:center;">Глава I</h2>
-        <p>Каждое слово — это след души...</p>
-    </div>
-
-    <div class="page">
-        <h2 style="text-align:center;">Глава II</h2>
-        <p>Иногда слова становятся светом...</p>
-    </div>
-
-    <div class="page">
-        <h2 style="text-align:center;">Эпилог</h2>
-        <p>Всё сказанное остаётся...</p>
-    </div>
-
-</div>
 </div>
 
 <script>
+let book;
+
 window.onload = function () {
 
-    const book = new St.PageFlip(document.getElementById("book"), {
+    book = new St.PageFlip(document.getElementById("book"), {
 
         width: 490,
         height: 640,
@@ -118,10 +184,9 @@ window.onload = function () {
         showCover: true,
         maxShadowOpacity: 0.75,
 
-        flippingTime: 950,
+        flippingTime: 900,
 
         drawShadow: true,
-
         useMouseEvents: true,
         swipeDistance: 20,
         mobileScrollSupport: true
@@ -129,13 +194,31 @@ window.onload = function () {
 
     book.loadFromHTML(document.querySelectorAll(".page"));
 
-    // 📱 гарантированный iPad APP START
-    requestAnimationFrame(() => {
-        setTimeout(() => {
-            document.body.classList.add("ready");
-        }, 500);
-    });
+    setTimeout(() => {
+        document.body.classList.add("ready");
+    }, 400);
 };
+
+/* 📌 navigation */
+function goPage(n) {
+    book.flip(n);
+}
+
+/* 🔍 search (simple highlight) */
+document.addEventListener("input", (e) => {
+    if (e.target.id !== "search") return;
+
+    let value = e.target.value.toLowerCase();
+    let pages = document.querySelectorAll(".page");
+
+    pages.forEach(p => {
+        if (p.innerText.toLowerCase().includes(value)) {
+            p.style.outline = "2px solid rgba(255,255,255,0.3)";
+        } else {
+            p.style.outline = "none";
+        }
+    });
+});
 </script>
 
 </body>
