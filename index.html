@@ -3,208 +3,207 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Apple Books ULTRA V4</title>
+<title>Apple Books V5 WebGL Engine</title>
 
 <style>
 html, body {
   margin: 0;
   height: 100%;
   overflow: hidden;
-  background: radial-gradient(circle at center, #151515, #000);
+  background: radial-gradient(circle at center, #111, #000);
 }
 
-/* 📱 APP STAGE */
-.stage {
+/* 📱 stage */
+#stage {
   position: fixed;
   inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
-
-/* 📖 CANVAS BOOK */
 canvas {
-  border-radius: 14px;
-  box-shadow: 0 40px 120px rgba(0,0,0,0.7);
-  cursor: grab;
+  display: block;
 }
-canvas:active { cursor: grabbing; }
 </style>
 </head>
 
 <body>
 
-<div class="stage">
-  <canvas id="book" width="1000" height="650"></canvas>
-</div>
+<div id="stage"></div>
+
+<!-- three.js -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
 <script>
-const canvas = document.getElementById("book");
-const ctx = canvas.getContext("2d");
+/* =========================
+   📖 WEBGL APPLE BOOKS ENGINE
+   ========================= */
 
-const W = canvas.width;
-const H = canvas.height;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 1000);
+camera.position.z = 6;
 
-/* 📖 YOUR BOOK */
-const pages = [
-  {
-    cover: true,
-    title: "Слова — это следы души",
-    author: "Вера Климошенко",
-    img: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80"
-  },
-  {
-    title: "Вступление",
-    text: "Слова сопровождают нас всю жизнь. Они остаются даже тогда, когда мы молчим."
-  },
-  {
-    title: "Глава I",
-    text: "Каждое слово — это след души, который нельзя стереть временем."
-  },
-  {
-    title: "Глава II",
-    text: "Иногда слова становятся светом, который ведёт нас через темноту."
-  },
-  {
-    title: "Эпилог",
-    text: "Всё сказанное остаётся. Даже если исчезает голос."
-  }
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(innerWidth, innerHeight);
+document.getElementById("stage").appendChild(renderer.domElement);
+
+/* 📖 TEXTURES (pages) */
+const loader = new THREE.TextureLoader();
+
+const textures = [
+  makeCover(),
+  makePage("Вступление\nСлова сопровождают нас всю жизнь."),
+  makePage("Глава I\nКаждое слово — это след души."),
+  makePage("Глава II\nИногда слова становятся светом."),
+  makePage("Эпилог\nВсё сказанное остаётся.")
 ];
 
-let index = 0;
+/* 📄 BOOK GEOMETRY */
+const geometry = new THREE.PlaneGeometry(3.5, 5);
+const materials = textures.map(t => new THREE.MeshBasicMaterial({ map: t }));
+
+const pages = [];
+
+for (let i = 0; i < materials.length; i++) {
+  const mesh = new THREE.Mesh(geometry, materials[i]);
+  mesh.position.x = i * 0.01;
+  mesh.userData.index = i;
+  scene.add(mesh);
+  pages.push(mesh);
+}
+
+let current = 0;
+
+/* 📱 PHYSICS */
+let targetRotation = 0;
+let rotation = 0;
+
+/* 📖 INPUT */
 let dragging = false;
 let startX = 0;
-let offset = 0;
 
-/* 📄 DRAW PAGE */
-function drawPage(p, xShift = 0, next = false) {
-  ctx.save();
-  ctx.translate(xShift, 0);
-
-  // background
-  if (p.cover) {
-    let img = new Image();
-    img.src = p.img;
-
-    ctx.drawImage(img, 0, 0, W, H);
-    ctx.fillStyle = "rgba(0,0,0,0.55)";
-    ctx.fillRect(0,0,W,H);
-
-    ctx.fillStyle = "#f5e7d3";
-    ctx.textAlign = "center";
-
-    ctx.font = "48px Georgia";
-    ctx.fillText(p.title, W/2, H/2 - 20);
-
-    ctx.font = "22px Georgia";
-    ctx.fillText(p.author, W/2, H/2 + 30);
-
-  } else {
-    ctx.fillStyle = "#fffdf7";
-    ctx.fillRect(0,0,W,H);
-
-    ctx.fillStyle = "#111";
-    ctx.textAlign = "center";
-
-    ctx.font = "28px Georgia";
-    ctx.fillText(p.title, W/2, 100);
-
-    ctx.font = "20px Georgia";
-
-    wrapText(p.text, W/2, 180, 700, 30);
-  }
-
-  ctx.restore();
-
-  // 📌 shadow (page curl feel)
-  if (next) {
-    ctx.fillStyle = "rgba(0,0,0,0.25)";
-    ctx.fillRect(0,0,W,H);
-  }
-}
-
-/* 📄 TEXT WRAP */
-function wrapText(text, x, y, maxWidth, lineHeight) {
-  let words = text.split(" ");
-  let line = "";
-
-  for (let n = 0; n < words.length; n++) {
-    let test = line + words[n] + " ";
-    if (ctx.measureText(test).width > maxWidth && n > 0) {
-      ctx.fillText(line, x, y);
-      line = words[n] + " ";
-      y += lineHeight;
-    } else {
-      line = test;
-    }
-  }
-  ctx.fillText(line, x, y);
-}
-
-/* 📖 CURL EFFECT */
-function curlEffect(x) {
-  return Math.sin(x / 200) * 30;
-}
-
-/* 🎨 RENDER LOOP */
-function render() {
-  ctx.clearRect(0,0,W,H);
-
-  let next = pages[index + 1];
-
-  drawPage(pages[index], offset);
-
-  if (next) {
-    let curl = curlEffect(offset);
-    drawPage(next, offset + W + curl, true);
-  }
-
-  // shadow overlay
-  ctx.fillStyle = "rgba(0,0,0," + Math.min(Math.abs(offset)/800, 0.6) + ")";
-  ctx.fillRect(0,0,W,H);
-
-  requestAnimationFrame(render);
-}
-render();
-
-/* 📱 DRAG */
-canvas.addEventListener("mousedown", e => {
+window.addEventListener("mousedown", e => {
   dragging = true;
   startX = e.clientX;
 });
 
-canvas.addEventListener("mousemove", e => {
-  if (!dragging) return;
-  offset = e.clientX - startX;
-});
-
-canvas.addEventListener("mouseup", () => {
+window.addEventListener("mouseup", e => {
   dragging = false;
 
-  if (offset < -150 && index < pages.length - 1) index++;
-  if (offset > 150 && index > 0) index--;
+  const diff = e.clientX - startX;
 
-  offset = 0;
+  if (diff < -80 && current < pages.length - 1) current++;
+  if (diff > 80 && current > 0) current--;
+
+  targetRotation = current * -Math.PI * 0.9;
+});
+
+window.addEventListener("mousemove", e => {
+  if (!dragging) return;
+
+  const diff = e.clientX - startX;
+  targetRotation = current * -Math.PI * 0.9 + diff * 0.005;
 });
 
 /* 📱 TOUCH */
-canvas.addEventListener("touchstart", e => {
-  dragging = true;
+window.addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
+  dragging = true;
 });
 
-canvas.addEventListener("touchmove", e => {
-  if (!dragging) return;
-  offset = e.touches[0].clientX - startX;
+window.addEventListener("touchmove", e => {
+  const diff = e.touches[0].clientX - startX;
+  targetRotation = current * -Math.PI * 0.9 + diff * 0.005;
 });
 
-canvas.addEventListener("touchend", () => {
+window.addEventListener("touchend", e => {
   dragging = false;
 
-  if (offset < -150 && index < pages.length - 1) index++;
-  if (offset > 150 && index > 0) index--;
+  const diff = e.changedTouches[0].clientX - startX;
 
-  offset = 0;
+  if (diff < -80 && current < pages.length - 1) current++;
+  if (diff > 80 && current > 0) current--;
+
+  targetRotation = current * -Math.PI * 0.9;
+});
+
+/* 📖 ANIMATION LOOP (physics smoothing) */
+function animate() {
+  requestAnimationFrame(animate);
+
+  rotation += (targetRotation - rotation) * 0.08;
+
+  pages.forEach((page, i) => {
+    const offset = i * -Math.PI * 0.9;
+
+    page.rotation.y = rotation - offset;
+
+    /* 📌 fake curl physics */
+    const bend = Math.sin(rotation - offset) * 0.2;
+    page.position.z = Math.abs(rotation - offset) * 0.5;
+
+    page.rotation.z = bend;
+  });
+
+  renderer.render(scene, camera);
+}
+animate();
+
+/* 📖 PAGE TEXTURE GENERATORS */
+function makePage(text) {
+  const c = document.createElement("canvas");
+  c.width = 1024;
+  c.height = 1024;
+
+  const ctx = c.getContext("2d");
+
+  ctx.fillStyle = "#fffdf7";
+  ctx.fillRect(0,0,c.width,c.height);
+
+  ctx.fillStyle = "#111";
+  ctx.font = "40px Georgia";
+  ctx.textAlign = "center";
+
+  const lines = text.split("\n");
+
+  lines.forEach((l, i) => {
+    ctx.fillText(l, c.width/2, 400 + i*60);
+  });
+
+  return new THREE.CanvasTexture(c);
+}
+
+/* 📘 COVER */
+function makeCover() {
+  const c = document.createElement("canvas");
+  c.width = 1024;
+  c.height = 1024;
+
+  const ctx = c.getContext("2d");
+
+  const img = new Image();
+  img.src = "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80";
+
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.fillRect(0,0,c.width,c.height);
+
+    ctx.fillStyle = "#f5e7d3";
+    ctx.font = "60px Georgia";
+    ctx.textAlign = "center";
+
+    ctx.fillText("Слова — это следы души", c.width/2, 500);
+    ctx.font = "30px Georgia";
+    ctx.fillText("Вера Климошенко", c.width/2, 580);
+  };
+
+  return new THREE.CanvasTexture(c);
+}
+
+/* 📱 RESIZE */
+window.addEventListener("resize", () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
 });
 </script>
 
