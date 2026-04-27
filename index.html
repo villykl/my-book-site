@@ -5,170 +5,111 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Слова — это следы души</title>
 
+<script src="https://unpkg.com/page-flip/dist/js/page-flip.browser.min.js"></script>
+
 <style>
 body {
     margin: 0;
     background: #0b0b0b;
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
     font-family: Georgia, serif;
 }
 
-/* ===== КНИГА ===== */
-.book {
+/* КНИГА */
+#book {
     width: 900px;
-    height: 520px;
-    perspective: 2500px;
-    position: relative;
+    height: 600px;
 }
 
-/* ===== ОБЛОЖКА (Apple Books effect) ===== */
+/* СТРАНИЦЫ */
+.page {
+    background: #fffdf7;
+    padding: 60px;
+    box-sizing: border-box;
+    font-size: 20px;
+}
+
+.page h1, .page h2 {
+    text-align: center;
+}
+
+/* ОБЛОЖКА */
 .cover {
-    position: absolute;
-    width: 50%;
-    height: 100%;
-    right: 50%;
-    transform-origin: right;
     background:
         linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)),
         url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f') center/cover;
-
     color: #f5e7d3;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    box-shadow: 10px 0 40px rgba(0,0,0,0.6);
-    transition: transform 1.2s ease;
-    z-index: 10;
 }
 
 .cover h1 {
-    font-size: 38px;
-    text-align: center;
+    font-size: 42px;
     margin: 0;
 }
 
 .cover p {
     opacity: 0.8;
 }
-
-/* открытие обложки */
-.book.open .cover {
-    transform: rotateY(-180deg);
-}
-
-/* ===== РАЗВОРОТЫ ===== */
-.spread {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    position: absolute;
-    background: transparent;
-}
-
-/* страницы */
-.page {
-    width: 50%;
-    height: 100%;
-    background: #fffdf7;
-    padding: 60px;
-    box-sizing: border-box;
-    box-shadow: inset 0 0 50px rgba(0,0,0,0.05);
-}
-
-/* скрываем до открытия */
-.content {
-    opacity: 0;
-    transition: 0.6s;
-}
-
-.book.open .content {
-    opacity: 1;
-}
-
-/* текст */
-h2 {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-p {
-    font-size: 20px;
-    line-height: 1.7;
-}
-
-/* кнопки */
-.controls {
-    position: absolute;
-    bottom: -70px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-}
-
-button {
-    padding: 10px 20px;
-    border: 1px solid white;
-    background: transparent;
-    color: white;
-    cursor: pointer;
-}
-
-button:hover {
-    background: white;
-    color: black;
-}
 </style>
 </head>
 
 <body>
 
-<div class="book" id="book">
+<div id="book">
 
     <!-- ОБЛОЖКА -->
-    <div class="cover">
+    <div class="page cover">
         <h1>Слова — это следы души</h1>
         <p>Вера Климошенко</p>
-        <p style="margin-top:30px;">нажмите →</p>
+        <p style="margin-top:20px;">tap to open</p>
     </div>
 
-    <!-- РАЗВОРОТ -->
-    <div class="spread content">
-
-        <div class="page">
-            <h2>Вступление</h2>
-            <p>
-                Слова сопровождают нас всю жизнь.
-                Иногда они становятся домом,
-                иногда — дыханием памяти.
-            </p>
-        </div>
-
-        <div class="page">
-            <h2>Глава I</h2>
-            <p>
-                Каждое слово — это след души.
-                Оно остаётся даже тогда,
-                когда мы его уже не слышим.
-            </p>
-        </div>
-
+    <!-- СТРАНИЦЫ -->
+    <div class="page">
+        <h2>Вступление</h2>
+        <p>
+            Слова сопровождают нас всю жизнь.
+            Иногда они становятся домом,
+            иногда — дыханием памяти.
+        </p>
     </div>
 
-</div>
+    <div class="page">
+        <h2>Глава I</h2>
+        <p>
+            Каждое слово — это след души.
+            Оно остаётся даже тогда,
+            когда мы его уже не слышим.
+        </p>
+    </div>
 
-<div class="controls">
-    <button onclick="openBook()">📖 Открыть</button>
+    <div class="page">
+        <h2>Глава II</h2>
+        <p>
+            И иногда именно слова
+            становятся тем, что удерживает нас внутри света.
+        </p>
+    </div>
+
 </div>
 
 <script>
-function openBook() {
-    document.getElementById("book").classList.add("open");
-}
+const pageFlip = new St.PageFlip(document.getElementById("book"), {
+    width: 450,
+    height: 600,
+    size: "stretch",
+    maxShadowOpacity: 0.6,
+    showCover: true,
+    mobileScrollSupport: true
+});
+
+pageFlip.loadFromHTML(document.querySelectorAll(".page"));
 </script>
 
 </body>
