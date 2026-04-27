@@ -1,9 +1,10 @@
-const CACHE = "books-cache-v1";
+const CACHE = "books-v1";
 
 const ASSETS = [
   "./",
   "./index.html",
-  "./manifest.json"
+  "./manifest.json",
+  "./icon.png"
 ];
 
 self.addEventListener("install", e => {
