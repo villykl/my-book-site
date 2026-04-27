@@ -10,18 +10,19 @@
 <style>
 body {
     margin: 0;
-    background: #0b0b0b;
+    background: radial-gradient(circle at center, #111, #000);
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     font-family: Georgia, serif;
+    overflow: hidden;
 }
 
 /* КНИГА */
 #book {
-    width: 900px;
-    height: 600px;
+    width: 960px;
+    height: 620px;
 }
 
 /* СТРАНИЦЫ */
@@ -30,31 +31,44 @@ body {
     padding: 60px;
     box-sizing: border-box;
     font-size: 20px;
+    line-height: 1.7;
 }
 
-.page h1, .page h2 {
-    text-align: center;
-}
-
-/* ОБЛОЖКА */
+/* 📖 АВТОМАТИЧЕСКАЯ ОБЛОЖКА (НЕ НУЖНО МЕНЯТЬ) */
 .cover {
     background:
-        linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)),
-        url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f') center/cover;
+        linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.85)),
+        url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80')
+        center/cover no-repeat;
+
     color: #f5e7d3;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
+
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.7);
 }
 
 .cover h1 {
-    font-size: 42px;
+    font-size: 44px;
     margin: 0;
+    letter-spacing: 1px;
 }
 
 .cover p {
-    opacity: 0.8;
+    opacity: 0.85;
+    font-size: 18px;
+}
+
+/* эффект бумаги */
+.page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.05);
+    pointer-events: none;
 }
 </style>
 </head>
@@ -70,46 +84,73 @@ body {
         <p style="margin-top:20px;">tap to open</p>
     </div>
 
-    <!-- СТРАНИЦЫ -->
+    <!-- СТРАНИЦА 1 -->
     <div class="page">
-        <h2>Вступление</h2>
+        <h2 style="text-align:center;">Вступление</h2>
         <p>
             Слова сопровождают нас всю жизнь.
             Иногда они становятся домом,
-            иногда — дыханием памяти.
+            иногда — дыханием памяти,
+            которое невозможно забыть.
         </p>
     </div>
 
+    <!-- СТРАНИЦА 2 -->
     <div class="page">
-        <h2>Глава I</h2>
+        <h2 style="text-align:center;">Глава I</h2>
         <p>
             Каждое слово — это след души.
             Оно остаётся даже тогда,
-            когда мы его уже не слышим.
+            когда мы уже перестаём его слышать.
         </p>
     </div>
 
+    <!-- СТРАНИЦА 3 -->
     <div class="page">
-        <h2>Глава II</h2>
+        <h2 style="text-align:center;">Глава II</h2>
         <p>
             И иногда именно слова
-            становятся тем, что удерживает нас внутри света.
+            становятся тем, что удерживает нас
+            внутри света.
+        </p>
+    </div>
+
+    <!-- ЭПИЛОГ -->
+    <div class="page">
+        <h2 style="text-align:center;">Эпилог</h2>
+        <p>
+            Всё сказанное остаётся.
+            Даже если исчезает голос.
         </p>
     </div>
 
 </div>
 
 <script>
-const pageFlip = new St.PageFlip(document.getElementById("book"), {
-    width: 450,
-    height: 600,
+const book = new St.PageFlip(document.getElementById("book"), {
+
+    width: 480,
+    height: 620,
+
     size: "stretch",
+
+    minWidth: 315,
+    maxWidth: 1000,
+    minHeight: 400,
+    maxHeight: 1536,
+
     maxShadowOpacity: 0.6,
     showCover: true,
-    mobileScrollSupport: true
+
+    mobileScrollSupport: true,
+
+    flippingTime: 900,
+    drawShadow: true,
+    useMouseEvents: true,
+    swipeDistance: 30
 });
 
-pageFlip.loadFromHTML(document.querySelectorAll(".page"));
+book.loadFromHTML(document.querySelectorAll(".page"));
 </script>
 
 </body>
