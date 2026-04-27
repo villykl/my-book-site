@@ -1,152 +1,88 @@
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Слова — это следы души</title>
 
 <style>
-:root{
-  --paper:#f5f2ea;
-  --ink:#2b2b2b;
+body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background: #1a1a1a;
 }
 
-html,body{margin:0;padding:0}
-body{
-  background: var(--paper);
-  color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif;
-  line-height: 1.85;
+/* ПРЕМИУМ ОБЛОЖКА */
+.hero {
+    height: 100vh;
+    background:
+        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+        url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f') center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #f5e6c8;
+    text-align: center;
 }
 
-/* --- COVER (bulletproof) --- */
-.cover{
-  min-height: 100vh;
-  display:flex;align-items:center;justify-content:center;
-  text-align:center;
-  color:#fff;
-  position:relative;
-  overflow:hidden;
-  /* 1) try local image, 2) fallback gradient */
-  background:
-    linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)),
-    url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f');
-  background-size: cover;
-  background-position: center;
+.hero h1 {
+    font-size: 60px;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
 }
 
-/* if image fails to load, keep a nice gradient */
-.cover::before{
-  content:"";
-  position:absolute;inset:0;
-  background: radial-gradient(ellipse at center, rgba(255,255,255,.06), rgba(0,0,0,.6));
-  pointer-events:none;
+.hero p {
+    font-size: 24px;
+    opacity: 0.9;
 }
 
-.cover-inner{
-  padding:60px 40px;
-  border-radius:14px;
-  backdrop-filter: blur(2px);
+/* КНОПКА */
+.btn {
+    margin-top: 40px;
+    padding: 15px 30px;
+    border: 1px solid #f5e6c8;
+    color: #f5e6c8;
+    text-decoration: none;
+    font-size: 18px;
 }
 
-.cover h1{
-  font-size:48px;margin:0 0 16px;letter-spacing:2px;
-}
-.cover p{font-size:20px;opacity:.95;margin:0}
-
-/* --- BOOK --- */
-.book{
-  max-width:820px;
-  margin:60px auto;
-  background:#fff;
-  padding:80px 64px;
-  box-shadow:0 12px 40px rgba(0,0,0,.15);
-  border-radius:10px;
+/* СТРАНИЦЫ КНИГИ */
+.book {
+    background: #f5f1e8;
+    padding: 80px 20px;
 }
 
-.toc{
-  margin:20px 0 40px;
-  padding:20px 24px;
-  border:1px solid #e3e3e3;
-  background:#fafafa;
-}
-.toc h3{margin:0 0 10px}
-.toc a{display:block;color:#333;text-decoration:none;margin:6px 0}
-.toc a:hover{text-decoration:underline}
-
-.chapter{margin-top:72px;page-break-before:always}
-.chapter h2{
-  font-size:28px;margin:0 0 18px;
-  border-bottom:1px solid #e3e3e3;padding-bottom:10px;
+.page {
+    max-width: 700px;
+    margin: auto;
+    background: white;
+    padding: 60px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
-p{font-size:18px;text-align:justify;margin:14px 0}
-
-/* page numbers (print + screen hint) */
-.page-num{
-  position:sticky;bottom:0;text-align:center;opacity:.5;font-size:14px;margin-top:40px
-}
-
-/* print */
-@media print{
-  body{background:#fff}
-  .book{box-shadow:none;margin:0;padding:0}
-  .cover{min-height:100vh}
+h2 {
+    text-align: center;
 }
 </style>
+
 </head>
 
 <body>
 
-<!-- COVER -->
-<section class="cover">
-  <div class="cover-inner">
+<div class="hero">
     <h1>Слова — это следы души</h1>
     <p>Вера Климошенко</p>
-  </div>
-</section>
+    <a href="#book" class="btn">Читать книгу</a>
+</div>
 
-<!-- BOOK -->
-<main class="book">
-  <nav class="toc">
-    <h3>Содержание</h3>
-    <a href="#ch1">Глава 1</a>
-    <a href="#ch2">Глава 2</a>
-  </nav>
-
-  <section id="ch1" class="chapter">
-    <h2>Глава 1</h2>
-    <p>Вставь сюда полный текст первой главы без сокращений. Этот блок уже оформлен как печатная книга: поля, межстрочный интервал и выравнивание.</p>
-    <div class="page-num">1</div>
-  </section>
-
-  <section id="ch2" class="chapter">
-    <h2>Глава 2</h2>
-    <p>Вставь сюда текст второй главы. При печати (Ctrl+P) каждая глава начнётся с новой страницы.</p>
-    <div class="page-num">2</div>
-  </section>
-
-</main>
-
-<!--
-✔ ГАРАНТИРОВАННО РАБОТАЮЩАЯ СТРУКТУРА
-
-my-book-site/
-├── index.html
-└── images/
-    └── cover.jpg
-
-ПРОВЕРКА:
-Открой в браузере:
-https://villykl.github.io/my-book-site/images/cover.jpg
-
-Если открывается — обложка подключится автоматически.
-
-Если нет — значит файл не там или имя отличается.
-
-✔ Этот код УЖЕ имеет fallback (градиент), поэтому сайт всегда выглядит красиво
-даже если картинка не загрузилась.
--->
+<div id="book" class="book">
+    <div class="page">
+        <h2>Вступление</h2>
+        <p>Слова... Они сопровождают нас всю жизнь...</p>
+    </div>
+</div>
 
 </body>
 </html>
