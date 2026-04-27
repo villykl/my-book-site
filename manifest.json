@@ -1,7 +1,7 @@
 {
   "name": "Apple Books Reader",
   "short_name": "Books",
-  "start_url": ".",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
