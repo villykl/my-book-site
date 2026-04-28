@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Final Book System</title>
+<title>Clean Final Book App</title>
 
 <style>
 :root {
@@ -100,7 +100,7 @@ button {
   height: 100%;
   width: 0%;
   background: var(--accent);
-  transition: 0.25s;
+  transition: 0.2s;
 }
 
 /* 📱 MOBILE */
@@ -154,7 +154,7 @@ const book = {
 let current = 0;
 
 /* 📚 INIT SIDEBAR */
-function initSidebar() {
+function init() {
   const sidebar = document.getElementById("sidebar");
   sidebar.innerHTML = "";
 
@@ -178,7 +178,7 @@ function render() {
   updateProgress();
 }
 
-/* 🔥 SIDEBAR ACTIVE */
+/* 🔥 ACTIVE CHAPTER */
 function updateSidebar() {
   const items = document.querySelectorAll(".item");
 
@@ -209,14 +209,14 @@ function prev() {
   }
 }
 
-/* 📌 GO CHAPTER */
+/* 📌 GO */
 function go(i) {
   current = i;
   render();
 }
 
-/* 🚀 INIT */
-initSidebar();
+/* 🚀 START */
+init();
 render();
 
 </script>
