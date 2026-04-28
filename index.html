@@ -3,68 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kindle Pro Max Library</title>
+<title>Kindle Ultra Reader</title>
 
 <style>
+:root {
+  --bg: #0b0b0b;
+  --card: #171717;
+  --text: #f5f1e8;
+  --accent: #c7a76c;
+}
+
+body.light {
+  --bg: #f4f4f4;
+  --card: #ffffff;
+  --text: #111;
+}
+
 body {
   margin: 0;
   font-family: Georgia, serif;
-  background: #0b0b0b;
-  color: #f5f1e8;
+  background: var(--bg);
+  color: var(--text);
+  transition: 0.3s;
 }
 
 /* 📚 LIBRARY */
-.library {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 20px;
-  padding: 30px;
+.header {
+  padding: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
-/* 📖 BOOK CARD */
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+/* GRID */
+.library {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
+/* BOOK CARD */
 .book {
-  background: #1a1a1a;
+  background: var(--card);
   border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transition: 0.25s;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 
 .book:hover {
-  transform: scale(1.05);
+  transform: translateY(-5px);
 }
 
-/* 📕 COVER */
 .cover {
-  height: 220px;
+  height: 210px;
   background-size: cover;
   background-position: center;
 }
 
-/* TEXT */
-.info {
-  padding: 12px;
-}
-
 .title {
-  font-size: 16px;
+  padding: 10px;
+  font-size: 14px;
 }
 
 /* 📖 READER */
 .reader {
   display: none;
-  padding: 40px;
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
+  padding: 20px;
 }
 
 .page {
-  background: #fffdf7;
-  color: #111;
-  padding: 50px;
+  background: var(--card);
+  padding: 60px;
   border-radius: 14px;
-  box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+  box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+  min-height: 60vh;
+  transition: opacity 0.2s;
+}
+
+/* TOP BAR */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
 }
 
 /* NAV */
@@ -72,7 +104,7 @@ body {
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
 button {
@@ -81,24 +113,66 @@ button {
   border-radius: 10px;
   background: #222;
   color: white;
+  cursor: pointer;
+}
+
+/* PROGRESS */
+.progress {
+  height: 4px;
+  background: #333;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+}
+
+/* ANIMATION */
+.fade {
+  animation: fade .25s ease;
+}
+
+@keyframes fade {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
 }
 </style>
 </head>
 
 <body>
 
-<!-- 📚 LIBRARY VIEW -->
-<div id="library" class="library"></div>
+<!-- 📚 LIBRARY -->
+<div id="libraryView">
 
-<!-- 📖 READER VIEW -->
-<div id="reader" class="reader">
-  <div class="page" id="page"></div>
+  <div class="header">
+    <input id="search" placeholder="Поиск книг..." oninput="filterBooks()">
+    <button onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="library" id="library"></div>
+</div>
+
+<!-- 📖 READER -->
+<div id="readerView" class="reader">
+
+  <div class="topbar">
+    <button onclick="back()">⬅</button>
+    <button onclick="bookmark()">📌</button>
+  </div>
+
+  <div class="page fade" id="page"></div>
+
+  <div class="progress"><div class="bar" id="bar"></div></div>
 
   <div class="nav">
-    <button onclick="backToLibrary()">⬅ Library</button>
     <button onclick="prev()">◀</button>
     <button onclick="next()">▶</button>
   </div>
+
 </div>
 
 <script>
@@ -107,7 +181,7 @@ button {
 const books = [
 {
   title: "Слова — это следы души",
-  cover: "YOUR_COVER.jpg", // ← ВСТАВЬ СЮДА СВОЮ ОБЛОЖКУ
+  cover: "YOUR_COVER.jpg",
   pages: [
     "Вера Климошенко",
     "Вступление: Слова сопровождают нас...",
@@ -118,76 +192,103 @@ const books = [
 {
   title: "Вторая книга",
   cover: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f",
-  pages: [
-    "Начало второй книги...",
-    "Глава 1...",
-    "Финал..."
-  ]
+  pages: ["Начало...", "Глава 1...", "Финал..."]
 }
 ];
 
-let currentBook = null;
-let pageIndex = 0;
+let current = null;
+let page = 0;
 
 /* 📚 render library */
-const lib = document.getElementById("library");
+function renderLibrary(list = books) {
+  const el = document.getElementById("library");
+  el.innerHTML = "";
 
-function renderLibrary() {
-  lib.innerHTML = "";
+  list.forEach((b, i) => {
+    const div = document.createElement("div");
+    div.className = "book";
+    div.onclick = () => openBook(i);
 
-  books.forEach((b, i) => {
-    const el = document.createElement("div");
-    el.className = "book";
-    el.onclick = () => openBook(i);
-
-    el.innerHTML = `
+    div.innerHTML = `
       <div class="cover" style="background-image:url('${b.cover}')"></div>
-      <div class="info">
-        <div class="title">${b.title}</div>
-      </div>
+      <div class="title">${b.title}</div>
     `;
 
-    lib.appendChild(el);
+    el.appendChild(div);
   });
 }
 
-/* 📖 open book */
+/* 📖 open */
 function openBook(i) {
-  currentBook = books[i];
-  pageIndex = 0;
+  current = books[i];
+  page = 0;
 
-  document.getElementById("library").style.display = "none";
-  document.getElementById("reader").style.display = "block";
+  document.getElementById("libraryView").style.display = "none";
+  document.getElementById("readerView").style.display = "block";
 
   renderPage();
 }
 
 /* 📄 render page */
 function renderPage() {
-  document.getElementById("page").innerHTML =
-    `<h2>${currentBook.title}</h2><p>${currentBook.pages[pageIndex]}</p>`;
+  const el = document.getElementById("page");
+
+  el.classList.remove("fade");
+  void el.offsetWidth;
+  el.classList.add("fade");
+
+  el.innerHTML = `
+    <h2>${current.title}</h2>
+    <p>${current.pages[page]}</p>
+  `;
+
+  updateProgress();
 }
 
-/* ⬅ library */
-function backToLibrary() {
-  document.getElementById("library").style.display = "grid";
-  document.getElementById("reader").style.display = "none";
+/* 📊 progress */
+function updateProgress() {
+  let percent = (page / (current.pages.length - 1)) * 100;
+  document.getElementById("bar").style.width = percent + "%";
+}
+
+/* ⬅ back */
+function back() {
+  document.getElementById("libraryView").style.display = "block";
+  document.getElementById("readerView").style.display = "none";
 }
 
 /* ▶ next */
 function next() {
-  if (pageIndex < currentBook.pages.length - 1) {
-    pageIndex++;
+  if (page < current.pages.length - 1) {
+    page++;
     renderPage();
   }
 }
 
 /* ◀ prev */
 function prev() {
-  if (pageIndex > 0) {
-    pageIndex--;
+  if (page > 0) {
+    page--;
     renderPage();
   }
+}
+
+/* 📌 bookmark */
+function bookmark() {
+  localStorage.setItem("bookmark_" + current.title, page);
+  alert("Закладка сохранена");
+}
+
+/* 🌙 theme */
+function toggleTheme() {
+  document.body.classList.toggle("light");
+}
+
+/* 🔍 search */
+function filterBooks() {
+  const q = document.getElementById("search").value.toLowerCase();
+  const filtered = books.filter(b => b.title.toLowerCase().includes(q));
+  renderLibrary(filtered);
 }
 
 /* init */
