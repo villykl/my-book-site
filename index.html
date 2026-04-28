@@ -1,179 +1,155 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Apple Books V6 GOD MODE</title>
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Book Site</title>
 
 <style>
-body {
-  margin: 0;
-  overflow: hidden;
-  background: radial-gradient(circle at center, #111, #000);
+body{
+  margin:0;
+  font-family: Georgia, serif;
+  background:#0f0f12;
+  color:#eee;
+  overflow-x:hidden;
 }
 
-#scene {
-  width: 100vw;
-  height: 100vh;
+/* Layout */
+.book-nav{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  z-index:10;
 }
 
-/* 🌑 cinematic vignette */
-#scene::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center,
-    transparent 35%,
-    rgba(0,0,0,0.75) 100%);
-  pointer-events: none;
+.book-nav a{
+  color:#aaa;
+  text-decoration:none;
+  font-size:14px;
+  transition:0.3s;
 }
+
+.book-nav a:hover{
+  color:#fff;
+}
+
+/* Chapters */
+.chapter{
+  position:absolute;
+  top:60px;
+  left:0;
+  width:100%;
+  min-height:calc(100vh - 60px);
+  padding:60px 20px;
+  box-sizing:border-box;
+
+  opacity:0;
+  transform: translateX(40px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  pointer-events:none;
+}
+
+.chapter.active{
+  opacity:1;
+  transform: translateX(0);
+  pointer-events:auto;
+}
+
+.chapter.exit-left{
+  opacity:0;
+  transform: translateX(-40px);
+}
+
+.chapter.exit-right{
+  opacity:0;
+  transform: translateX(40px);
+}
+
+h1{
+  font-size:32px;
+  margin-bottom:20px;
+}
+
+p{
+  max-width:700px;
+  line-height:1.6;
+  font-size:18px;
+}
+
 </style>
 </head>
-
 <body>
 
-<div id="scene"></div>
+<div class="book-nav">
+  <a href="#ch0" onclick="goTo('ch0')">Chapter 1</a>
+  <a href="#ch1" onclick="goTo('ch1')">Chapter 2</a>
+  <a href="#ch2" onclick="goTo('ch2')">Chapter 3</a>
+</div>
+
+<!-- Chapters -->
+<div id="ch0" class="chapter active">
+  <h1>Chapter 1</h1>
+  <p>Your text here... This is the first chapter of your book.</p>
+</div>
+
+<div id="ch1" class="chapter">
+  <h1>Chapter 2</h1>
+  <p>Your text here... This is the second chapter.</p>
+</div>
+
+<div id="ch2" class="chapter">
+  <h1>Chapter 3</h1>
+  <p>Your text here... This is the third chapter.</p>
+</div>
 
 <script>
+let current = "ch0";
 
-/* =========================
-   📚 APPLE BOOKS V6 GOD MODE
-========================= */
+function goTo(id){
+  if(id === current) return;
 
-const scene = new THREE.Scene();
+  const old = document.getElementById(current);
+  const next = document.getElementById(id);
 
-/* 🎥 CAMERA */
-const camera = new THREE.PerspectiveCamera(
-  50,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
+  // determine direction
+  const ids = ["ch0","ch1","ch2"];
+  const oldIndex = ids.indexOf(current);
+  const newIndex = ids.indexOf(id);
 
-camera.position.z = 3.5;
+  old.classList.remove("active");
 
-/* 🖥 RENDERER */
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.getElementById("scene").appendChild(renderer.domElement);
-
-/* 💡 LIGHT SYSTEM */
-const key = new THREE.PointLight(0xffffff, 2);
-key.position.set(2, 2, 3);
-scene.add(key);
-
-const warm = new THREE.PointLight(0xd6b36a, 1.5);
-warm.position.set(-2, -1, 2);
-scene.add(warm);
-
-scene.add(new THREE.AmbientLight(0x222222, 1));
-
-/* 📕 TEXTURE */
-const loader = new THREE.TextureLoader();
-const texture = loader.load("cover.jpg");
-
-/* 📦 COVER */
-const coverGeo = new THREE.PlaneGeometry(2, 3);
-
-const coverMat = new THREE.MeshStandardMaterial({
-  map: texture,
-  roughness: 0.35,
-  metalness: 0.25
-});
-
-const cover = new THREE.Mesh(coverGeo, coverMat);
-scene.add(cover);
-
-/* 📄 PAGE SYSTEM (FAKE BOOK) */
-const pages = [];
-
-for (let i = 0; i < 3; i++) {
-  const pageMat = new THREE.MeshStandardMaterial({
-    color: 0x1a1a1a,
-    roughness: 0.9
-  });
-
-  const page = new THREE.Mesh(
-    new THREE.PlaneGeometry(2, 3),
-    pageMat
-  );
-
-  page.position.z = -0.01 * i;
-  pages.push(page);
-  scene.add(page);
-}
-
-/* 🧲 PHYSICS */
-let targetX = 0;
-let targetY = 0;
-let rotX = 0;
-let rotY = 0;
-
-/* 📖 STATE */
-let opened = false;
-
-/* 🖱 MOUSE */
-document.addEventListener("mousemove", (e) => {
-  targetY = (e.clientX / window.innerWidth - 0.5) * 1.2;
-  targetX = (e.clientY / window.innerHeight - 0.5) * -1.0;
-
-  key.position.x = targetY * 3;
-  key.position.y = targetX * 3;
-});
-
-/* 📕 CLICK = OPEN BOOK */
-document.addEventListener("click", () => {
-  opened = !opened;
-});
-
-/* 🎬 LOOP */
-function animate() {
-  requestAnimationFrame(animate);
-
-  rotX += (targetX - rotX) * 0.05;
-  rotY += (targetY - rotY) * 0.05;
-
-  /* 📕 COVER ANIMATION */
-  cover.rotation.x = rotX;
-  cover.rotation.y = rotY;
-
-  if (opened) {
-    cover.position.z += ( -1.2 - cover.position.z ) * 0.05;
-    cover.rotation.y += 0.02;
-
-    pages.forEach((p, i) => {
-      p.position.x = Math.sin(Date.now()*0.001 + i) * 0.02;
-      p.rotation.y = -0.4 + Math.sin(Date.now()*0.0008 + i) * 0.05;
-    });
-
+  if(newIndex > oldIndex){
+    old.classList.add("exit-left");
   } else {
-    cover.position.z += (0 - cover.position.z) * 0.05;
-
-    pages.forEach((p) => {
-      p.rotation.y *= 0.9;
-    });
+    old.classList.add("exit-right");
   }
 
-  /* 🎥 CAMERA DRIFT */
-  camera.position.x += (targetY * 0.2 - camera.position.x) * 0.03;
-  camera.position.y += (targetX * 0.2 - camera.position.y) * 0.03;
+  setTimeout(() => {
+    old.classList.remove("exit-left","exit-right");
+  }, 600);
 
-  camera.lookAt(0, 0, 0);
+  next.classList.add("active");
+  current = id;
 
-  renderer.render(scene, camera);
+  // update URL hash
+  history.replaceState(null,null,"#"+id);
 }
 
-animate();
-
-/* 📱 RESIZE */
-window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+// load from hash
+window.addEventListener("load",()=>{
+  const hash = location.hash.replace("#","" );
+  if(hash && document.getElementById(hash)){
+    goTo(hash);
+  }
 });
-
 </script>
 
 </body>
