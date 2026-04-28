@@ -3,149 +3,289 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Perfect Kindle Nav V2</title>
+<title>Single Perfect Book System</title>
 
 <style>
-html {
-  scroll-behavior: smooth;
+:root {
+  --bg: #0e0e0e;
+  --card: #171717;
+  --text: #f5f1e8;
+  --accent: #c7a76c;
 }
 
 body {
   margin: 0;
   font-family: Georgia, serif;
-  background: #0e0e0e;
-  color: #f5f1e8;
+  background: var(--bg);
+  color: var(--text);
 }
 
-/* 📖 HERO */
-.hero {
-  height: 100vh;
+/* 📚 LIBRARY */
+.header {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: radial-gradient(circle at center, #1a1a1a, #000);
-  text-align: center;
+  gap: 10px;
+  padding: 15px;
 }
 
-.hero h1 {
-  font-size: 48px;
-  margin: 0;
+.header input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
 }
 
-/* 📚 NAV */
-.nav {
-  position: sticky;
-  top: 0;
-  background: rgba(10,10,10,0.95);
-  backdrop-filter: blur(10px);
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  padding: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  z-index: 100;
+/* GRID */
+.library {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+  padding: 20px;
 }
 
-.nav a {
-  color: #f5f1e8;
-  text-decoration: none;
-  font-size: 14px;
-  opacity: 0.5;
+.book {
+  background: var(--card);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
   transition: 0.2s;
 }
 
-.nav a.active {
-  opacity: 1;
-  color: #c7a76c;
-  transform: scale(1.05);
+.book:hover {
+  transform: translateY(-4px);
 }
 
-/* 📖 SECTIONS */
-.section {
-  max-width: 800px;
-  margin: 80px auto;
-  background: #ffffff;
-  color: #111;
+.cover {
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+}
+
+.title {
+  padding: 10px;
+  font-size: 14px;
+}
+
+/* 📖 READER */
+.reader {
+  display: none;
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.page {
+  background: var(--card);
   padding: 60px;
   border-radius: 14px;
-  box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+  min-height: 60vh;
+  box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+}
+
+/* TOP BAR */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: #222;
+  color: white;
+  cursor: pointer;
+}
+
+/* PROGRESS */
+.progress {
+  height: 4px;
+  background: #333;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
   transition: 0.3s;
 }
 
-h2 {
-  text-align: center;
+/* TOC */
+.toc {
+  margin-top: 15px;
+  font-size: 13px;
+  opacity: 0.8;
 }
 
-/* 📱 MOBILE */
-@media (max-width: 600px) {
-  .hero h1 { font-size: 32px; }
-  .section { padding: 30px; margin: 40px 15px; }
+.toc div {
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+.toc div:hover {
+  color: var(--accent);
 }
 </style>
 </head>
 
 <body>
 
-<!-- 📖 HERO -->
-<div class="hero">
-  <h1>Слова — это следы души</h1>
-  <p>Вера Климошенко</p>
+<!-- 📚 LIBRARY VIEW -->
+<div id="libraryView">
+
+  <div class="header">
+    <input id="search" placeholder="Поиск книги..." oninput="searchBooks()">
+  </div>
+
+  <div class="library" id="library"></div>
 </div>
 
-<!-- 📚 NAV -->
-<div class="nav">
-  <a href="#intro" class="navlink">Вступление</a>
-  <a href="#ch1" class="navlink">Глава I</a>
-  <a href="#ch2" class="navlink">Глава II</a>
-  <a href="#end" class="navlink">Эпилог</a>
-</div>
+<!-- 📖 READER VIEW -->
+<div id="readerView" class="reader">
 
-<!-- 📖 CONTENT -->
-<div id="intro" class="section">
-  <h2>Вступление</h2>
-  <p>Слова сопровождают нас всю жизнь. Иногда они становятся домом для наших чувств.</p>
-</div>
+  <div class="topbar">
+    <button onclick="back()">⬅ Назад</button>
+    <button onclick="bookmark()">📌</button>
+  </div>
 
-<div id="ch1" class="section">
-  <h2>Глава I</h2>
-  <p>Каждое слово — это след души, который остаётся даже когда голос исчезает.</p>
-</div>
+  <div class="page" id="page"></div>
 
-<div id="ch2" class="section">
-  <h2>Глава II</h2>
-  <p>Иногда слова становятся светом, который помогает пройти через темноту.</p>
-</div>
+  <div class="toc" id="toc"></div>
 
-<div id="end" class="section">
-  <h2>Эпилог</h2>
-  <p>Всё сказанное остаётся. Даже если исчезает голос.</p>
+  <div class="progress">
+    <div class="bar" id="bar"></div>
+  </div>
+
+  <div style="margin-top:10px; display:flex; gap:10px; justify-content:center;">
+    <button onclick="prev()">◀</button>
+    <button onclick="next()">▶</button>
+  </div>
+
 </div>
 
 <script>
-/* 🔥 ACTIVE SECTION HIGHLIGHT */
-const links = document.querySelectorAll(".navlink");
-const sections = document.querySelectorAll(".section");
 
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const id = entry.target.id;
+/* 📚 SINGLE SOURCE OF TRUTH */
+const books = [
+{
+  title: "Слова — это следы души",
+  cover: "YOUR_COVER.jpg",
+  pages: [
+    "Вера Климошенко",
+    "Вступление: Слова сопровождают нас...",
+    "Глава I: Каждое слово — это след души...",
+    "Глава II: Иногда слова становятся светом...",
+    "Эпилог: Всё сказанное остаётся..."
+  ]
+}
+];
 
-      links.forEach(link => {
-        link.classList.remove("active");
+let book = null;
+let page = 0;
 
-        if (link.getAttribute("href") === "#" + id) {
-          link.classList.add("active");
-        }
-      });
-    }
+/* 📚 render library */
+function renderLibrary(list = books) {
+  const el = document.getElementById("library");
+  el.innerHTML = "";
+
+  list.forEach((b, i) => {
+    const div = document.createElement("div");
+    div.className = "book";
+    div.onclick = () => openBook(i);
+
+    div.innerHTML = `
+      <div class="cover" style="background-image:url('${b.cover}')"></div>
+      <div class="title">${b.title}</div>
+    `;
+
+    el.appendChild(div);
   });
-}, {
-  threshold: 0.55
-});
+}
 
-sections.forEach(sec => observer.observe(sec));
+/* 📖 open */
+function openBook(i) {
+  book = books[i];
+  page = 0;
+
+  document.getElementById("libraryView").style.display = "none";
+  document.getElementById("readerView").style.display = "block";
+
+  renderTOC();
+  render();
+}
+
+/* 📄 render page */
+function render() {
+  document.getElementById("page").innerHTML = `
+    <h2>${book.title}</h2>
+    <p>${book.pages[page]}</p>
+  `;
+
+  updateProgress();
+}
+
+/* 📑 TOC */
+function renderTOC() {
+  const toc = document.getElementById("toc");
+  toc.innerHTML = "";
+
+  book.pages.forEach((p, i) => {
+    const d = document.createElement("div");
+    d.innerText = "• " + p.slice(0, 40);
+    d.onclick = () => {
+      page = i;
+      render();
+    };
+    toc.appendChild(d);
+  });
+}
+
+/* 📊 progress */
+function updateProgress() {
+  let percent = (page / (book.pages.length - 1)) * 100;
+  document.getElementById("bar").style.width = percent + "%";
+}
+
+/* ⬅ back */
+function back() {
+  document.getElementById("libraryView").style.display = "block";
+  document.getElementById("readerView").style.display = "none";
+}
+
+/* ▶ next */
+function next() {
+  if (page < book.pages.length - 1) {
+    page++;
+    render();
+  }
+}
+
+/* ◀ prev */
+function prev() {
+  if (page > 0) {
+    page--;
+    render();
+  }
+}
+
+/* 📌 bookmark */
+function bookmark() {
+  localStorage.setItem("bookmark", page);
+  alert("Закладка сохранена");
+}
+
+/* 🔍 search */
+function searchBooks() {
+  const q = document.getElementById("search").value.toLowerCase();
+  renderLibrary(books.filter(b => b.title.toLowerCase().includes(q)));
+}
+
+/* INIT */
+renderLibrary();
+
 </script>
 
 </body>
