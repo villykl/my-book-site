@@ -6,6 +6,10 @@
 <title>Слова — это следы души</title>
 
 <style>
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family: Georgia, serif;
@@ -20,21 +24,16 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center;
   background: radial-gradient(circle at center, #1a1a1a, #000);
-  padding: 20px;
+  text-align: center;
 }
 
 .hero h1 {
-  font-size: 46px;
+  font-size: 48px;
   margin: 0;
 }
 
-.hero p {
-  opacity: 0.7;
-}
-
-/* 📚 NAV */
+/* 📚 NAVBAR */
 .nav {
   position: sticky;
   top: 0;
@@ -45,20 +44,23 @@ body {
   gap: 20px;
   padding: 12px;
   border-bottom: 1px solid rgba(255,255,255,0.1);
+  z-index: 10;
 }
 
 .nav a {
   color: #f5f1e8;
   text-decoration: none;
   font-size: 14px;
-  opacity: 0.8;
+  opacity: 0.6;
+  transition: 0.2s;
 }
 
-.nav a:hover {
+.nav a.active {
   opacity: 1;
+  color: #c7a76c;
 }
 
-/* 📖 SECTION */
+/* 📖 SECTIONS */
 .section {
   max-width: 800px;
   margin: 80px auto;
@@ -79,7 +81,6 @@ h2 {
   .section { padding: 30px; margin: 40px 15px; }
 }
 </style>
-
 </head>
 
 <body>
@@ -92,41 +93,57 @@ h2 {
 
 <!-- 📚 NAV -->
 <div class="nav">
-  <a href="#intro">Вступление</a>
-  <a href="#ch1">Глава I</a>
-  <a href="#ch2">Глава II</a>
-  <a href="#end">Эпилог</a>
+  <a href="#intro" class="navlink">Вступление</a>
+  <a href="#ch1" class="navlink">Глава I</a>
+  <a href="#ch2" class="navlink">Глава II</a>
+  <a href="#end" class="navlink">Эпилог</a>
 </div>
 
-<!-- 📖 CONTENT -->
-<div class="section" id="intro">
+<!-- 📖 CHAPTERS -->
+<div id="intro" class="section">
   <h2>Вступление</h2>
-  <p>
-    Слова сопровождают нас всю жизнь. Иногда они становятся домом для наших чувств,
-    иногда — тишиной между мыслями.
-  </p>
+  <p>Слова сопровождают нас всю жизнь. Иногда они становятся домом для наших чувств.</p>
 </div>
 
-<div class="section" id="ch1">
+<div id="ch1" class="section">
   <h2>Глава I</h2>
-  <p>
-    Каждое слово — это след души. Оно остаётся даже тогда, когда его уже не слышно.
-  </p>
+  <p>Каждое слово — это след души. Оно остаётся даже когда исчезает голос.</p>
 </div>
 
-<div class="section" id="ch2">
+<div id="ch2" class="section">
   <h2>Глава II</h2>
-  <p>
-    Иногда слова становятся светом, который помогает пройти через темноту.
-  </p>
+  <p>Иногда слова становятся светом, который помогает пройти через темноту.</p>
 </div>
 
-<div class="section" id="end">
+<div id="end" class="section">
   <h2>Эпилог</h2>
-  <p>
-    Всё сказанное остаётся. Даже если исчезает голос.
-  </p>
+  <p>Всё сказанное остаётся. Даже если исчезает голос.</p>
 </div>
+
+<script>
+/* ✨ highlight active chapter */
+const links = document.querySelectorAll(".navlink");
+const sections = document.querySelectorAll(".section");
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      let id = entry.target.id;
+
+      links.forEach(l => {
+        l.classList.remove("active");
+        if (l.getAttribute("href") === "#" + id) {
+          l.classList.add("active");
+        }
+      });
+    }
+  });
+}, {
+  threshold: 0.5
+});
+
+sections.forEach(sec => observer.observe(sec));
+</script>
 
 </body>
 </html>
