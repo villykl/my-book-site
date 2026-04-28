@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Apple Books Cover Engine V5</title>
+<title>Apple Books V6 GOD MODE</title>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
@@ -25,8 +25,8 @@ body {
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at center,
-    transparent 40%,
-    rgba(0,0,0,0.7) 100%);
+    transparent 35%,
+    rgba(0,0,0,0.75) 100%);
   pointer-events: none;
 }
 </style>
@@ -37,85 +37,126 @@ body {
 <div id="scene"></div>
 
 <script>
+
 /* =========================
-   🎬 APPLE BOOKS V5 ENGINE
+   📚 APPLE BOOKS V6 GOD MODE
 ========================= */
 
 const scene = new THREE.Scene();
 
 /* 🎥 CAMERA */
 const camera = new THREE.PerspectiveCamera(
-  55,
+  50,
   window.innerWidth / window.innerHeight,
   0.1,
   1000
 );
-camera.position.z = 3.2;
+
+camera.position.z = 3.5;
 
 /* 🖥 RENDERER */
-const renderer = new THREE.WebGLRenderer({
-  antialias: true,
-  alpha: true
-});
-
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 document.getElementById("scene").appendChild(renderer.domElement);
 
-/* 💡 LIGHTS (APPLE STYLE) */
-const keyLight = new THREE.PointLight(0xffffff, 2);
-keyLight.position.set(2, 2, 3);
-scene.add(keyLight);
+/* 💡 LIGHT SYSTEM */
+const key = new THREE.PointLight(0xffffff, 2);
+key.position.set(2, 2, 3);
+scene.add(key);
 
-const warmLight = new THREE.PointLight(0xd6b36a, 1.2);
-warmLight.position.set(-2, -1, 2);
-scene.add(warmLight);
+const warm = new THREE.PointLight(0xd6b36a, 1.5);
+warm.position.set(-2, -1, 2);
+scene.add(warm);
 
 scene.add(new THREE.AmbientLight(0x222222, 1));
 
-/* 📕 COVER TEXTURE */
+/* 📕 TEXTURE */
 const loader = new THREE.TextureLoader();
 const texture = loader.load("cover.jpg");
 
-/* 📦 BOOK OBJECT */
-const geometry = new THREE.PlaneGeometry(2, 3);
+/* 📦 COVER */
+const coverGeo = new THREE.PlaneGeometry(2, 3);
 
-const material = new THREE.MeshStandardMaterial({
+const coverMat = new THREE.MeshStandardMaterial({
   map: texture,
   roughness: 0.35,
   metalness: 0.25
 });
 
-const book = new THREE.Mesh(geometry, material);
-scene.add(book);
+const cover = new THREE.Mesh(coverGeo, coverMat);
+scene.add(cover);
+
+/* 📄 PAGE SYSTEM (FAKE BOOK) */
+const pages = [];
+
+for (let i = 0; i < 3; i++) {
+  const pageMat = new THREE.MeshStandardMaterial({
+    color: 0x1a1a1a,
+    roughness: 0.9
+  });
+
+  const page = new THREE.Mesh(
+    new THREE.PlaneGeometry(2, 3),
+    pageMat
+  );
+
+  page.position.z = -0.01 * i;
+  pages.push(page);
+  scene.add(page);
+}
 
 /* 🧲 PHYSICS */
 let targetX = 0;
 let targetY = 0;
-let velX = 0;
-let velY = 0;
+let rotX = 0;
+let rotY = 0;
+
+/* 📖 STATE */
+let opened = false;
 
 /* 🖱 MOUSE */
 document.addEventListener("mousemove", (e) => {
-  targetY = (e.clientX / window.innerWidth - 0.5) * 1.4;
-  targetX = (e.clientY / window.innerHeight - 0.5) * -1.2;
+  targetY = (e.clientX / window.innerWidth - 0.5) * 1.2;
+  targetX = (e.clientY / window.innerHeight - 0.5) * -1.0;
 
-  keyLight.position.x = targetY * 3;
-  keyLight.position.y = targetX * 3;
+  key.position.x = targetY * 3;
+  key.position.y = targetX * 3;
+});
+
+/* 📕 CLICK = OPEN BOOK */
+document.addEventListener("click", () => {
+  opened = !opened;
 });
 
 /* 🎬 LOOP */
 function animate() {
   requestAnimationFrame(animate);
 
-  velX += (targetX - velX) * 0.06;
-  velY += (targetY - velY) * 0.06;
+  rotX += (targetX - rotX) * 0.05;
+  rotY += (targetY - rotY) * 0.05;
 
-  book.rotation.x = velX;
-  book.rotation.y = velY;
+  /* 📕 COVER ANIMATION */
+  cover.rotation.x = rotX;
+  cover.rotation.y = rotY;
 
-  book.position.y = Math.sin(Date.now() * 0.001) * 0.05;
+  if (opened) {
+    cover.position.z += ( -1.2 - cover.position.z ) * 0.05;
+    cover.rotation.y += 0.02;
 
+    pages.forEach((p, i) => {
+      p.position.x = Math.sin(Date.now()*0.001 + i) * 0.02;
+      p.rotation.y = -0.4 + Math.sin(Date.now()*0.0008 + i) * 0.05;
+    });
+
+  } else {
+    cover.position.z += (0 - cover.position.z) * 0.05;
+
+    pages.forEach((p) => {
+      p.rotation.y *= 0.9;
+    });
+  }
+
+  /* 🎥 CAMERA DRIFT */
   camera.position.x += (targetY * 0.2 - camera.position.x) * 0.03;
   camera.position.y += (targetX * 0.2 - camera.position.y) * 0.03;
 
@@ -132,6 +173,7 @@ window.addEventListener("resize", () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
 </script>
 
 </body>
