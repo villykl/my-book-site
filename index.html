@@ -3,72 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PRO Reader</title>
+<title>Kindle Pro Max Library</title>
 
 <style>
-:root {
-  --bg: #0e0e0e;
-  --card: #ffffff;
-  --text: #111;
-  --accent: #c7a76c;
-}
-
-body.dark {
-  --bg: #0e0e0e;
-  --card: #1b1b1b;
-  --text: #f5f1e8;
-}
-
 body {
   margin: 0;
   font-family: Georgia, serif;
-  background: var(--bg);
-  color: var(--text);
+  background: #0b0b0b;
+  color: #f5f1e8;
+}
+
+/* 📚 LIBRARY */
+.library {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  padding: 30px;
+}
+
+/* 📖 BOOK CARD */
+.book {
+  background: #1a1a1a;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
   transition: 0.3s;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* 📖 APP */
-.app {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
+.book:hover {
+  transform: scale(1.05);
 }
 
-/* 📊 TOP BAR */
-.topbar {
-  position: sticky;
-  top: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(10px);
-  padding: 10px;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  z-index: 10;
+/* 📕 COVER */
+.cover {
+  height: 220px;
+  background-size: cover;
+  background-position: center;
 }
 
-.topbar input {
-  flex: 1;
-  padding: 8px;
-  border-radius: 8px;
-  border: none;
+/* TEXT */
+.info {
+  padding: 12px;
+}
+
+.title {
+  font-size: 16px;
 }
 
 /* 📖 READER */
 .reader {
-  background: var(--card);
-  color: var(--text);
-  padding: 60px;
-  margin-top: 20px;
-  border-radius: 14px;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-  min-height: 60vh;
-  transition: opacity 0.2s;
+  display: none;
+  padding: 40px;
+  max-width: 800px;
+  margin: auto;
 }
 
-h1, h2 { text-align: center; }
+.page {
+  background: #fffdf7;
+  color: #111;
+  padding: 50px;
+  border-radius: 14px;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+}
 
-/* 📚 NAV */
+/* NAV */
 .nav {
   display: flex;
   justify-content: center;
@@ -80,149 +79,120 @@ button {
   padding: 10px 14px;
   border: none;
   border-radius: 10px;
-  cursor: pointer;
   background: #222;
   color: white;
-}
-
-/* 📊 PROGRESS */
-.progress {
-  height: 4px;
-  background: #333;
-  margin-top: 10px;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.bar {
-  height: 100%;
-  width: 0%;
-  background: var(--accent);
-  transition: 0.3s;
-}
-
-/* 📌 bookmark */
-.bookmark {
-  cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<!-- 📚 LIBRARY VIEW -->
+<div id="library" class="library"></div>
 
-  <!-- 📊 TOP BAR -->
-  <div class="topbar">
-    <input id="search" placeholder="Поиск по книге..." oninput="searchText()">
-    <button onclick="toggleTheme()">🌙</button>
-    <button onclick="bookmark()">📌</button>
-  </div>
+<!-- 📖 READER VIEW -->
+<div id="reader" class="reader">
+  <div class="page" id="page"></div>
 
-  <!-- 📖 READER -->
-  <div class="reader" id="reader"></div>
-
-  <!-- 📊 PROGRESS -->
-  <div class="progress">
-    <div class="bar" id="bar"></div>
-  </div>
-
-  <!-- NAV -->
   <div class="nav">
+    <button onclick="backToLibrary()">⬅ Library</button>
     <button onclick="prev()">◀</button>
     <button onclick="next()">▶</button>
   </div>
-
 </div>
 
 <script>
-const pages = [
-"Слова — это следы души. Вера Климошенко.",
-"Вступление: Слова сопровождают нас всю жизнь...",
-"Глава I: Каждое слово — это след души...",
-"Глава II: Иногда слова становятся светом...",
-"Эпилог: Всё сказанное остаётся..."
+
+/* 📚 BOOK DATA */
+const books = [
+{
+  title: "Слова — это следы души",
+  cover: "YOUR_COVER.jpg", // ← ВСТАВЬ СЮДА СВОЮ ОБЛОЖКУ
+  pages: [
+    "Вера Климошенко",
+    "Вступление: Слова сопровождают нас...",
+    "Глава I: Каждое слово — это след души...",
+    "Эпилог: Всё сказанное остаётся..."
+  ]
+},
+{
+  title: "Вторая книга",
+  cover: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f",
+  pages: [
+    "Начало второй книги...",
+    "Глава 1...",
+    "Финал..."
+  ]
+}
 ];
 
-let i = parseInt(localStorage.getItem("page") || "0");
-let bookmarkPage = localStorage.getItem("bookmark");
+let currentBook = null;
+let pageIndex = 0;
 
-const el = document.getElementById("reader");
-const bar = document.getElementById("bar");
+/* 📚 render library */
+const lib = document.getElementById("library");
 
-/* 📖 render */
-function render() {
-  el.style.opacity = 0;
+function renderLibrary() {
+  lib.innerHTML = "";
 
-  setTimeout(() => {
+  books.forEach((b, i) => {
+    const el = document.createElement("div");
+    el.className = "book";
+    el.onclick = () => openBook(i);
+
     el.innerHTML = `
-      <h2>Слово</h2>
-      <p>${pages[i]}</p>
-      ${bookmarkPage == i ? "<p class='bookmark'>📌 Закладка</p>" : ""}
+      <div class="cover" style="background-image:url('${b.cover}')"></div>
+      <div class="info">
+        <div class="title">${b.title}</div>
+      </div>
     `;
 
-    el.style.opacity = 1;
-
-    localStorage.setItem("page", i);
-    updateProgress();
-  }, 120);
+    lib.appendChild(el);
+  });
 }
 
-/* 📊 progress */
-function updateProgress() {
-  let percent = (i / (pages.length - 1)) * 100;
-  bar.style.width = percent + "%";
+/* 📖 open book */
+function openBook(i) {
+  currentBook = books[i];
+  pageIndex = 0;
+
+  document.getElementById("library").style.display = "none";
+  document.getElementById("reader").style.display = "block";
+
+  renderPage();
 }
 
-/* ➡️ next */
+/* 📄 render page */
+function renderPage() {
+  document.getElementById("page").innerHTML =
+    `<h2>${currentBook.title}</h2><p>${currentBook.pages[pageIndex]}</p>`;
+}
+
+/* ⬅ library */
+function backToLibrary() {
+  document.getElementById("library").style.display = "grid";
+  document.getElementById("reader").style.display = "none";
+}
+
+/* ▶ next */
 function next() {
-  if (i < pages.length - 1) i++;
-  render();
-}
-
-/* ⬅️ prev */
-function prev() {
-  if (i > 0) i--;
-  render();
-}
-
-/* 🌙 theme */
-function toggleTheme() {
-  document.body.classList.toggle("dark");
-}
-
-/* 📌 bookmark */
-function bookmark() {
-  localStorage.setItem("bookmark", i);
-  alert("Закладка сохранена");
-  render();
-}
-
-/* 🔍 search */
-function searchText() {
-  let q = document.getElementById("search").value.toLowerCase();
-
-  let found = pages.findIndex(p => p.toLowerCase().includes(q));
-  if (found !== -1) {
-    i = found;
-    render();
+  if (pageIndex < currentBook.pages.length - 1) {
+    pageIndex++;
+    renderPage();
   }
 }
 
-/* 📱 swipe */
-let startX = 0;
-
-document.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-
-document.addEventListener("touchend", e => {
-  let diff = e.changedTouches[0].clientX - startX;
-
-  if (diff < -60) next();
-  if (diff > 60) prev();
-});
+/* ◀ prev */
+function prev() {
+  if (pageIndex > 0) {
+    pageIndex--;
+    renderPage();
+  }
+}
 
 /* init */
-render();
+renderLibrary();
+
 </script>
 
 </body>
