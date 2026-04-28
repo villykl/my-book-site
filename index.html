@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Single Perfect Book System</title>
+<title>Book System Locked</title>
 
 <style>
 :root {
@@ -20,72 +20,62 @@ body {
   color: var(--text);
 }
 
-/* 📚 LIBRARY */
-.header {
+/* 📚 LAYOUT */
+.container {
   display: flex;
-  gap: 10px;
+  height: 100vh;
+}
+
+/* 📚 SIDEBAR */
+.sidebar {
+  width: 260px;
+  background: #111;
   padding: 15px;
+  overflow-y: auto;
+  border-right: 1px solid #222;
 }
 
-.header input {
-  flex: 1;
+.chapter {
   padding: 10px;
-  border-radius: 10px;
-  border: none;
-}
-
-/* GRID */
-.library {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 16px;
-  padding: 20px;
-}
-
-.book {
-  background: var(--card);
-  border-radius: 14px;
-  overflow: hidden;
+  margin-bottom: 6px;
   cursor: pointer;
+  border-radius: 8px;
+  opacity: 0.7;
   transition: 0.2s;
 }
 
-.book:hover {
-  transform: translateY(-4px);
+.chapter:hover {
+  background: #222;
+  opacity: 1;
 }
 
-.cover {
-  height: 220px;
-  background-size: cover;
-  background-position: center;
-}
-
-.title {
-  padding: 10px;
-  font-size: 14px;
+.chapter.active {
+  background: #2a241a;
+  color: var(--accent);
+  opacity: 1;
 }
 
 /* 📖 READER */
 .reader {
-  display: none;
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
 }
 
 .page {
+  max-width: 800px;
+  margin: auto;
   background: var(--card);
   padding: 60px;
   border-radius: 14px;
-  min-height: 60vh;
   box-shadow: 0 30px 100px rgba(0,0,0,0.5);
 }
 
-/* TOP BAR */
+/* 📊 TOP BAR */
 .topbar {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 button {
@@ -97,194 +87,140 @@ button {
   cursor: pointer;
 }
 
-/* PROGRESS */
+/* 📊 PROGRESS */
 .progress {
   height: 4px;
   background: #333;
   border-radius: 10px;
   overflow: hidden;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 .bar {
   height: 100%;
   width: 0%;
   background: var(--accent);
-  transition: 0.3s;
+  transition: 0.2s;
 }
 
-/* TOC */
-.toc {
-  margin-top: 15px;
-  font-size: 13px;
-  opacity: 0.8;
-}
-
-.toc div {
-  padding: 4px 0;
-  cursor: pointer;
-}
-
-.toc div:hover {
-  color: var(--accent);
+/* 📱 MOBILE */
+@media (max-width: 800px) {
+  .container { flex-direction: column; }
+  .sidebar { width: 100%; display: flex; overflow-x: auto; }
+  .chapter { white-space: nowrap; }
 }
 </style>
+
 </head>
 
 <body>
 
-<!-- 📚 LIBRARY VIEW -->
-<div id="libraryView">
+<div class="container">
 
-  <div class="header">
-    <input id="search" placeholder="Поиск книги..." oninput="searchBooks()">
-  </div>
+  <!-- 📚 SIDEBAR -->
+  <div class="sidebar" id="sidebar"></div>
 
-  <div class="library" id="library"></div>
-</div>
+  <!-- 📖 READER -->
+  <div class="reader">
 
-<!-- 📖 READER VIEW -->
-<div id="readerView" class="reader">
+    <div class="topbar">
+      <button onclick="prev()">◀</button>
+      <button onclick="next()">▶</button>
+    </div>
 
-  <div class="topbar">
-    <button onclick="back()">⬅ Назад</button>
-    <button onclick="bookmark()">📌</button>
-  </div>
+    <div class="page" id="page"></div>
 
-  <div class="page" id="page"></div>
+    <div class="progress">
+      <div class="bar" id="bar"></div>
+    </div>
 
-  <div class="toc" id="toc"></div>
-
-  <div class="progress">
-    <div class="bar" id="bar"></div>
-  </div>
-
-  <div style="margin-top:10px; display:flex; gap:10px; justify-content:center;">
-    <button onclick="prev()">◀</button>
-    <button onclick="next()">▶</button>
   </div>
 
 </div>
 
 <script>
 
-/* 📚 SINGLE SOURCE OF TRUTH */
-const books = [
-{
+/* 🔒 SINGLE SOURCE OF TRUTH */
+const book = {
   title: "Слова — это следы души",
-  cover: "YOUR_COVER.jpg",
-  pages: [
-    "Вера Климошенко",
-    "Вступление: Слова сопровождают нас...",
+  chapters: [
+    "Вступление: Слова сопровождают нас всю жизнь...",
     "Глава I: Каждое слово — это след души...",
     "Глава II: Иногда слова становятся светом...",
     "Эпилог: Всё сказанное остаётся..."
   ]
-}
-];
+};
 
-let book = null;
-let page = 0;
+let current = 0;
 
-/* 📚 render library */
-function renderLibrary(list = books) {
-  const el = document.getElementById("library");
-  el.innerHTML = "";
+/* 📚 INIT SIDEBAR */
+function renderSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.innerHTML = "";
 
-  list.forEach((b, i) => {
+  book.chapters.forEach((ch, i) => {
     const div = document.createElement("div");
-    div.className = "book";
-    div.onclick = () => openBook(i);
+    div.className = "chapter";
+    div.innerText = ch.slice(0, 40);
+    div.onclick = () => go(i);
 
-    div.innerHTML = `
-      <div class="cover" style="background-image:url('${b.cover}')"></div>
-      <div class="title">${b.title}</div>
-    `;
-
-    el.appendChild(div);
+    sidebar.appendChild(div);
   });
+
+  updateSidebar();
 }
 
-/* 📖 open */
-function openBook(i) {
-  book = books[i];
-  page = 0;
-
-  document.getElementById("libraryView").style.display = "none";
-  document.getElementById("readerView").style.display = "block";
-
-  renderTOC();
-  render();
-}
-
-/* 📄 render page */
+/* 📖 RENDER PAGE */
 function render() {
   document.getElementById("page").innerHTML = `
     <h2>${book.title}</h2>
-    <p>${book.pages[page]}</p>
+    <p>${book.chapters[current]}</p>
   `;
 
+  updateSidebar();
   updateProgress();
 }
 
-/* 📑 TOC */
-function renderTOC() {
-  const toc = document.getElementById("toc");
-  toc.innerHTML = "";
+/* 🔥 SIDEBAR ACTIVE */
+function updateSidebar() {
+  const items = document.querySelectorAll(".chapter");
 
-  book.pages.forEach((p, i) => {
-    const d = document.createElement("div");
-    d.innerText = "• " + p.slice(0, 40);
-    d.onclick = () => {
-      page = i;
-      render();
-    };
-    toc.appendChild(d);
+  items.forEach((el, i) => {
+    el.classList.toggle("active", i === current);
   });
 }
 
-/* 📊 progress */
+/* 📊 PROGRESS */
 function updateProgress() {
-  let percent = (page / (book.pages.length - 1)) * 100;
+  let percent = (current / (book.chapters.length - 1)) * 100;
   document.getElementById("bar").style.width = percent + "%";
 }
 
-/* ⬅ back */
-function back() {
-  document.getElementById("libraryView").style.display = "block";
-  document.getElementById("readerView").style.display = "none";
-}
-
-/* ▶ next */
+/* ▶ NEXT */
 function next() {
-  if (page < book.pages.length - 1) {
-    page++;
+  if (current < book.chapters.length - 1) {
+    current++;
     render();
   }
 }
 
-/* ◀ prev */
+/* ◀ PREV */
 function prev() {
-  if (page > 0) {
-    page--;
+  if (current > 0) {
+    current--;
     render();
   }
 }
 
-/* 📌 bookmark */
-function bookmark() {
-  localStorage.setItem("bookmark", page);
-  alert("Закладка сохранена");
+/* 📌 GO */
+function go(i) {
+  current = i;
+  render();
 }
 
-/* 🔍 search */
-function searchBooks() {
-  const q = document.getElementById("search").value.toLowerCase();
-  renderLibrary(books.filter(b => b.title.toLowerCase().includes(q)));
-}
-
-/* INIT */
-renderLibrary();
+/* 🚀 START */
+renderSidebar();
+render();
 
 </script>
 
