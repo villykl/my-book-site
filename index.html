@@ -3,146 +3,313 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Слова — это следы души</title>
+<title>Kindle Final App Mode</title>
 
 <style>
-html {
-  scroll-behavior: smooth;
+:root {
+  --bg: #0e0e0e;
+  --card: #171717;
+  --text: #f5f1e8;
+  --accent: #c7a76c;
+}
+
+body.light {
+  --bg: #f4f4f4;
+  --card: #ffffff;
+  --text: #111;
 }
 
 body {
   margin: 0;
   font-family: Georgia, serif;
-  background: #0e0e0e;
-  color: #f5f1e8;
+  background: var(--bg);
+  color: var(--text);
+  transition: 0.3s;
 }
 
-/* 📖 HERO */
-.hero {
-  height: 100vh;
+/* 📚 HEADER */
+.header {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  gap: 10px;
+  padding: 15px;
   align-items: center;
-  background: radial-gradient(circle at center, #1a1a1a, #000);
-  text-align: center;
 }
 
-.hero h1 {
-  font-size: 48px;
-  margin: 0;
+.header input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
 }
 
-/* 📚 NAVBAR */
-.nav {
-  position: sticky;
-  top: 0;
-  background: rgba(10,10,10,0.95);
-  backdrop-filter: blur(10px);
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  padding: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  z-index: 10;
+/* 📚 LIBRARY */
+.library {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+  padding: 20px;
 }
 
-.nav a {
-  color: #f5f1e8;
-  text-decoration: none;
+.book {
+  background: var(--card);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.25s;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+.book:hover {
+  transform: translateY(-5px);
+}
+
+.cover {
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+}
+
+.title {
+  padding: 10px;
   font-size: 14px;
-  opacity: 0.6;
-  transition: 0.2s;
 }
 
-.nav a.active {
-  opacity: 1;
-  color: #c7a76c;
+/* 📖 READER */
+.reader {
+  display: none;
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
 }
 
-/* 📖 SECTIONS */
-.section {
-  max-width: 800px;
-  margin: 80px auto;
-  background: #ffffff;
-  color: #111;
+/* PAGE */
+.page {
+  background: var(--card);
   padding: 60px;
   border-radius: 14px;
-  box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+  box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+  min-height: 55vh;
 }
 
-h2 {
-  text-align: center;
+/* TOP BAR */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-/* 📱 MOBILE */
-@media (max-width: 600px) {
-  .hero h1 { font-size: 32px; }
-  .section { padding: 30px; margin: 40px 15px; }
+/* NAV */
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: #222;
+  color: white;
+  cursor: pointer;
+}
+
+/* PROGRESS */
+.progress {
+  height: 4px;
+  background: #333;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: 0.3s;
+}
+
+/* TOC */
+.toc {
+  margin-top: 10px;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.toc span {
+  display: block;
+  cursor: pointer;
+  padding: 3px 0;
+}
+
+.toc span:hover {
+  color: var(--accent);
 }
 </style>
 </head>
 
 <body>
 
-<!-- 📖 HERO -->
-<div class="hero">
-  <h1>Слова — это следы души</h1>
-  <p>Вера Климошенко</p>
+<!-- 📚 LIBRARY -->
+<div id="libraryView">
+
+  <div class="header">
+    <input id="search" placeholder="Поиск книги..." oninput="filterBooks()">
+    <button onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="library" id="library"></div>
 </div>
 
-<!-- 📚 NAV -->
-<div class="nav">
-  <a href="#intro" class="navlink">Вступление</a>
-  <a href="#ch1" class="navlink">Глава I</a>
-  <a href="#ch2" class="navlink">Глава II</a>
-  <a href="#end" class="navlink">Эпилог</a>
-</div>
+<!-- 📖 READER -->
+<div id="readerView" class="reader">
 
-<!-- 📖 CHAPTERS -->
-<div id="intro" class="section">
-  <h2>Вступление</h2>
-  <p>Слова сопровождают нас всю жизнь. Иногда они становятся домом для наших чувств.</p>
-</div>
+  <div class="topbar">
+    <button onclick="back()">⬅</button>
+    <button onclick="bookmark()">📌</button>
+  </div>
 
-<div id="ch1" class="section">
-  <h2>Глава I</h2>
-  <p>Каждое слово — это след души. Оно остаётся даже когда исчезает голос.</p>
-</div>
+  <div class="page" id="page"></div>
 
-<div id="ch2" class="section">
-  <h2>Глава II</h2>
-  <p>Иногда слова становятся светом, который помогает пройти через темноту.</p>
-</div>
+  <div class="toc" id="toc"></div>
 
-<div id="end" class="section">
-  <h2>Эпилог</h2>
-  <p>Всё сказанное остаётся. Даже если исчезает голос.</p>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <div class="nav">
+    <button onclick="prev()">◀</button>
+    <button onclick="next()">▶</button>
+  </div>
+
 </div>
 
 <script>
-/* ✨ highlight active chapter */
-const links = document.querySelectorAll(".navlink");
-const sections = document.querySelectorAll(".section");
 
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      let id = entry.target.id;
+/* 📚 DATA */
+const books = [
+{
+  title: "Слова — это следы души",
+  cover: "YOUR_COVER.jpg",
+  pages: [
+    "Вера Климошенко",
+    "Вступление: Слова сопровождают нас...",
+    "Глава I: Каждое слово — это след души...",
+    "Глава II: Иногда слова становятся светом...",
+    "Эпилог: Всё сказанное остаётся..."
+  ]
+}
+];
 
-      links.forEach(l => {
-        l.classList.remove("active");
-        if (l.getAttribute("href") === "#" + id) {
-          l.classList.add("active");
-        }
-      });
-    }
+let current = null;
+let page = 0;
+
+/* 📚 LIBRARY */
+function renderLibrary(list = books) {
+  const el = document.getElementById("library");
+  el.innerHTML = "";
+
+  list.forEach((b, i) => {
+    const div = document.createElement("div");
+    div.className = "book";
+    div.onclick = () => openBook(i);
+
+    div.innerHTML = `
+      <div class="cover" style="background-image:url('${b.cover}')"></div>
+      <div class="title">${b.title}</div>
+    `;
+
+    el.appendChild(div);
   });
-}, {
-  threshold: 0.5
-});
+}
 
-sections.forEach(sec => observer.observe(sec));
+/* 📖 OPEN BOOK */
+function openBook(i) {
+  current = books[i];
+  page = 0;
+
+  document.getElementById("libraryView").style.display = "none";
+  document.getElementById("readerView").style.display = "block";
+
+  renderTOC();
+  renderPage();
+}
+
+/* 📄 PAGE */
+function renderPage() {
+  document.getElementById("page").innerHTML = `
+    <h2>${current.title}</h2>
+    <p>${current.pages[page]}</p>
+  `;
+
+  updateProgress();
+}
+
+/* 📑 TOC */
+function renderTOC() {
+  const toc = document.getElementById("toc");
+  toc.innerHTML = "";
+
+  current.pages.forEach((p, i) => {
+    const s = document.createElement("span");
+    s.innerText = "• " + p.slice(0, 30);
+    s.onclick = () => {
+      page = i;
+      renderPage();
+    };
+    toc.appendChild(s);
+  });
+}
+
+/* 📊 PROGRESS */
+function updateProgress() {
+  let percent = (page / (current.pages.length - 1)) * 100;
+  document.getElementById("bar").style.width = percent + "%";
+}
+
+/* ⬅ BACK */
+function back() {
+  document.getElementById("libraryView").style.display = "block";
+  document.getElementById("readerView").style.display = "none";
+}
+
+/* ▶ NEXT */
+function next() {
+  if (page < current.pages.length - 1) {
+    page++;
+    renderPage();
+  }
+}
+
+/* ◀ PREV */
+function prev() {
+  if (page > 0) {
+    page--;
+    renderPage();
+  }
+}
+
+/* 📌 BOOKMARK */
+function bookmark() {
+  localStorage.setItem("bookmark_" + current.title, page);
+  alert("Закладка сохранена");
+}
+
+/* 🌙 THEME */
+function toggleTheme() {
+  document.body.classList.toggle("light");
+}
+
+/* 🔍 SEARCH */
+function filterBooks() {
+  const q = document.getElementById("search").value.toLowerCase();
+  const filtered = books.filter(b => b.title.toLowerCase().includes(q));
+  renderLibrary(filtered);
+}
+
+/* INIT */
+renderLibrary();
+
 </script>
 
 </body>
