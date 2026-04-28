@@ -5,138 +5,100 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Слова — это следы души</title>
 
-<link rel="manifest" href="manifest.json">
-
 <style>
-html, body {
+body {
   margin: 0;
-  height: 100%;
-  background: #000;
   font-family: Georgia, serif;
-  overflow: hidden;
+  background: linear-gradient(135deg, #1a1a1a, #000);
+  color: #f5f1e8;
 }
 
-/* 📱 APP */
-.app {
-  position: fixed;
-  inset: 0;
+/* 📖 HEADER */
+.header {
+  height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: radial-gradient(circle at center, #1a1a1a, #000);
+  text-align: center;
+  padding: 20px;
 }
 
-/* 📖 READER */
-.reader {
-  width: min(900px, 92vw);
-  height: min(600px, 80vh);
-  background: #fffdf7;
-  border-radius: 14px;
+.header h1 {
+  font-size: 48px;
+  margin: 0;
+}
+
+.header p {
+  font-size: 20px;
+  opacity: 0.8;
+  margin-top: 10px;
+}
+
+/* 📚 BOOK SECTION */
+.book {
+  background: #f5f1e8;
+  color: #111;
+  padding: 80px 20px;
+}
+
+.page {
+  max-width: 800px;
+  margin: 40px auto;
+  background: white;
   padding: 50px;
-  box-sizing: border-box;
-  box-shadow: 0 30px 120px rgba(0,0,0,0.7);
-  transition: opacity .2s ease;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease;
 }
 
-/* TEXT */
-h1, h2 { text-align: center; }
-p { font-size: 20px; line-height: 1.7; }
-
-/* NAV */
-.nav {
-  position: fixed;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
+.page:hover {
+  transform: translateY(-5px);
 }
 
-button {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  backdrop-filter: blur(10px);
+h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+/* 📱 responsive */
+@media (max-width: 600px) {
+  .header h1 { font-size: 32px; }
+  .page { padding: 30px; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
-  <div class="reader" id="reader"></div>
+<div class="header">
+  <h1>Слова — это следы души</h1>
+  <p>Вера Климошенко</p>
 </div>
 
-<div class="nav">
-  <button onclick="prev()">◀</button>
-  <button onclick="next()">▶</button>
+<div class="book">
+
+  <div class="page">
+    <h2>Вступление</h2>
+    <p>Слова сопровождают нас всю жизнь. Иногда они становятся домом для наших чувств, иногда — тишиной между мыслями.</p>
+  </div>
+
+  <div class="page">
+    <h2>Глава I</h2>
+    <p>Каждое слово — это след души. Оно остаётся даже тогда, когда мы его уже не слышим.</p>
+  </div>
+
+  <div class="page">
+    <h2>Глава II</h2>
+    <p>Иногда слова становятся светом, который помогает пройти через темноту.</p>
+  </div>
+
+  <div class="page">
+    <h2>Эпилог</h2>
+    <p>Всё сказанное остаётся. Даже если исчезает голос.</p>
+  </div>
+
 </div>
-
-<script>
-const pages = [
-`<h1>Слова — это следы души</h1><p>Вера Климошенко</p>`,
-
-`<h2>Вступление</h2><p>Слова сопровождают нас всю жизнь...</p>`,
-
-`<h2>Глава I</h2><p>Каждое слово — это след души...</p>`,
-
-`<h2>Глава II</h2><p>Иногда слова становятся светом...</p>`,
-
-`<h2>Эпилог</h2><p>Всё сказанное остаётся...</p>`
-];
-
-let i = parseInt(localStorage.getItem("page") || "0");
-const el = document.getElementById("reader");
-
-/* 📄 render */
-function render() {
-  el.style.opacity = 0;
-
-  setTimeout(() => {
-    el.innerHTML = pages[i];
-    el.style.opacity = 1;
-    localStorage.setItem("page", i);
-  }, 120);
-}
-
-/* ➡️ next */
-function next() {
-  if (i < pages.length - 1) i++;
-  render();
-}
-
-/* ⬅️ prev */
-function prev() {
-  if (i > 0) i--;
-  render();
-}
-
-/* 📱 swipe */
-let startX = 0;
-
-document.addEventListener("touchstart", e => {
-  startX = e.touches[0].clientX;
-});
-
-document.addEventListener("touchend", e => {
-  let diff = e.changedTouches[0].clientX - startX;
-
-  if (diff < -60) next();
-  if (diff > 60) prev();
-});
-
-render();
-
-/* 📲 SAFE PWA REGISTER */
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js")
-      .catch(err => console.log("SW error:", err));
-  });
-}
-</script>
 
 </body>
 </html>
