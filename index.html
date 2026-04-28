@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kindle V4 Continuous</title>
+<title>Kindle V5 Ultra Pro Max</title>
 
 <style>
 body {
@@ -11,16 +11,18 @@ body {
   font-family: Georgia, serif;
   background: #0e0e0e;
   color: #f5f1e8;
+  overflow: hidden;
 }
 
-.container {
+/* 🧠 APP LAYOUT */
+.app {
   display: flex;
   height: 100vh;
 }
 
 /* 📚 SIDEBAR */
 .sidebar {
-  width: 280px;
+  width: 260px;
   background: #111;
   border-right: 1px solid #222;
   padding: 15px;
@@ -48,24 +50,43 @@ body {
 /* 📖 READER */
 .reader {
   flex: 1;
-  padding: 40px;
-  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 2000px;
 }
 
+/* 📄 PAGE */
 .page {
-  max-width: 800px;
-  margin: auto;
+  width: 60%;
+  height: 70%;
   background: #171717;
   padding: 60px;
   border-radius: 14px;
-  box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+  box-shadow: 0 40px 120px rgba(0,0,0,0.6);
+  transform-origin: center left;
+  transition: transform 0.6s ease, opacity 0.6s ease;
 }
 
-/* NAV */
-.topbar {
+/* 🔄 FLIP EFFECT */
+.flip-next {
+  transform: rotateY(-90deg);
+  opacity: 0;
+}
+
+.flip-prev {
+  transform: rotateY(90deg);
+  opacity: 0;
+}
+
+/* 📊 NAV */
+.nav {
+  position: absolute;
+  bottom: 25px;
+  width: 100%;
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
+  justify-content: center;
+  gap: 10px;
 }
 
 button {
@@ -77,41 +98,27 @@ button {
   cursor: pointer;
 }
 
-/* PROGRESS */
-.progress {
-  height: 4px;
-  background: #333;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 15px;
-}
-
-.bar {
-  height: 100%;
-  width: 0%;
-  background: #c7a76c;
-  transition: 0.2s;
+/* 📱 MOBILE SWIPE AREA */
+.reader {
+  touch-action: pan-y;
 }
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
 
   <div class="sidebar" id="sidebar"></div>
 
-  <div class="reader">
-
-    <div class="topbar">
-      <button onclick="prev()">◀</button>
-      <button onclick="next()">▶</button>
-    </div>
+  <div class="reader" id="reader">
 
     <div class="page" id="page"></div>
 
-    <div class="progress">
-      <div class="bar" id="bar"></div>
+    <div class="nav">
+      <button onclick="prev()">◀</button>
+      <button onclick="next()">▶</button>
     </div>
 
   </div>
@@ -123,7 +130,7 @@ button {
 /* 📚 BOOK */
 const book = {
   title: "Слова — это следы души",
-  chapters: [
+  pages: [
     "Вступление: Слова сопровождают нас всю жизнь...",
     "Глава I: Каждое слово — это след души...",
     "Глава II: Иногда слова становятся светом...",
@@ -132,53 +139,46 @@ const book = {
 };
 
 let current = 0;
+let animating = false;
 
-/* 💾 STORAGE KEY */
-const KEY = "kindle_progress_v4";
+/* 💾 STORAGE */
+const KEY = "kindle_v5_progress";
 
-/* 🔗 GET FROM URL */
+/* 🔗 URL SYNC */
 function getFromURL() {
-  const hash = location.hash.replace("#ch", "");
-  const i = parseInt(hash);
-
-  if (!isNaN(i) && i >= 0 && i < book.chapters.length) {
-    return i;
-  }
-
+  const h = location.hash.replace("#ch", "");
+  const i = parseInt(h);
+  if (!isNaN(i)) return i;
   return null;
 }
 
-/* 💾 SAVE */
-function saveProgress() {
+function setURL(i) {
+  history.replaceState(null, "", "#ch" + i);
+}
+
+/* 💾 SAVE/LOAD */
+function save() {
   localStorage.setItem(KEY, current);
 }
 
-/* 🔄 LOAD */
-function loadProgress() {
+function load() {
   const url = getFromURL();
-  if (url !== null) return url;
+  if (url !== null && url >= 0 && url < book.pages.length) return url;
 
   const saved = localStorage.getItem(KEY);
-  if (saved !== null) return parseInt(saved);
-
-  return 0;
+  return saved ? parseInt(saved) : 0;
 }
 
-/* 🔗 UPDATE URL SAFELY */
-function syncURL() {
-  history.replaceState(null, "", "#ch" + current);
-}
+/* 📚 SIDEBAR */
+function initSidebar() {
+  const s = document.getElementById("sidebar");
 
-/* 📚 INIT SIDEBAR */
-function init() {
-  const sidebar = document.getElementById("sidebar");
-
-  book.chapters.forEach((c, i) => {
-    const div = document.createElement("div");
-    div.className = "item";
-    div.innerText = c.slice(0, 40);
-    div.onclick = () => go(i);
-    sidebar.appendChild(div);
+  book.pages.forEach((p, i) => {
+    const d = document.createElement("div");
+    d.className = "item";
+    d.innerText = p.slice(0, 40);
+    d.onclick = () => go(i);
+    s.appendChild(d);
   });
 }
 
@@ -186,63 +186,81 @@ function init() {
 function render() {
   document.getElementById("page").innerHTML = `
     <h2>${book.title}</h2>
-    <p>${book.chapters[current]}</p>
+    <p>${book.pages[current]}</p>
   `;
 
   updateSidebar();
-  updateProgress();
-
-  saveProgress();
-  syncURL();
+  save();
+  setURL(current);
 }
 
-/* 🔥 ACTIVE */
-function updateSidebar() {
-  document.querySelectorAll(".item").forEach((el, i) => {
-    el.classList.toggle("active", i === current);
-  });
-}
+/* 🔥 FLIP ENGINE */
+function flip(dir, cb) {
+  if (animating) return;
+  animating = true;
 
-/* 📊 PROGRESS */
-function updateProgress() {
-  const percent = (current / (book.chapters.length - 1)) * 100;
-  document.getElementById("bar").style.width = percent + "%";
+  const page = document.getElementById("page");
+
+  page.classList.add(dir === "next" ? "flip-next" : "flip-prev");
+
+  setTimeout(() => {
+    page.classList.remove("flip-next", "flip-prev");
+    cb();
+    render();
+    animating = false;
+  }, 300);
 }
 
 /* ▶ NEXT */
 function next() {
-  if (current < book.chapters.length - 1) {
-    current++;
-    render();
+  if (current < book.pages.length - 1) {
+    flip("next", () => current++);
   }
 }
 
 /* ◀ PREV */
 function prev() {
   if (current > 0) {
-    current--;
-    render();
+    flip("prev", () => current--);
   }
 }
 
 /* 📌 GO */
 function go(i) {
-  current = i;
-  render();
+  if (i === current) return;
+  flip(i > current ? "next" : "prev", () => current = i);
 }
 
-/* 🔁 BACK/FORWARD SUPPORT */
-window.addEventListener("hashchange", () => {
-  const fromURL = getFromURL();
-  if (fromURL !== null) {
-    current = fromURL;
-    render();
-  }
+/* 📊 SIDEBAR STATE */
+function updateSidebar() {
+  document.querySelectorAll(".item").forEach((el, i) => {
+    el.classList.toggle("active", i === current);
+  });
+}
+
+/* ⌨️ KEYBOARD */
+window.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") next();
+  if (e.key === "ArrowLeft") prev();
 });
 
-/* 🚀 START */
-init();
-current = loadProgress();
+/* 📱 SWIPE */
+let startX = 0;
+
+document.getElementById("reader").addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
+
+document.getElementById("reader").addEventListener("touchend", e => {
+  let dx = e.changedTouches[0].clientX - startX;
+
+  if (dx > 50) prev();
+  if (dx < -50) next();
+});
+
+/* 🚀 INIT */
+initSidebar();
+current = load();
 render();
 
 </script>
