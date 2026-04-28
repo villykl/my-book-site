@@ -3,26 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kindle V3 Flip Engine</title>
+<title>Kindle V4 Continuous</title>
 
 <style>
 body {
   margin: 0;
-  background: #0e0e0e;
   font-family: Georgia, serif;
+  background: #0e0e0e;
   color: #f5f1e8;
-  overflow: hidden;
 }
 
-/* 📚 LAYOUT */
-.app {
+.container {
   display: flex;
   height: 100vh;
 }
 
-/* 📑 SIDEBAR */
+/* 📚 SIDEBAR */
 .sidebar {
-  width: 260px;
+  width: 280px;
   background: #111;
   border-right: 1px solid #222;
   padding: 15px;
@@ -44,49 +42,30 @@ body {
 .item.active {
   background: #2a241a;
   color: #c7a76c;
+  opacity: 1;
 }
 
-/* 📖 BOOK STAGE */
-.stage {
+/* 📖 READER */
+.reader {
   flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  perspective: 2000px;
+  padding: 40px;
+  overflow-y: auto;
 }
 
-/* 📄 PAGE */
 .page {
-  width: 60%;
-  height: 70%;
+  max-width: 800px;
+  margin: auto;
   background: #171717;
-  border-radius: 12px;
   padding: 60px;
-  box-shadow: 0 40px 120px rgba(0,0,0,0.6);
-  transform-origin: left center;
-  transition: transform 0.8s ease, opacity 0.8s ease;
-  position: absolute;
+  border-radius: 14px;
+  box-shadow: 0 30px 100px rgba(0,0,0,0.5);
 }
 
-/* FLIP ANIMATION */
-.flip-next {
-  transform: rotateY(-80deg) translateX(-40px);
-  opacity: 0;
-}
-
-.flip-prev {
-  transform: rotateY(80deg) translateX(40px);
-  opacity: 0;
-}
-
-/* 📊 NAV */
-.nav {
-  position: absolute;
-  bottom: 30px;
-  width: 100%;
+/* NAV */
+.topbar {
   display: flex;
-  justify-content: center;
-  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
 button {
@@ -97,24 +76,42 @@ button {
   color: white;
   cursor: pointer;
 }
+
+/* PROGRESS */
+.progress {
+  height: 4px;
+  background: #333;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 15px;
+}
+
+.bar {
+  height: 100%;
+  width: 0%;
+  background: #c7a76c;
+  transition: 0.2s;
+}
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<div class="container">
 
-  <!-- 📑 SIDEBAR -->
   <div class="sidebar" id="sidebar"></div>
 
-  <!-- 📖 STAGE -->
-  <div class="stage">
+  <div class="reader">
+
+    <div class="topbar">
+      <button onclick="prev()">◀</button>
+      <button onclick="next()">▶</button>
+    </div>
 
     <div class="page" id="page"></div>
 
-    <div class="nav">
-      <button onclick="prev()">◀</button>
-      <button onclick="next()">▶</button>
+    <div class="progress">
+      <div class="bar" id="bar"></div>
     </div>
 
   </div>
@@ -126,7 +123,7 @@ button {
 /* 📚 BOOK */
 const book = {
   title: "Слова — это следы души",
-  pages: [
+  chapters: [
     "Вступление: Слова сопровождают нас всю жизнь...",
     "Глава I: Каждое слово — это след души...",
     "Глава II: Иногда слова становятся светом...",
@@ -135,83 +132,117 @@ const book = {
 };
 
 let current = 0;
-let animating = false;
 
-/* 📑 SIDEBAR */
-function initSidebar() {
-  const el = document.getElementById("sidebar");
+/* 💾 STORAGE KEY */
+const KEY = "kindle_progress_v4";
 
-  book.pages.forEach((p, i) => {
+/* 🔗 GET FROM URL */
+function getFromURL() {
+  const hash = location.hash.replace("#ch", "");
+  const i = parseInt(hash);
+
+  if (!isNaN(i) && i >= 0 && i < book.chapters.length) {
+    return i;
+  }
+
+  return null;
+}
+
+/* 💾 SAVE */
+function saveProgress() {
+  localStorage.setItem(KEY, current);
+}
+
+/* 🔄 LOAD */
+function loadProgress() {
+  const url = getFromURL();
+  if (url !== null) return url;
+
+  const saved = localStorage.getItem(KEY);
+  if (saved !== null) return parseInt(saved);
+
+  return 0;
+}
+
+/* 🔗 UPDATE URL SAFELY */
+function syncURL() {
+  history.replaceState(null, "", "#ch" + current);
+}
+
+/* 📚 INIT SIDEBAR */
+function init() {
+  const sidebar = document.getElementById("sidebar");
+
+  book.chapters.forEach((c, i) => {
     const div = document.createElement("div");
     div.className = "item";
-    div.innerText = p.slice(0, 40);
-
+    div.innerText = c.slice(0, 40);
     div.onclick = () => go(i);
-    el.appendChild(div);
+    sidebar.appendChild(div);
   });
 }
 
 /* 📖 RENDER */
 function render() {
-  const page = document.getElementById("page");
-
-  page.innerHTML = `
+  document.getElementById("page").innerHTML = `
     <h2>${book.title}</h2>
-    <p>${book.pages[current]}</p>
+    <p>${book.chapters[current]}</p>
   `;
 
   updateSidebar();
+  updateProgress();
+
+  saveProgress();
+  syncURL();
 }
 
-/* 🔥 FLIP EFFECT */
-function flip(direction, callback) {
-  if (animating) return;
-  animating = true;
-
-  const page = document.getElementById("page");
-
-  page.classList.add(direction === "next" ? "flip-next" : "flip-prev");
-
-  setTimeout(() => {
-    page.classList.remove("flip-next", "flip-prev");
-    callback();
-    render();
-    animating = false;
-  }, 400);
-}
-
-/* ▶ NEXT */
-function next() {
-  if (current < book.pages.length - 1) {
-    flip("next", () => current++);
-  }
-}
-
-/* ◀ PREV */
-function prev() {
-  if (current > 0) {
-    flip("prev", () => current--);
-  }
-}
-
-/* 📌 GO */
-function go(i) {
-  if (i === current) return;
-
-  const dir = i > current ? "next" : "prev";
-
-  flip(dir, () => current = i);
-}
-
-/* 🔥 SIDEBAR ACTIVE */
+/* 🔥 ACTIVE */
 function updateSidebar() {
   document.querySelectorAll(".item").forEach((el, i) => {
     el.classList.toggle("active", i === current);
   });
 }
 
-/* 🚀 INIT */
-initSidebar();
+/* 📊 PROGRESS */
+function updateProgress() {
+  const percent = (current / (book.chapters.length - 1)) * 100;
+  document.getElementById("bar").style.width = percent + "%";
+}
+
+/* ▶ NEXT */
+function next() {
+  if (current < book.chapters.length - 1) {
+    current++;
+    render();
+  }
+}
+
+/* ◀ PREV */
+function prev() {
+  if (current > 0) {
+    current--;
+    render();
+  }
+}
+
+/* 📌 GO */
+function go(i) {
+  current = i;
+  render();
+}
+
+/* 🔁 BACK/FORWARD SUPPORT */
+window.addEventListener("hashchange", () => {
+  const fromURL = getFromURL();
+  if (fromURL !== null) {
+    current = fromURL;
+    render();
+  }
+});
+
+/* 🚀 START */
+init();
+current = loadProgress();
 render();
 
 </script>
