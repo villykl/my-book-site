@@ -1,25 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>My Book Site</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Книга</title>
 
 <style>
 :root{
   --bg:#0f0f12;
   --text:#eee;
   --nav:rgba(0,0,0,0.6);
-  --muted:#aaa;
-  --shadow:rgba(0,0,0,0.5);
 }
 
 body.light{
   --bg:#f5f2ea;
   --text:#1a1a1a;
   --nav:rgba(255,255,255,0.7);
-  --muted:#444;
-  --shadow:rgba(0,0,0,0.2);
 }
 
 body{
@@ -28,7 +25,7 @@ body{
   background:var(--bg);
   color:var(--text);
   overflow:hidden;
-  transition:0.4s ease;
+  transition:0.4s;
 }
 
 /* NAV */
@@ -39,8 +36,8 @@ body{
   right:0;
   height:60px;
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
   gap:20px;
   background:var(--nav);
   backdrop-filter: blur(10px);
@@ -48,184 +45,195 @@ body{
 }
 
 .book-nav a{
-  color:var(--muted);
+  color:#aaa;
   text-decoration:none;
-  font-size:14px;
+  cursor:pointer;
 }
 
 .toggle{
   position:absolute;
   right:20px;
-  padding:6px 12px;
-  border:1px solid var(--muted);
-  border-radius:20px;
   cursor:pointer;
-  background:transparent;
-  color:var(--text);
 }
 
-/* BOOK STAGE */
+/* BOOK */
 .book{
   position:absolute;
   top:60px;
-  left:0;
   width:100%;
   height:calc(100vh - 60px);
   perspective:2500px;
-  overflow:hidden;
 }
 
+/* PAGE */
 .page{
   position:absolute;
   width:100%;
   height:100%;
-  padding:70px 25px;
+  padding:60px 20px;
   box-sizing:border-box;
   background:var(--bg);
   transform-origin:left;
+  transition:transform 0.9s;
   backface-visibility:hidden;
-  transition: transform 0.9s cubic-bezier(.2,.8,.2,1), box-shadow 0.5s;
-  box-shadow:0 0 40px var(--shadow);
 }
 
-.page h1{ font-size:32px; margin-bottom:20px; }
-.page p{ max-width:700px; line-height:1.6; font-size:18px; }
+.page.flipped{
+  transform: rotateY(-180deg);
+}
 
-/* STACK */
-.page{ z-index:1; }
-.page.active{ z-index:50; }
+.page.active{
+  z-index:10;
+}
 
-/* STATES */
-.page.flipped{ transform: rotateY(-180deg); box-shadow:-20px 0 60px var(--shadow); }
-.page.unflipped{ transform: rotateY(0deg); }
+/* COVER */
+.cover{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100%;
+}
+
+.cover img{
+  max-width:80%;
+  border-radius:12px;
+  box-shadow:0 30px 80px rgba(0,0,0,0.6);
+}
+
+/* TEXT */
+h1{
+  font-size:32px;
+}
+
+p{
+  max-width:700px;
+  font-size:18px;
+  line-height:1.6;
+}
 
 </style>
 </head>
 <body>
 
 <div class="book-nav">
-  <a href="#ch0" onclick="goTo(0)">Chapter 1</a>
-  <a href="#ch1" onclick="goTo(1)">Chapter 2</a>
-  <a href="#ch2" onclick="goTo(2)">Chapter 3</a>
-  <button class="toggle" onclick="toggleTheme()">🌙 / ☀️</button>
+  <a onclick="goTo(1)">Глава 1</a>
+  <a onclick="goTo(2)">Глава 2</a>
+  <a onclick="goTo(3)">Глава 3</a>
+  <span class="toggle" onclick="toggleTheme()">🌙 / ☀️</span>
 </div>
 
-<div class="book" id="book">
-  <div class="page active" id="p0">
-    <h1>Chapter 1</h1>
-    <p>Your text here... This is the first chapter of your book.</p>
+<div class="book">
+
+  <!-- ОБЛОЖКА -->
+  <div class="page active">
+    <div class="cover">
+      <img src="cover.jpg">
+    </div>
   </div>
 
-  <div class="page" id="p1">
-    <h1>Chapter 2</h1>
-    <p>Your text here... This is the second chapter.</p>
+  <!-- ГЛАВА 1 -->
+  <div class="page">
+    <h1>Глава 1</h1>
+    <p>Тут будет твой текст книги...</p>
   </div>
 
-  <div class="page" id="p2">
-    <h1>Chapter 3</h1>
-    <p>Your text here... This is the third chapter.</p>
+  <!-- ГЛАВА 2 -->
+  <div class="page">
+    <h1>Глава 2</h1>
+    <p>Продолжение книги...</p>
   </div>
+
+  <!-- ГЛАВА 3 -->
+  <div class="page">
+    <h1>Глава 3</h1>
+    <p>Дальше текст...</p>
+  </div>
+
 </div>
 
 <script>
-let current = 0;
-const pages = document.querySelectorAll('.page');
 
+const pages = document.querySelectorAll(".page");
+let current = 0;
+
+/* ОТРИСОВКА */
 function render(){
   pages.forEach((p,i)=>{
     if(i < current){
-      p.classList.add('flipped');
-      p.classList.remove('active');
-    } else if(i === current){
-      p.classList.add('active');
-      p.classList.remove('flipped');
+      p.classList.add("flipped");
     } else {
-      p.classList.remove('active','flipped');
+      p.classList.remove("flipped");
+    }
+
+    if(i === current){
+      p.classList.add("active");
+    } else {
+      p.classList.remove("active");
     }
   });
 }
 
-function goTo(index){
-  animateTo(index);
-}
-
-/* SEQUENTIAL PAGE FLIP (Apple Books style) */
-async function animateTo(target){
-  if(target === current) return;
-
+/* АНИМАЦИЯ ПО СТРАНИЦАМ */
+async function goTo(target){
   let step = target > current ? 1 : -1;
 
   while(current !== target){
     current += step;
     render();
-    await wait(450); // delay between flips
+    await new Promise(r=>setTimeout(r,400));
   }
 
-  history.replaceState(null,null,'#ch'+current);
+  location.hash = "ch"+current;
 }
 
-function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+/* ТЕМА */
+function toggleTheme(){
+  document.body.classList.toggle("light");
+}
 
-/* DRAG */
+/* СВАЙП */
 let startX = 0;
-let dragging = false;
 
-document.addEventListener('mousedown',e=>{
-  dragging = true;
+document.addEventListener("mousedown",e=>{
   startX = e.clientX;
 });
 
-document.addEventListener('mouseup',e=>{
-  if(!dragging) return;
-  dragging = false;
-
+document.addEventListener("mouseup",e=>{
   let diff = e.clientX - startX;
 
   if(diff < -80 && current < pages.length-1){
-    animateTo(current+1);
+    goTo(current+1);
   }
 
   if(diff > 80 && current > 0){
-    animateTo(current-1);
+    goTo(current-1);
   }
 });
 
 /* TOUCH */
-document.addEventListener('touchstart',e=>{
+document.addEventListener("touchstart",e=>{
   startX = e.touches[0].clientX;
 });
 
-document.addEventListener('touchend',e=>{
+document.addEventListener("touchend",e=>{
   let diff = e.changedTouches[0].clientX - startX;
 
   if(diff < -80 && current < pages.length-1){
-    animateTo(current+1);
+    goTo(current+1);
   }
 
   if(diff > 80 && current > 0){
-    animateTo(current-1);
+    goTo(current-1);
   }
 });
 
-function toggleTheme(){
-  document.body.classList.toggle('light');
-  localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
-}
-
-window.addEventListener('load', async ()=>{
-  const hash = location.hash.replace('#ch','');
-
-  const saved = localStorage.getItem('theme');
-  if(saved === 'light') document.body.classList.add('light');
-
-  render();
-
-  if(hash && !isNaN(hash)){
-    let target = parseInt(hash);
-    await wait(300);
-    animateTo(target);
+/* LOAD */
+window.onload = ()=>{
+  let hash = location.hash.replace("#ch","");
+  if(hash){
+    goTo(parseInt(hash));
   }
-});
+};
 
 </script>
 
