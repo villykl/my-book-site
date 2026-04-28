@@ -3,30 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kindle App V2</title>
+<title>LOCKED KINDLE ENGINE</title>
 
 <style>
-:root {
-  --bg: #0e0e0e;
-  --card: #171717;
-  --text: #f5f1e8;
-  --accent: #c7a76c;
-}
-
 body {
   margin: 0;
   font-family: Georgia, serif;
-  background: var(--bg);
-  color: var(--text);
+  background: #0e0e0e;
+  color: #f5f1e8;
 }
 
-/* 📚 LAYOUT */
 .container {
   display: flex;
   height: 100vh;
 }
 
-/* 📚 SIDEBAR */
+/* SIDEBAR */
 .sidebar {
   width: 280px;
   background: #111;
@@ -41,7 +33,6 @@ body {
   border-radius: 8px;
   cursor: pointer;
   opacity: 0.7;
-  transition: 0.2s;
 }
 
 .item:hover {
@@ -51,11 +42,11 @@ body {
 
 .item.active {
   background: #2a241a;
-  color: var(--accent);
+  color: #c7a76c;
   opacity: 1;
 }
 
-/* 📖 READER */
+/* READER */
 .reader {
   flex: 1;
   padding: 40px;
@@ -65,13 +56,13 @@ body {
 .page {
   max-width: 800px;
   margin: auto;
-  background: var(--card);
+  background: #171717;
   padding: 60px;
   border-radius: 14px;
   box-shadow: 0 30px 100px rgba(0,0,0,0.5);
 }
 
-/* 📊 TOP BAR */
+/* NAV */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -86,34 +77,15 @@ button {
   color: white;
   cursor: pointer;
 }
-
-/* 📊 PROGRESS */
-.progress {
-  height: 4px;
-  background: #333;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 15px;
-}
-
-.bar {
-  height: 100%;
-  width: 0%;
-  background: var(--accent);
-  transition: 0.25s;
-}
 </style>
-
 </head>
 
 <body>
 
 <div class="container">
 
-  <!-- 📚 SIDEBAR -->
   <div class="sidebar" id="sidebar"></div>
 
-  <!-- 📖 READER -->
   <div class="reader">
 
     <div class="topbar">
@@ -123,17 +95,13 @@ button {
 
     <div class="page" id="page"></div>
 
-    <div class="progress">
-      <div class="bar" id="bar"></div>
-    </div>
-
   </div>
 
 </div>
 
 <script>
 
-/* 📚 BOOK DATA */
+/* 🔒 SINGLE SOURCE OF TRUTH */
 const book = {
   title: "Слова — это следы души",
   chapters: [
@@ -146,39 +114,20 @@ const book = {
 
 let current = 0;
 
-/* 🔥 ROUTER (DEEP LINK FIX) */
-function getChapterFromURL() {
-  const hash = location.hash.replace("#ch", "");
-  const index = parseInt(hash);
-
-  if (!isNaN(index) && index >= 0 && index < book.chapters.length) {
-    return index;
-  }
-
-  return 0;
-}
-
-/* 📌 UPDATE URL SAFELY */
-function setURL(index) {
-  history.replaceState(null, "", "#ch" + index);
-}
-
-/* 📚 SIDEBAR */
+/* INIT */
 function init() {
   const sidebar = document.getElementById("sidebar");
-  sidebar.innerHTML = "";
 
-  book.chapters.forEach((ch, i) => {
+  book.chapters.forEach((c, i) => {
     const div = document.createElement("div");
     div.className = "item";
-    div.innerText = ch.slice(0, 40);
-
+    div.innerText = c.slice(0, 40);
     div.onclick = () => go(i);
     sidebar.appendChild(div);
   });
 }
 
-/* 📖 RENDER */
+/* RENDER */
 function render() {
   document.getElementById("page").innerHTML = `
     <h2>${book.title}</h2>
@@ -186,27 +135,16 @@ function render() {
   `;
 
   updateSidebar();
-  updateProgress();
-
-  setURL(current);
 }
 
-/* 🔥 ACTIVE STATE */
+/* SIDEBAR ACTIVE */
 function updateSidebar() {
-  const items = document.querySelectorAll(".item");
-
-  items.forEach((el, i) => {
+  document.querySelectorAll(".item").forEach((el, i) => {
     el.classList.toggle("active", i === current);
   });
 }
 
-/* 📊 PROGRESS */
-function updateProgress() {
-  const percent = (current / (book.chapters.length - 1)) * 100;
-  document.getElementById("bar").style.width = percent + "%";
-}
-
-/* ▶ NEXT */
+/* NAV */
 function next() {
   if (current < book.chapters.length - 1) {
     current++;
@@ -214,7 +152,6 @@ function next() {
   }
 }
 
-/* ◀ PREV */
 function prev() {
   if (current > 0) {
     current--;
@@ -222,21 +159,13 @@ function prev() {
   }
 }
 
-/* 📌 GO */
 function go(i) {
   current = i;
   render();
 }
 
-/* 🔁 HANDLE BACK/FORWARD */
-window.addEventListener("hashchange", () => {
-  current = getChapterFromURL();
-  render();
-});
-
-/* 🚀 INIT */
+/* START */
 init();
-current = getChapterFromURL();
 render();
 
 </script>
