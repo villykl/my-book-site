@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Книга</title>
+<style>
+:root{--bg:#0f0f12;--text:#eee;--nav:rgba(0,0,0,0.6);}
+body.light{--bg:#f5f2ea;--text:#1a1a1a;--nav:rgba(255,255,255,0.7);}
+body{margin:0;font-family:Georgia,serif;background:var(--bg);color:var(--text);overflow:hidden;}
+.book-nav{position:fixed;top:0;left:0;right:0;height:60px;display:flex;justify-content:center;align-items:center;gap:20px;background:var(--nav);z-index:100;}
+.book{position:absolute;top:60px;width:100%;height:calc(100vh - 60px);perspective:2500px;}
+.page{position:absolute;width:100%;height:100%;padding:60px 20px;background:var(--bg);transform-origin:left;transition:transform 0.9s;}
+.page.flipped{transform:rotateY(-180deg);}
+.cover{display:flex;justify-content:center;align-items:center;height:100%;}
+.cover img{max-width:80%;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,0.6);}
+</style>
+</head>
+<body>
+
+<div class="book-nav">
+<a onclick="goTo(1)">Глава 1</a>
+<a onclick="goTo(2)">Глава 2</a>
+<a onclick="goTo(3)">Глава 3</a>
+</div>
+
+<div class="book">
+<div class="page"><div class="cover"><img src="cover.jpg"></div></div>
+<div class="page"><h1>Глава 1</h1><p>Текст...</p></div>
+<div class="page"><h1>Глава 2</h1><p>Текст...</p></div>
+<div class="page"><h1>Глава 3</h1><p>Текст...</p></div>
+</div>
+
+<script>
+const pages=document.querySelectorAll(".page");let current=0;
+function render(){pages.forEach((p,i)=>{if(i<current){p.classList.add("flipped");}else{p.classList.remove("flipped");}});}
+async function goTo(t){let s=t>current?1:-1;while(current!=t){current+=s;render();await new Promise(r=>setTimeout(r,400));}}
+</script>
+
+</body>
+</html>
