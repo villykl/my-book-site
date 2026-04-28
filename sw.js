@@ -1,20 +1,25 @@
-const CACHE = "books-v1";
+const CACHE = "books-safe-v1";
 
 const ASSETS = [
-  "./",
   "./index.html",
-  "./manifest.json",
-  "./icon.png"
+  "./manifest.json"
 ];
 
 self.addEventListener("install", e => {
+  self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE).then(cache => cache.addAll(ASSETS))
   );
 });
 
+self.addEventListener("activate", e => {
+  e.waitUntil(self.clients.claim());
+});
+
 self.addEventListener("fetch", e => {
   e.respondWith(
-    caches.match(e.request).then(res => res || fetch(e.request))
+    fetch(e.request).catch(() =>
+      caches.match(e.request)
+    )
   );
 });
