@@ -6,15 +6,30 @@
 <title>My Book Site</title>
 
 <style>
+:root{
+  --bg:#0f0f12;
+  --text:#eee;
+  --nav:rgba(0,0,0,0.6);
+  --muted:#aaa;
+}
+
+body.light{
+  --bg:#f5f2ea;
+  --text:#1a1a1a;
+  --nav:rgba(255,255,255,0.7);
+  --muted:#444;
+}
+
 body{
   margin:0;
   font-family: Georgia, serif;
-  background:#0f0f12;
-  color:#eee;
-  overflow-x:hidden;
+  background:var(--bg);
+  color:var(--text);
+  overflow:hidden;
+  transition:0.4s ease;
 }
 
-/* Layout */
+/* NAV */
 .book-nav{
   position:fixed;
   top:0;
@@ -25,63 +40,81 @@ body{
   align-items:center;
   justify-content:center;
   gap:20px;
-  background:rgba(0,0,0,0.6);
+  background:var(--nav);
   backdrop-filter: blur(10px);
-  z-index:10;
+  z-index:100;
 }
 
 .book-nav a{
-  color:#aaa;
+  color:var(--muted);
   text-decoration:none;
   font-size:14px;
   transition:0.3s;
 }
 
-.book-nav a:hover{
-  color:#fff;
+.book-nav a:hover{ color:var(--text); }
+
+.toggle{
+  position:absolute;
+  right:20px;
+  padding:6px 12px;
+  border:1px solid var(--muted);
+  border-radius:20px;
+  font-size:12px;
+  cursor:pointer;
+  background:transparent;
+  color:var(--text);
 }
 
-/* Chapters */
-.chapter{
+/* BOOK */
+.book{
   position:absolute;
   top:60px;
   left:0;
   width:100%;
-  min-height:calc(100vh - 60px);
+  height:calc(100vh - 60px);
+  perspective:2000px;
+}
+
+.page{
+  position:absolute;
+  width:100%;
+  height:100%;
   padding:60px 20px;
   box-sizing:border-box;
+  background:var(--bg);
 
-  opacity:0;
-  transform: translateX(40px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-  pointer-events:none;
+  transform-origin:left;
+  transform-style:preserve-3d;
+  transition:transform 0.9s cubic-bezier(.2,.8,.2,1);
+
+  backface-visibility:hidden;
 }
 
-.chapter.active{
-  opacity:1;
-  transform: translateX(0);
-  pointer-events:auto;
-}
-
-.chapter.exit-left{
-  opacity:0;
-  transform: translateX(-40px);
-}
-
-.chapter.exit-right{
-  opacity:0;
-  transform: translateX(40px);
-}
-
-h1{
+.page h1{
   font-size:32px;
   margin-bottom:20px;
 }
 
-p{
+.page p{
   max-width:700px;
   line-height:1.6;
   font-size:18px;
+}
+
+.page.active{
+  z-index:2;
+  transform:rotateY(0deg);
+}
+
+.page.flipped-left{
+  transform:rotateY(-180deg);
+  z-index:1;
+}
+
+.page.flipped-right{
+  transform:rotateY(180deg);
+  z-index:1;
 }
 
 </style>
@@ -92,63 +125,71 @@ p{
   <a href="#ch0" onclick="goTo('ch0')">Chapter 1</a>
   <a href="#ch1" onclick="goTo('ch1')">Chapter 2</a>
   <a href="#ch2" onclick="goTo('ch2')">Chapter 3</a>
+  <button class="toggle" onclick="toggleTheme()">🌙 / ☀️</button>
 </div>
 
-<!-- Chapters -->
-<div id="ch0" class="chapter active">
-  <h1>Chapter 1</h1>
-  <p>Your text here... This is the first chapter of your book.</p>
-</div>
+<div class="book">
+  <div id="ch0" class="page active">
+    <h1>Chapter 1</h1>
+    <p>Your text here... This is the first chapter of your book.</p>
+  </div>
 
-<div id="ch1" class="chapter">
-  <h1>Chapter 2</h1>
-  <p>Your text here... This is the second chapter.</p>
-</div>
+  <div id="ch1" class="page">
+    <h1>Chapter 2</h1>
+    <p>Your text here... This is the second chapter.</p>
+  </div>
 
-<div id="ch2" class="chapter">
-  <h1>Chapter 3</h1>
-  <p>Your text here... This is the third chapter.</p>
+  <div id="ch2" class="page">
+    <h1>Chapter 3</h1>
+    <p>Your text here... This is the third chapter.</p>
+  </div>
 </div>
 
 <script>
 let current = "ch0";
+const pages = ["ch0","ch1","ch2"];
 
 function goTo(id){
   if(id === current) return;
 
-  const old = document.getElementById(current);
-  const next = document.getElementById(id);
+  const currentEl = document.getElementById(current);
+  const nextEl = document.getElementById(id);
 
-  // determine direction
-  const ids = ["ch0","ch1","ch2"];
-  const oldIndex = ids.indexOf(current);
-  const newIndex = ids.indexOf(id);
+  const oldIndex = pages.indexOf(current);
+  const newIndex = pages.indexOf(id);
 
-  old.classList.remove("active");
-
+  // flip current page
   if(newIndex > oldIndex){
-    old.classList.add("exit-left");
+    currentEl.classList.add("flipped-left");
   } else {
-    old.classList.add("exit-right");
+    currentEl.classList.add("flipped-right");
   }
 
-  setTimeout(() => {
-    old.classList.remove("exit-left","exit-right");
-  }, 600);
+  currentEl.classList.remove("active");
 
-  next.classList.add("active");
+  // reset old after animation
+  setTimeout(()=>{
+    currentEl.classList.remove("flipped-left","flipped-right");
+  },900);
+
+  // show new page
+  nextEl.classList.add("active");
+
   current = id;
-
-  // update URL hash
   history.replaceState(null,null,"#"+id);
 }
 
-// load from hash
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("theme", document.body.classList.contains("light") ? "light" : "dark");
+}
+
 window.addEventListener("load",()=>{
   const hash = location.hash.replace("#","" );
-  if(hash && document.getElementById(hash)){
-    goTo(hash);
-  }
+  if(hash && document.getElementById(hash)) goTo(hash);
+
+  const saved = localStorage.getItem("theme");
+  if(saved === "light") document.body.classList.add("light");
 });
 </script>
 
