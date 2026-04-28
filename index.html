@@ -5,17 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Слова — это следы души</title>
 
+<link rel="manifest" href="manifest.json">
+
 <style>
 html, body {
   margin: 0;
   height: 100%;
-  background: #0b0b0b;
+  background: #000;
   font-family: Georgia, serif;
   overflow: hidden;
 }
 
-/* 📱 APP STAGE */
-.stage {
+/* 📱 APP */
+.app {
   position: fixed;
   inset: 0;
   display: flex;
@@ -24,8 +26,8 @@ html, body {
   background: radial-gradient(circle at center, #1a1a1a, #000);
 }
 
-/* 📖 BOOK */
-.book {
+/* 📖 READER */
+.reader {
   width: min(900px, 92vw);
   height: min(600px, 80vh);
   background: #fffdf7;
@@ -33,17 +35,12 @@ html, body {
   padding: 50px;
   box-sizing: border-box;
   box-shadow: 0 30px 120px rgba(0,0,0,0.7);
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  transition: opacity .2s ease;
 }
 
 /* TEXT */
-h1, h2 {
-  text-align: center;
-}
-p {
-  font-size: 20px;
-  line-height: 1.7;
-}
+h1, h2 { text-align: center; }
+p { font-size: 20px; line-height: 1.7; }
 
 /* NAV */
 .nav {
@@ -57,8 +54,8 @@ p {
 
 button {
   padding: 10px 14px;
-  border-radius: 10px;
   border: none;
+  border-radius: 10px;
   background: rgba(255,255,255,0.1);
   color: white;
   backdrop-filter: blur(10px);
@@ -68,8 +65,8 @@ button {
 
 <body>
 
-<div class="stage">
-  <div class="book" id="book"></div>
+<div class="app">
+  <div class="reader" id="reader"></div>
 </div>
 
 <div class="nav">
@@ -78,25 +75,25 @@ button {
 </div>
 
 <script>
-/* 📖 BOOK CONTENT */
 const pages = [
 `<h1>Слова — это следы души</h1><p>Вера Климошенко</p>`,
 
-`<h2>Вступление</h2><p>Слова сопровождают нас всю жизнь. Они остаются в памяти даже тогда, когда мы молчим.</p>`,
+`<h2>Вступление</h2><p>Слова сопровождают нас всю жизнь...</p>`,
 
-`<h2>Глава I</h2><p>Каждое слово — это след души, который нельзя стереть временем.</p>`,
+`<h2>Глава I</h2><p>Каждое слово — это след души...</p>`,
 
-`<h2>Глава II</h2><p>Иногда слова становятся светом, который ведёт нас через темноту.</p>`,
+`<h2>Глава II</h2><p>Иногда слова становятся светом...</p>`,
 
-`<h2>Эпилог</h2><p>Всё сказанное остаётся. Даже если исчезает голос.</p>`
+`<h2>Эпилог</h2><p>Всё сказанное остаётся...</p>`
 ];
 
 let i = parseInt(localStorage.getItem("page") || "0");
-const el = document.getElementById("book");
+const el = document.getElementById("reader");
 
-/* 📄 RENDER */
+/* 📄 render */
 function render() {
   el.style.opacity = 0;
+
   setTimeout(() => {
     el.innerHTML = pages[i];
     el.style.opacity = 1;
@@ -104,19 +101,19 @@ function render() {
   }, 120);
 }
 
-/* ➡️ NEXT */
+/* ➡️ next */
 function next() {
   if (i < pages.length - 1) i++;
   render();
 }
 
-/* ⬅️ PREV */
+/* ⬅️ prev */
 function prev() {
   if (i > 0) i--;
   render();
 }
 
-/* 📱 SWIPE */
+/* 📱 swipe */
 let startX = 0;
 
 document.addEventListener("touchstart", e => {
@@ -130,8 +127,15 @@ document.addEventListener("touchend", e => {
   if (diff > 60) prev();
 });
 
-/* INIT */
 render();
+
+/* 📲 SAFE PWA REGISTER */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .catch(err => console.log("SW error:", err));
+  });
+}
 </script>
 
 </body>
