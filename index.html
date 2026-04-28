@@ -1,317 +1,137 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apple Books Pro Max</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Apple Books Cover Engine V5</title>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
 <style>
-:root {
-  --bg: #0b0b0b;
-  --card: #151515;
-  --text: #f5f1e8;
-  --muted: rgba(245,241,232,0.6);
-  --accent: #d6b36a;
-}
-
-/* 🌑 GLOBAL */
 body {
   margin: 0;
-  font-family: Georgia, serif;
-  background: var(--bg);
-  color: var(--text);
   overflow: hidden;
+  background: radial-gradient(circle at center, #111, #000);
 }
 
-/* 📚 LIBRARY */
-.library {
+#scene {
+  width: 100vw;
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
-.cover {
-  width: 340px;
-  height: 480px;
-  background: linear-gradient(145deg, #1a1a1a, #0e0e0e);
-  border-radius: 18px;
-  box-shadow: 0 60px 150px rgba(0,0,0,0.8);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: transform 0.4s ease;
-}
-
-.cover:hover {
-  transform: scale(1.03);
-}
-
-.cover h1 {
-  color: var(--accent);
-  text-align: center;
-  font-size: 22px;
-}
-
-.cover p {
-  color: var(--muted);
-  font-size: 14px;
-}
-
-/* 📖 READER */
-.reader {
-  display: none;
-  height: 100vh;
-  flex-direction: column;
-}
-
-/* TOP BAR */
-.topbar {
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  background: #0e0e0e;
-  border-bottom: 1px solid #222;
-}
-
-button {
-  background: #1c1c1c;
-  color: var(--text);
-  border: none;
-  padding: 8px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-/* 📄 PAGE AREA */
-.content {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-
-/* 📖 PAGE CARD (REAL FEEL) */
-.page {
-  width: 720px;
-  max-width: 90%;
-  background: var(--card);
-  padding: 70px;
-  border-radius: 18px;
-
-  /* ✨ REAL FEEL DEPTH */
-  box-shadow:
-    0 50px 120px rgba(0,0,0,0.7),
-    inset 0 0 0 1px rgba(255,255,255,0.03);
-
-  transform: translateY(0);
-  transition: opacity 0.35s ease, transform 0.35s ease;
-}
-
-/* ✨ ANIMATION STATES */
-.fade-out {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-.fade-in {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-h2 {
-  color: var(--accent);
-  margin-bottom: 20px;
-}
-
-p {
-  line-height: 1.8;
-  font-size: 18px;
-}
-
-/* 📑 TOC */
-.toc {
+/* 🌑 cinematic vignette */
+#scene::after {
+  content: "";
   position: absolute;
-  left: 20px;
-  top: 80px;
-  width: 220px;
-}
-
-.toc-item {
-  padding: 10px;
-  cursor: pointer;
-  color: var(--muted);
-  transition: 0.2s;
-}
-
-.toc-item:hover {
-  color: var(--text);
-}
-
-.toc-item.active {
-  color: var(--accent);
-}
-
-/* 📱 MOBILE */
-@media (max-width: 800px) {
-  .toc {
-    display: none;
-  }
-
-  .page {
-    padding: 40px;
-  }
+  inset: 0;
+  background: radial-gradient(circle at center,
+    transparent 40%,
+    rgba(0,0,0,0.7) 100%);
+  pointer-events: none;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 📚 LIBRARY -->
-<div class="library" id="library">
-  <div class="cover" onclick="openBook()">
-    <h1>Слова — это следы души</h1>
-    <p>Apple Books Experience</p>
-  </div>
-</div>
-
-<!-- 📖 READER -->
-<div class="reader" id="reader">
-
-  <div class="topbar">
-    <button onclick="back()">← Library</button>
-    <div>
-      <button onclick="prev()">◀</button>
-      <button onclick="next()">▶</button>
-    </div>
-  </div>
-
-  <div class="toc" id="toc"></div>
-
-  <div class="content">
-    <div class="page" id="page"></div>
-  </div>
-
-</div>
+<div id="scene"></div>
 
 <script>
+/* =========================
+   🎬 APPLE BOOKS V5 ENGINE
+========================= */
 
-/* 📚 BOOK */
-const book = {
-  chapters: [
-    { title: "Вступление", text: "Слова сопровождают нас всю жизнь. Они формируют наш внутренний мир и память." },
-    { title: "Глава I", text: "Каждое слово оставляет след. Оно может согреть или разрушить." },
-    { title: "Глава II", text: "Иногда слова становятся тихим светом, ведущим сквозь темноту." },
-    { title: "Эпилог", text: "Всё сказанное остаётся в нас навсегда." }
-  ]
-};
+const scene = new THREE.Scene();
 
-let current = 0;
+/* 🎥 CAMERA */
+const camera = new THREE.PerspectiveCamera(
+  55,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+camera.position.z = 3.2;
 
-/* 💾 SAVE */
-function save() {
-  localStorage.setItem("apple_books_pro_max", current);
+/* 🖥 RENDERER */
+const renderer = new THREE.WebGLRenderer({
+  antialias: true,
+  alpha: true
+});
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.getElementById("scene").appendChild(renderer.domElement);
+
+/* 💡 LIGHTS (APPLE STYLE) */
+const keyLight = new THREE.PointLight(0xffffff, 2);
+keyLight.position.set(2, 2, 3);
+scene.add(keyLight);
+
+const warmLight = new THREE.PointLight(0xd6b36a, 1.2);
+warmLight.position.set(-2, -1, 2);
+scene.add(warmLight);
+
+scene.add(new THREE.AmbientLight(0x222222, 1));
+
+/* 📕 COVER TEXTURE */
+const loader = new THREE.TextureLoader();
+const texture = loader.load("cover.jpg");
+
+/* 📦 BOOK OBJECT */
+const geometry = new THREE.PlaneGeometry(2, 3);
+
+const material = new THREE.MeshStandardMaterial({
+  map: texture,
+  roughness: 0.35,
+  metalness: 0.25
+});
+
+const book = new THREE.Mesh(geometry, material);
+scene.add(book);
+
+/* 🧲 PHYSICS */
+let targetX = 0;
+let targetY = 0;
+let velX = 0;
+let velY = 0;
+
+/* 🖱 MOUSE */
+document.addEventListener("mousemove", (e) => {
+  targetY = (e.clientX / window.innerWidth - 0.5) * 1.4;
+  targetX = (e.clientY / window.innerHeight - 0.5) * -1.2;
+
+  keyLight.position.x = targetY * 3;
+  keyLight.position.y = targetX * 3;
+});
+
+/* 🎬 LOOP */
+function animate() {
+  requestAnimationFrame(animate);
+
+  velX += (targetX - velX) * 0.06;
+  velY += (targetY - velY) * 0.06;
+
+  book.rotation.x = velX;
+  book.rotation.y = velY;
+
+  book.position.y = Math.sin(Date.now() * 0.001) * 0.05;
+
+  camera.position.x += (targetY * 0.2 - camera.position.x) * 0.03;
+  camera.position.y += (targetX * 0.2 - camera.position.y) * 0.03;
+
+  camera.lookAt(0, 0, 0);
+
+  renderer.render(scene, camera);
 }
 
-/* 🔄 LOAD */
-function load() {
-  const v = localStorage.getItem("apple_books_pro_max");
-  return v ? parseInt(v) : 0;
-}
+animate();
 
-/* 📕 OPEN */
-function openBook() {
-  document.getElementById("library").style.display = "none";
-  document.getElementById("reader").style.display = "flex";
-  initTOC();
-  render(true);
-}
-
-/* 📚 BACK */
-function back() {
-  document.getElementById("reader").style.display = "none";
-  document.getElementById("library").style.display = "flex";
-}
-
-/* 📑 TOC */
-function initTOC() {
-  const toc = document.getElementById("toc");
-  toc.innerHTML = "";
-
-  book.chapters.forEach((c, i) => {
-    const d = document.createElement("div");
-    d.className = "toc-item";
-    d.innerText = c.title;
-    d.onclick = () => go(i);
-    toc.appendChild(d);
-  });
-}
-
-/* 📖 RENDER (REAL FEEL TRANSITION) */
-function render(first=false) {
-  const page = document.getElementById("page");
-
-  if (!first) {
-    page.classList.add("fade-out");
-
-    setTimeout(() => {
-      draw(page);
-      page.classList.remove("fade-out");
-      page.classList.add("fade-in");
-    }, 200);
-  } else {
-    draw(page);
-  }
-
-  updateTOC();
-  save();
-}
-
-/* 🧾 DRAW CONTENT */
-function draw(page) {
-  const ch = book.chapters[current];
-
-  page.innerHTML = `
-    <h2>${ch.title}</h2>
-    <p>${ch.text}</p>
-  `;
-}
-
-/* 🔥 TOC */
-function updateTOC() {
-  document.querySelectorAll(".toc-item").forEach((el, i) => {
-    el.classList.toggle("active", i === current);
-  });
-}
-
-/* ▶ NEXT */
-function next() {
-  if (current < book.chapters.length - 1) {
-    current++;
-    render();
-  }
-}
-
-/* ◀ PREV */
-function prev() {
-  if (current > 0) {
-    current--;
-    render();
-  }
-}
-
-/* 📌 GO */
-function go(i) {
-  current = i;
-  render();
-}
-
-/* 🚀 INIT */
-current = load();
-
+/* 📱 RESIZE */
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
 </script>
 
 </body>
