@@ -9,96 +9,150 @@
 body {
   margin: 0;
   font-family: Georgia, serif;
-  background: linear-gradient(135deg, #1a1a1a, #000);
+  background: #0e0e0e;
   color: #f5f1e8;
+  scroll-behavior: smooth;
 }
 
-/* 📖 HEADER */
-.header {
+/* 📖 HERO */
+.hero {
   height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
+  background: radial-gradient(circle at center, #1c1c1c, #000);
+  flex-direction: column;
   padding: 20px;
+  animation: fadeIn 1.2s ease;
 }
 
-.header h1 {
-  font-size: 48px;
+.hero h1 {
+  font-size: 52px;
   margin: 0;
 }
 
-.header p {
-  font-size: 20px;
+.hero p {
   opacity: 0.8;
   margin-top: 10px;
 }
 
-/* 📚 BOOK SECTION */
-.book {
-  background: #f5f1e8;
-  color: #111;
-  padding: 80px 20px;
+/* 📚 TOC */
+.toc {
+  position: sticky;
+  top: 0;
+  background: rgba(20,20,20,0.95);
+  backdrop-filter: blur(10px);
+  padding: 15px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  z-index: 10;
 }
 
-.page {
+.toc a {
+  color: #f5f1e8;
+  text-decoration: none;
+  font-size: 14px;
+  opacity: 0.8;
+  transition: 0.2s;
+}
+
+.toc a:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* 📖 SECTIONS */
+.section {
   max-width: 800px;
-  margin: 40px auto;
-  background: white;
-  padding: 50px;
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-  transition: transform 0.3s ease;
+  margin: 80px auto;
+  padding: 60px;
+  background: #ffffff;
+  color: #111;
+  border-radius: 14px;
+  box-shadow: 0 25px 70px rgba(0,0,0,0.4);
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s ease;
 }
 
-.page:hover {
-  transform: translateY(-5px);
+.section.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 h2 {
   text-align: center;
-  margin-top: 0;
 }
 
-/* 📱 responsive */
+/* ✨ animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* 📱 mobile */
 @media (max-width: 600px) {
-  .header h1 { font-size: 32px; }
-  .page { padding: 30px; }
+  .hero h1 { font-size: 34px; }
+  .section { padding: 30px; margin: 40px 15px; }
+  .toc { flex-wrap: wrap; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
+<!-- 📖 HERO -->
+<div class="hero">
   <h1>Слова — это следы души</h1>
   <p>Вера Климошенко</p>
 </div>
 
-<div class="book">
-
-  <div class="page">
-    <h2>Вступление</h2>
-    <p>Слова сопровождают нас всю жизнь. Иногда они становятся домом для наших чувств, иногда — тишиной между мыслями.</p>
-  </div>
-
-  <div class="page">
-    <h2>Глава I</h2>
-    <p>Каждое слово — это след души. Оно остаётся даже тогда, когда мы его уже не слышим.</p>
-  </div>
-
-  <div class="page">
-    <h2>Глава II</h2>
-    <p>Иногда слова становятся светом, который помогает пройти через темноту.</p>
-  </div>
-
-  <div class="page">
-    <h2>Эпилог</h2>
-    <p>Всё сказанное остаётся. Даже если исчезает голос.</p>
-  </div>
-
+<!-- 📚 TABLE OF CONTENTS -->
+<div class="toc">
+  <a href="#intro">Вступление</a>
+  <a href="#ch1">Глава I</a>
+  <a href="#ch2">Глава II</a>
+  <a href="#epilogue">Эпилог</a>
 </div>
+
+<!-- 📖 CONTENT -->
+<div class="section" id="intro">
+  <h2>Вступление</h2>
+  <p>Слова сопровождают нас всю жизнь. Иногда они становятся домом для наших чувств, иногда — тишиной между мыслями.</p>
+</div>
+
+<div class="section" id="ch1">
+  <h2>Глава I</h2>
+  <p>Каждое слово — это след души. Оно остаётся даже тогда, когда мы его уже не слышим.</p>
+</div>
+
+<div class="section" id="ch2">
+  <h2>Глава II</h2>
+  <p>Иногда слова становятся светом, который помогает пройти через темноту.</p>
+</div>
+
+<div class="section" id="epilogue">
+  <h2>Эпилог</h2>
+  <p>Всё сказанное остаётся. Даже если исчезает голос.</p>
+</div>
+
+<script>
+/* ✨ scroll animation reveal */
+const sections = document.querySelectorAll(".section");
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("show");
+    }
+  });
+}, { threshold: 0.2 });
+
+sections.forEach(s => observer.observe(s));
+</script>
 
 </body>
 </html>
