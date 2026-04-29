@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apple Books Cover</title>
+<title>Apple Books Cover Fix</title>
 
 <style>
 body{
@@ -24,13 +24,15 @@ body{
   perspective:1200px;
 }
 
-/* 📸 COVER IMAGE */
+/* 📸 COVER BOOK */
 .cover-book{
   width:340px;
   height:460px;
+
   background:
     linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.75)),
     url("cover.jpg");
+
   background-size:cover;
   background-position:center;
 
@@ -41,19 +43,27 @@ body{
   transition:1s ease;
 
   position:relative;
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
+  overflow:hidden;
 }
 
-/* 📖 TEXT ON COVER */
+/* 📖 TEXT INSIDE COVER (FIXED) */
 .cover-text{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
   color:white;
-  font-size:24px;
+  font-size:26px;
   font-weight:bold;
   text-align:center;
-  padding:25px;
-  text-shadow:0 3px 15px rgba(0,0,0,0.9);
+
+  padding:30px;
+  box-sizing:border-box;
+
+  text-shadow:0 4px 20px rgba(0,0,0,0.95);
+  pointer-events:none;
 }
 
 /* OPEN ANIMATION */
@@ -152,9 +162,11 @@ button{
 <div id="cover">
 
   <div class="cover-book" id="coverBook">
+
     <div class="cover-text">
       Вест-Спрингфилд 2025
     </div>
+
   </div>
 
   <button id="openBtn" onclick="openBook()">Открыть книгу</button>
@@ -167,17 +179,17 @@ button{
 
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Теперь у тебя персональная обложка книги.</p>
+      <p>Теперь текст встроен прямо в обложку.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Apple Books стиль + твоя история.</p>
+      <p>Apple Books стиль сохранён.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>Финальная версия книги готова.</p>
+      <p>Финальная стабильная версия.</p>
     </div>
 
   </div>
