@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultra Polish Book</title>
+<title>Ultra Book Clean</title>
 
 <style>
 body{
@@ -24,13 +24,13 @@ body{
   perspective:1400px;
 }
 
-/* 📖 BOOK COVER */
+/* 📖 COVER BOOK (PHOTO ONLY) */
 .cover-book{
   width:340px;
   height:460px;
 
   background:
-    linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.8)),
+    linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.75)),
     url("cover.jpg");
 
   background-size:cover;
@@ -51,30 +51,9 @@ body{
   border-left:6px solid rgba(0,0,0,0.35);
 }
 
-/* 📖 TITLE */
-.cover-text{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:white;
-  font-size:26px;
-  font-weight:bold;
-  text-align:center;
-  padding:30px;
-
-  text-shadow:
-    0 3px 15px rgba(0,0,0,0.9),
-    0 0 40px rgba(0,0,0,0.6);
-}
-
-/* OPEN ANIMATION (REAL BOOK FEEL) */
+/* OPEN ANIMATION */
 .cover-open{
-  transform:
-    rotateY(-120deg)
-    translateX(-40px);
+  transform: rotateY(-120deg) translateX(-40px);
   opacity:0;
 }
 
@@ -89,7 +68,7 @@ body{
   font-weight:bold;
 }
 
-/* ================= SCENE ================= */
+/* ================= BOOK ================= */
 #scene{
   display:none;
   height:100vh;
@@ -99,7 +78,6 @@ body{
   background: radial-gradient(circle at center, #1a1a1a, #000);
 }
 
-/* BOOK */
 .book{
   width:820px;
   height:520px;
@@ -108,7 +86,7 @@ body{
   transform: rotateX(10deg);
 }
 
-/* SPINE */
+/* spine */
 .book::before{
   content:"";
   position:absolute;
@@ -119,7 +97,7 @@ body{
   background:linear-gradient(#111,#000,#111);
 }
 
-/* ================= PAGES ================= */
+/* pages */
 .page{
   position:absolute;
   width:50%;
@@ -127,24 +105,14 @@ body{
   left:50%;
   transform-origin:left;
 
-  background:
-    linear-gradient(to right, #f7f2e6, #efe7d5);
+  background:#f6f1e3;
 
   padding:40px;
   box-sizing:border-box;
 
   transition:1s cubic-bezier(.2,.8,.2,1);
 
-  box-shadow:
-    0 30px 80px rgba(0,0,0,0.6);
-
-  border-radius:0 10px 10px 0;
-
-  cursor:grab;
-}
-
-.page:active{
-  cursor:grabbing;
+  box-shadow:0 30px 80px rgba(0,0,0,0.6);
 }
 
 .page:nth-child(1){ z-index:3; }
@@ -155,7 +123,7 @@ body{
   transform: rotateY(-180deg);
 }
 
-/* ================= UI ================= */
+/* UI */
 .ui{
   position:fixed;
   bottom:20px;
@@ -163,6 +131,7 @@ body{
   display:flex;
   justify-content:center;
   gap:10px;
+  z-index:20;
 }
 
 button{
@@ -181,11 +150,7 @@ button{
 <!-- 📖 COVER -->
 <div id="cover">
 
-  <div class="cover-book" id="coverBook">
-    <div class="cover-text">
-      Вест-Спрингфилд 2025
-    </div>
-  </div>
+  <div class="cover-book" id="coverBook"></div>
 
   <button id="openBtn" onclick="openBook()">Открыть книгу</button>
 </div>
@@ -197,17 +162,17 @@ button{
 
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Ultra Polish версия книги.</p>
+      <p>Чистая обложка без текста.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Теперь это ощущается как Apple Books.</p>
+      <p>Apple Books стиль.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>Перелистывание с физическим ощущением.</p>
+      <p>Готовая книга.</p>
     </div>
 
   </div>
@@ -248,27 +213,6 @@ function reset(){
   pages.forEach(p => p.classList.remove("flipped"));
   i = 0;
 }
-
-/* ✋ SWIPE (simple drag feel) */
-let startX = 0;
-
-document.addEventListener("mousedown", e=>{
-  startX = e.clientX;
-});
-
-document.addEventListener("mouseup", e=>{
-  let diff = e.clientX - startX;
-
-  if(diff < -50){
-    flip();
-  }
-  if(diff > 50){
-    if(i > 0){
-      pages[i-1].classList.remove("flipped");
-      i--;
-    }
-  }
-});
 
 </script>
 
