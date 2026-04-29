@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smooth Apple Book</title>
+<title>Ultra Book Page Curl</title>
 
 <style>
 body{
@@ -21,17 +21,16 @@ body{
   align-items:center;
   justify-content:center;
   background: radial-gradient(circle at center, #000, #120a06);
-  perspective:1400px;
-  transition:opacity 0.9s ease;
+  perspective:1600px;
 }
 
-/* 📖 COVER BOOK */
+/* BOOK COVER */
 .cover-book{
   width:340px;
   height:460px;
 
   background:
-    linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.75)),
+    linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.8)),
     url("cover.jpg");
 
   background-size:cover;
@@ -44,27 +43,54 @@ body{
     0 50px 120px rgba(0,0,0,0.9);
 
   transform-origin:left;
-
   position:relative;
   overflow:hidden;
 
   border-left:6px solid rgba(0,0,0,0.35);
 
-  transition:
-    transform 1.2s cubic-bezier(.2,.8,.2,1),
-    opacity 0.8s ease,
-    filter 1.2s ease;
+  transition:1.2s cubic-bezier(.2,.8,.2,1);
 }
 
-/* 🌟 SMOOTH OPEN EFFECT */
+/* 🌟 SPINE LIGHT */
+.cover-book::after{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:12px;
+  height:100%;
+
+  background:linear-gradient(
+    180deg,
+    rgba(255,255,255,0),
+    rgba(255,255,255,0.25),
+    rgba(255,255,255,0)
+  );
+
+  opacity:0;
+  transition:1s ease;
+}
+
+/* OPEN STATE */
 .cover-open{
   transform: perspective(1200px)
-             rotateY(-95deg)
-             translateX(-60px)
+             rotateY(-110deg)
+             translateX(-80px)
              scale(0.95);
+  filter: blur(2px);
+  opacity:0.2;
+}
 
-  opacity:0.15;
-  filter: blur(6px);
+/* activate spine light */
+.cover-open::after{
+  opacity:1;
+  animation:shine 1.2s ease;
+}
+
+@keyframes shine{
+  0%{ transform:translateX(0); opacity:0; }
+  40%{ opacity:1; }
+  100%{ transform:translateX(320px); opacity:0; }
 }
 
 /* ================= BOOK ================= */
@@ -73,7 +99,7 @@ body{
   height:100vh;
   align-items:center;
   justify-content:center;
-  perspective:2000px;
+  perspective:2200px;
   background: radial-gradient(circle at center, #1a1a1a, #000);
 }
 
@@ -85,6 +111,7 @@ body{
   transform: rotateX(10deg);
 }
 
+/* SPINE */
 .book::before{
   content:"";
   position:absolute;
@@ -93,6 +120,24 @@ body{
   left:50%;
   transform:translateX(-50%);
   background:linear-gradient(#111,#000,#111);
+}
+
+/* SPINE LIGHT CORE */
+.book::after{
+  content:"";
+  position:absolute;
+  width:6px;
+  height:100%;
+  left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(
+    180deg,
+    transparent,
+    rgba(255,255,255,0.5),
+    transparent
+  );
+  opacity:0;
+  transition:1s ease;
 }
 
 /* pages */
@@ -170,24 +215,24 @@ button:hover{
 
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Плавное раскрытие обложки реализовано.</p>
+      <p>Теперь есть page curl + свет по корешку.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Apple Books стиль + мягкая анимация.</p>
+      <p>Эффект как у Apple Books.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>Финальная премиум версия.</p>
+      <p>Премиум рендер книги.</p>
     </div>
 
   </div>
 
 </div>
 
-<!-- 📱 UI -->
+<!-- UI -->
 <div class="ui">
   <button onclick="openBook()">📖 Open</button>
   <button onclick="flip()">➡ Next</button>
@@ -199,34 +244,46 @@ button:hover{
 let i = 0;
 const pages = document.querySelectorAll(".page");
 
-/* 📖 SMOOTH OPEN */
+/* OPEN BOOK + SPINE LIGHT */
 function openBook(){
   const cover = document.getElementById("coverBook");
+  const book = document.querySelector(".book");
 
   cover.classList.add("cover-open");
 
+  // spine light activation
+  book.style.setProperty("--open","1");
+  book.querySelector && (book.style.opacity = "1");
+
   setTimeout(()=>{
-    document.getElementById("cover").style.opacity = "0";
+    document.getElementById("cover").style.display = "none";
+    document.getElementById("scene").style.display = "flex";
 
-    setTimeout(()=>{
-      document.getElementById("cover").style.display = "none";
-      document.getElementById("scene").style.display = "flex";
-    }, 800);
-
+    // show spine light
+    book.style.setProperty("filter","brightness(1.1)");
   }, 900);
 }
 
-/* 📄 FLIP */
+/* PAGE CURL SIMULATION */
 function flip(){
   if(i < pages.length){
+    pages[i].style.transition = "1s cubic-bezier(.2,.8,.2,1)";
+    pages[i].style.transformOrigin = "left";
+
+    pages[i].style.transform =
+      "rotateY(-160deg) skewY(2deg)";
+
     pages[i].classList.add("flipped");
     i++;
   }
 }
 
-/* 🔄 RESET */
+/* RESET */
 function reset(){
-  pages.forEach(p => p.classList.remove("flipped"));
+  pages.forEach(p=>{
+    p.classList.remove("flipped");
+    p.style.transform = "";
+  });
   i = 0;
 }
 
