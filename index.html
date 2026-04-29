@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clean Book App</title>
+<title>Clean Book</title>
 
 <style>
 body{
@@ -12,20 +12,19 @@ body{
   background:#111;
 }
 
-/* COVER (REAL ENTRY POINT) */
+/* COVER */
 #cover{
   position:fixed;
   inset:0;
+  background:#3a2215;
+  color:#f3e3d0;
   display:flex;
   align-items:center;
   justify-content:center;
   flex-direction:column;
-  background:#3a2215;
-  color:#f3e3d0;
-  z-index:1000;
 }
 
-/* BOOK (hidden until start) */
+/* BOOK */
 #book{
   display:none;
   padding:40px;
@@ -33,8 +32,8 @@ body{
 
 .page{
   background:#f6f1e3;
-  padding:20px;
   margin:10px 0;
+  padding:20px;
   border-radius:10px;
 }
 </style>
@@ -57,15 +56,10 @@ body{
 
 <script>
 
-/* 🚪 START APP (IMPORTANT FIX) */
+/* 🚪 START APP */
 function start(){
   document.getElementById("cover").style.display = "none";
   document.getElementById("book").style.display = "block";
-}
-
-/* 🚫 BLOCK HASH ISSUES */
-if(window.location.hash){
-  history.replaceState(null,null," ");
 }
 
 </script>
