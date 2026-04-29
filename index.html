@@ -3,36 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Iron Book Fix</title>
+<title>Locked Book</title>
 
 <style>
 body{
   margin:0;
   font-family: Georgia, serif;
-  background:#000;
+  background:#0b0b0b;
   overflow:hidden;
 }
 
-/* 🚫 BLOCK DIRECT ACCESS (CRITICAL FIX) */
-body.locked{
-  overflow:hidden;
-}
-
-/* ===== ENTRY COVER ===== */
+/* 🚫 FORCE START SCREEN */
 .cover{
   position:fixed;
   inset:0;
-  background:
-    linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.95)),
-    url('https://www.transparenttextures.com/patterns/dark-leather.png');
-  background-color:#3a2215;
   display:flex;
   align-items:center;
   justify-content:center;
   flex-direction:column;
+
+  background:
+    linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.95)),
+    url('https://www.transparenttextures.com/patterns/dark-leather.png');
+  background-color:#3a2215;
+
   color:#f3e3d0;
+  text-align:center;
+
   z-index:9999;
-  transition:1s;
+  transition:1s ease;
 }
 
 .cover h1{
@@ -60,7 +59,7 @@ body.locked{
   pointer-events:none;
 }
 
-/* ===== BOOK ===== */
+/* BOOK STAGE */
 .stage{
   height:100vh;
   display:flex;
@@ -69,6 +68,7 @@ body.locked{
   perspective:2600px;
 }
 
+/* BOOK */
 .book{
   width:800px;
   height:500px;
@@ -88,16 +88,18 @@ body.locked{
   background:linear-gradient(#111,#000,#111);
 }
 
-/* pages */
+/* PAGES */
 .page{
   position:absolute;
   width:50%;
   height:100%;
   left:50%;
   transform-origin:left;
+
   background:#f6f1e3;
   padding:40px;
   box-sizing:border-box;
+
   transition:1s;
   box-shadow:0 30px 80px rgba(0,0,0,0.6);
 }
@@ -132,37 +134,36 @@ button{
 </style>
 </head>
 
-<body class="locked">
+<body>
 
-<!-- 🔒 ENTRY COVER (FORCES PROPER FLOW) -->
+<!-- 📖 COVER (FORCED ENTRY) -->
 <div class="cover" id="cover">
   <h1>Слова — следы души</h1>
-  <p>Железная книга</p>
-  <button onclick="enterBook()">Открыть книгу</button>
+  <p>Нажми, чтобы открыть книгу</p>
+  <button onclick="enterBook()">Открыть</button>
 </div>
 
-<!-- 📖 BOOK -->
+<!-- 📚 BOOK -->
 <div class="stage">
 
   <div class="book">
 
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Теперь невозможно попасть сразу в главы. Только через обложку.</p>
+      <p>Теперь обложка всегда показывается первой. Нельзя зайти сразу в главы.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Структура сайта исправлена полностью.</p>
+      <p>Книга работает как приложение, а не как обычная страница GitHub Pages.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>GitHub Pages теперь показывает книгу корректно.</p>
+      <p>Ты можешь вставить сюда свои тексты.</p>
     </div>
 
   </div>
-
 </div>
 
 <!-- UI -->
@@ -178,13 +179,12 @@ const pages = document.querySelectorAll(".page");
 
 let i = 0;
 
-/* 🔒 FORCE ENTRY */
+/* 🚪 OPEN BOOK */
 function enterBook(){
   cover.classList.add("hide");
-  document.body.classList.remove("locked");
 }
 
-/* FLIP */
+/* 📄 FLIP */
 function flip(){
   if(i < pages.length){
     pages[i].classList.add("flipped");
@@ -192,16 +192,22 @@ function flip(){
   }
 }
 
-/* RESET */
+/* 🔄 RESET */
 function resetBook(){
   pages.forEach(p=>p.classList.remove("flipped"));
   i = 0;
 }
 
-/* 🚫 BLOCK HASH ENTRY (CRITICAL FIX) */
-if(window.location.hash === "#ch1"){
+/* 🚫 HARD LOCK: block #ch1 bypass */
+if (window.location.hash.includes("ch")) {
   window.location.hash = "";
 }
+
+/* ⌨️ keyboard */
+document.addEventListener("keydown",(e)=>{
+  if(e.key==="ArrowRight") flip();
+  if(e.key==="ArrowLeft") resetBook();
+});
 
 </script>
 
