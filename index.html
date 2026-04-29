@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apple Books Cover Fix</title>
+<title>Ultra Polish Book</title>
 
 <style>
 body{
@@ -13,7 +13,7 @@ body{
   overflow:hidden;
 }
 
-/* ===== COVER ===== */
+/* ================= COVER ================= */
 #cover{
   position:fixed;
   inset:0;
@@ -21,32 +21,37 @@ body{
   align-items:center;
   justify-content:center;
   background: radial-gradient(circle at center, #000, #120a06);
-  perspective:1200px;
+  perspective:1400px;
 }
 
-/* 📸 COVER BOOK */
+/* 📖 BOOK COVER */
 .cover-book{
   width:340px;
   height:460px;
 
   background:
-    linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.75)),
+    linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.8)),
     url("cover.jpg");
 
   background-size:cover;
   background-position:center;
 
-  border-radius:12px;
-  box-shadow:0 40px 120px rgba(0,0,0,0.9);
+  border-radius:8px 18px 18px 8px;
+
+  box-shadow:
+    -14px 0 0 rgba(0,0,0,0.25),
+    0 50px 120px rgba(0,0,0,0.9);
 
   transform-origin:left;
-  transition:1s ease;
+  transition:1s cubic-bezier(.2,.8,.2,1);
 
   position:relative;
   overflow:hidden;
+
+  border-left:6px solid rgba(0,0,0,0.35);
 }
 
-/* 📖 TEXT INSIDE COVER (FIXED) */
+/* 📖 TITLE */
 .cover-text{
   position:absolute;
   inset:0;
@@ -58,17 +63,18 @@ body{
   font-size:26px;
   font-weight:bold;
   text-align:center;
-
   padding:30px;
-  box-sizing:border-box;
 
-  text-shadow:0 4px 20px rgba(0,0,0,0.95);
-  pointer-events:none;
+  text-shadow:
+    0 3px 15px rgba(0,0,0,0.9),
+    0 0 40px rgba(0,0,0,0.6);
 }
 
-/* OPEN ANIMATION */
+/* OPEN ANIMATION (REAL BOOK FEEL) */
 .cover-open{
-  transform: rotateY(-120deg);
+  transform:
+    rotateY(-120deg)
+    translateX(-40px);
   opacity:0;
 }
 
@@ -83,7 +89,7 @@ body{
   font-weight:bold;
 }
 
-/* ===== BOOK ===== */
+/* ================= SCENE ================= */
 #scene{
   display:none;
   height:100vh;
@@ -93,15 +99,16 @@ body{
   background: radial-gradient(circle at center, #1a1a1a, #000);
 }
 
+/* BOOK */
 .book{
-  width:800px;
-  height:500px;
+  width:820px;
+  height:520px;
   position:relative;
   transform-style:preserve-3d;
-  transform: rotateX(8deg);
+  transform: rotateX(10deg);
 }
 
-/* spine */
+/* SPINE */
 .book::before{
   content:"";
   position:absolute;
@@ -112,18 +119,32 @@ body{
   background:linear-gradient(#111,#000,#111);
 }
 
-/* pages */
+/* ================= PAGES ================= */
 .page{
   position:absolute;
   width:50%;
   height:100%;
   left:50%;
   transform-origin:left;
-  background:#f6f1e3;
+
+  background:
+    linear-gradient(to right, #f7f2e6, #efe7d5);
+
   padding:40px;
   box-sizing:border-box;
-  transition:1s ease;
-  box-shadow:0 30px 80px rgba(0,0,0,0.6);
+
+  transition:1s cubic-bezier(.2,.8,.2,1);
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.6);
+
+  border-radius:0 10px 10px 0;
+
+  cursor:grab;
+}
+
+.page:active{
+  cursor:grabbing;
 }
 
 .page:nth-child(1){ z-index:3; }
@@ -134,7 +155,7 @@ body{
   transform: rotateY(-180deg);
 }
 
-/* UI */
+/* ================= UI ================= */
 .ui{
   position:fixed;
   bottom:20px;
@@ -142,7 +163,6 @@ body{
   display:flex;
   justify-content:center;
   gap:10px;
-  z-index:20;
 }
 
 button{
@@ -162,11 +182,9 @@ button{
 <div id="cover">
 
   <div class="cover-book" id="coverBook">
-
     <div class="cover-text">
       Вест-Спрингфилд 2025
     </div>
-
   </div>
 
   <button id="openBtn" onclick="openBook()">Открыть книгу</button>
@@ -179,17 +197,17 @@ button{
 
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Теперь текст встроен прямо в обложку.</p>
+      <p>Ultra Polish версия книги.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Apple Books стиль сохранён.</p>
+      <p>Теперь это ощущается как Apple Books.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>Финальная стабильная версия.</p>
+      <p>Перелистывание с физическим ощущением.</p>
     </div>
 
   </div>
@@ -230,6 +248,27 @@ function reset(){
   pages.forEach(p => p.classList.remove("flipped"));
   i = 0;
 }
+
+/* ✋ SWIPE (simple drag feel) */
+let startX = 0;
+
+document.addEventListener("mousedown", e=>{
+  startX = e.clientX;
+});
+
+document.addEventListener("mouseup", e=>{
+  let diff = e.clientX - startX;
+
+  if(diff < -50){
+    flip();
+  }
+  if(diff > 50){
+    if(i > 0){
+      pages[i-1].classList.remove("flipped");
+      i--;
+    }
+  }
+});
 
 </script>
 
