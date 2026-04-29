@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultra Paper Physics Book</title>
+<title>Apple Studio Book Engine</title>
 
 <style>
 body{
@@ -100,9 +100,27 @@ body{
   transition:transform 1.1s cubic-bezier(.2,.8,.2,1);
 
   will-change: transform;
+  overflow:hidden;
 }
 
-/* 🔥 PAPER EDGE SHADOW (REALISM) */
+/* 🌌 APPLE STUDIO LIGHT */
+.page::before{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  background: radial-gradient(
+    circle at var(--lx, 50%) var(--ly, 20%),
+    rgba(255,255,255,0.35),
+    rgba(255,255,255,0.12) 25%,
+    transparent 60%
+  );
+
+  mix-blend-mode: soft-light;
+  pointer-events:none;
+}
+
+/* page edge shadow */
 .page::after{
   content:"";
   position:absolute;
@@ -120,20 +138,6 @@ body{
 
 .page.flipped{
   transform:rotateY(-180deg);
-}
-
-/* 🌫 DRAG SHADOW LAYER */
-.drag-shadow{
-  position:absolute;
-  top:0;
-  left:50%;
-  width:50%;
-  height:100%;
-  pointer-events:none;
-  background:radial-gradient(circle at left, rgba(0,0,0,0.35), transparent 70%);
-  opacity:0;
-  transition:opacity 0.2s;
-  transform:translateX(-100%);
 }
 
 /* 🎛 UI */
@@ -176,8 +180,6 @@ button:active{
 <!-- 📚 BOOK -->
 <div id="reader">
   <div class="book">
-
-    <div class="drag-shadow" id="shadow"></div>
 
     <div class="page">📖 Глава 1</div>
     <div class="page">📖 Глава 2</div>
@@ -237,15 +239,13 @@ function back(){
   }
 }
 
-/* 📱 PHYSICS SWIPE */
+/* 📱 SWIPE PHYSICS */
 let startX = 0;
 let dragging = false;
-let shadow = document.getElementById("shadow");
 
 function start(e){
   dragging = true;
   startX = e.touches ? e.touches[0].clientX : e.clientX;
-  shadow.style.opacity = 1;
 }
 
 function move(e){
@@ -257,8 +257,8 @@ function move(e){
   let page = pages[current];
 
   if(page){
-    let bend = delta * 0.35;   /* 🔥 bend physics */
-    let rotate = delta * 0.06; /* 🔥 soft rotation */
+    let bend = delta * 0.35;
+    let rotate = delta * 0.06;
 
     page.style.transform = `
       translateX(${bend}px)
@@ -270,8 +270,6 @@ function move(e){
 function end(e){
   if(!dragging) return;
   dragging = false;
-
-  shadow.style.opacity = 0;
 
   let x = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
   let delta = x - startX;
@@ -288,7 +286,7 @@ function end(e){
   render();
 }
 
-/* EVENTS */
+/* 🎛 EVENTS */
 document.addEventListener("mousedown", start);
 document.addEventListener("mousemove", move);
 document.addEventListener("mouseup", end);
@@ -296,6 +294,17 @@ document.addEventListener("mouseup", end);
 document.addEventListener("touchstart", start);
 document.addEventListener("touchmove", move);
 document.addEventListener("touchend", end);
+
+/* 🌌 APPLE STUDIO LIGHT TRACKING */
+document.addEventListener("mousemove", (e) => {
+  let x = (e.clientX / window.innerWidth) * 100;
+  let y = (e.clientY / window.innerHeight) * 100;
+
+  document.querySelectorAll(".page").forEach(p => {
+    p.style.setProperty("--lx", x + "%");
+    p.style.setProperty("--ly", y + "%");
+  });
+});
 
 /* INIT */
 render();
