@@ -2,17 +2,104 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Apple Shader Book Engine</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Books Fixed Engine</title>
+
 <style>
 body{
   margin:0;
+  background:#0b0b0b;
+  font-family: Georgia, serif;
   overflow:hidden;
-  background:#000;
 }
-canvas{ display:block; }
 
-/* UI */
+/* ================= COVER ================= */
+#cover{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: radial-gradient(circle at center, #000, #1a0f0a);
+}
+
+.cover{
+  width:340px;
+  height:460px;
+
+  background-image:url("cover.jpg");
+  background-size:cover;
+  background-position:center;
+
+  border-radius:12px;
+  box-shadow:0 70px 160px rgba(0,0,0,0.9);
+
+  transform-origin:left;
+  transition:1s cubic-bezier(.2,.8,.2,1);
+
+  filter:brightness(1.1) contrast(1.05);
+}
+
+.cover.open{
+  transform:rotateY(-120deg) translateX(-80px);
+  opacity:0;
+}
+
+/* ================= BOOK ================= */
+#reader{
+  display:none;
+  height:100vh;
+  align-items:center;
+  justify-content:center;
+  background: radial-gradient(circle at center, #1a1a1a, #000);
+}
+
+.book{
+  width:820px;
+  height:520px;
+  position:relative;
+  perspective:2000px;
+}
+
+/* SPINE */
+.book::before{
+  content:"";
+  position:absolute;
+  width:30px;
+  height:100%;
+  left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(#111,#000,#111);
+}
+
+/* PAGE */
+.page{
+  position:absolute;
+  width:50%;
+  height:100%;
+  left:50%;
+  transform-origin:left;
+
+  background:linear-gradient(to right, #f7f2e6, #efe6d3);
+
+  padding:40px;
+  box-sizing:border-box;
+
+  box-shadow:0 30px 80px rgba(0,0,0,0.5);
+
+  transition:0.7s cubic-bezier(.2,.8,.2,1);
+}
+
+/* stack */
+.page:nth-child(1){ z-index:3; }
+.page:nth-child(2){ z-index:2; }
+.page:nth-child(3){ z-index:1; }
+
+.page.flipped{
+  transform:rotateY(-180deg);
+}
+
+/* ================= UI ================= */
 .ui{
   position:fixed;
   right:20px;
@@ -21,212 +108,78 @@ canvas{ display:block; }
   display:flex;
   flex-direction:column;
   gap:10px;
-  z-index:10;
+  z-index:999;
 }
+
 button{
   padding:10px 14px;
   border:none;
   border-radius:12px;
-  background:rgba(255,255,255,0.9);
+  background:rgba(255,255,255,0.92);
   font-weight:bold;
   cursor:pointer;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 </style>
 </head>
 
 <body>
 
-<div class="ui">
-  <button onclick="nextPage()">➡ Next</button>
-  <button onclick="prevPage()">⬅ Back</button>
+<!-- 📖 COVER -->
+<div id="cover">
+  <div class="cover" id="coverBook"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<!-- 📚 BOOK -->
+<div id="reader">
+
+  <div class="book">
+
+    <div class="page">📖 Глава 1 — старт</div>
+    <div class="page">📖 Глава 2 — развитие</div>
+    <div class="page">📖 Глава 3 — финал</div>
+
+  </div>
+
+</div>
+
+<!-- UI -->
+<div class="ui">
+  <button onclick="openBook()">📖 Open</button>
+  <button onclick="next()">➡ Next</button>
+  <button onclick="back()">⬅ Back</button>
+</div>
 
 <script>
 
-let scene, camera, renderer;
-let pages = [];
-let current = 0;
+let pages = document.querySelectorAll(".page");
+let i = 0;
 
-let drag = false;
-let startX = 0;
-let velocity = 0;
+/* OPEN */
+function openBook(){
+  document.getElementById("coverBook").classList.add("open");
 
-/* ================= INIT ================= */
-init();
-animate();
-
-function init(){
-
-  scene = new THREE.Scene();
-
-  camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 1000);
-  camera.position.z = 4;
-
-  renderer = new THREE.WebGLRenderer({antialias:true});
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  /* LIGHT (Apple-style soft key light) */
-  const light = new THREE.DirectionalLight(0xffffff, 1.2);
-  light.position.set(2,2,3);
-  scene.add(light);
-
-  const ambient = new THREE.AmbientLight(0x333333);
-  scene.add(ambient);
-
-  /* ================= SHADER PAGE ================= */
-  const geo = new THREE.PlaneGeometry(2.2,3.2,60,60);
-
-  const shaderMat = new THREE.ShaderMaterial({
-
-    uniforms:{
-      time:{value:0},
-      curl:{value:0}
-    },
-
-    vertexShader:`
-      uniform float time;
-      uniform float curl;
-
-      varying vec2 vUv;
-
-      void main(){
-        vUv = uv;
-
-        vec3 pos = position;
-
-        // 📖 PAGE CURL CORE (APPLE STYLE)
-        float bend = curl * 2.0;
-
-        float x = pos.x;
-
-        pos.z += sin(x * 3.0 + bend) * curl * 0.6;
-        pos.y += cos(x * 2.0 + bend) * curl * 0.2;
-
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos,1.0);
-      }
-    `,
-
-    fragmentShader:`
-      varying vec2 vUv;
-
-      void main(){
-
-        vec3 base = vec3(0.95,0.92,0.85);
-
-        float shadow = smoothstep(0.0,1.0,vUv.x);
-
-        vec3 color = base - shadow * 0.25;
-
-        gl_FragColor = vec4(color,1.0);
-      }
-    `,
-
-    side:THREE.DoubleSide
-  });
-
-  /* PAGES */
-  for(let i=0;i<3;i++){
-
-    let mesh = new THREE.Mesh(geo, shaderMat.clone());
-    mesh.position.z = -i * 0.02;
-
-    scene.add(mesh);
-    pages.push(mesh);
-  }
-
-  /* DRAG */
-  window.addEventListener("mousedown",(e)=>{
-    drag = true;
-    startX = e.clientX;
-  });
-
-  window.addEventListener("mouseup",()=>{
-    drag = false;
-
-    if(velocity < -0.02) nextPage();
-    if(velocity > 0.02) prevPage();
-
-    velocity *= 0.8;
-  });
-
-  window.addEventListener("mousemove",(e)=>{
-    if(!drag) return;
-
-    velocity = (e.clientX - startX) * 0.002;
-    startX = e.clientX;
-
-    applyCurl(velocity);
-  });
-
-  window.addEventListener("resize",onResize);
+  setTimeout(()=>{
+    document.getElementById("cover").style.display = "none";
+    document.getElementById("reader").style.display = "flex";
+  },900);
 }
 
-/* ================= REAL SHADER CURL CONTROL ================= */
-function applyCurl(v){
-
-  let mesh = pages[current];
-  mesh.material.uniforms.curl.value = v;
-
-}
-
-/* ================= PAGE FLIP ================= */
-function nextPage(){
-  if(current < pages.length-1){
-    animateFlip(pages[current], -1);
-    current++;
+/* NEXT */
+function next(){
+  if(i < pages.length){
+    pages[i].classList.add("flipped");
+    i++;
   }
 }
 
-function prevPage(){
-  if(current > 0){
-    current--;
-    animateFlip(pages[current], 1);
+/* BACK */
+function back(){
+  if(i > 0){
+    i--;
+    pages[i].classList.remove("flipped");
   }
 }
-
-/* smooth rotation */
-function animateFlip(mesh, dir){
-
-  let a = 0;
-
-  function step(){
-    a += 0.08;
-
-    mesh.rotation.y = dir * -a;
-
-    if(a < Math.PI){
-      requestAnimationFrame(step);
-    }
-  }
-
-  step();
-}
-
-/* ================= LOOP ================= */
-function animate(){
-
-  requestAnimationFrame(animate);
-
-  pages.forEach(p=>{
-    p.material.uniforms.time.value += 0.01;
-  });
-
-  renderer.render(scene,camera);
-}
-
-/* ================= RESIZE ================= */
-function onResize(){
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-/* UI */
-function nextPage(){ if(current < pages.length-1){ animateFlip(pages[current],-1); current++; } }
-function prevPage(){ if(current > 0){ current--; animateFlip(pages[current],1); } }
 
 </script>
 
