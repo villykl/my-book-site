@@ -3,62 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Book Cover Fix</title>
+<title>Ultra Apple Cover</title>
 
 <style>
 body{
   margin:0;
-  background:#0b0b0b;
-  font-family: Georgia, serif;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: radial-gradient(circle at center, #1a1a1a, #000);
   overflow:hidden;
 }
 
-/* 📖 COVER FIX */
+/* 📖 COVER */
 .cover{
   width:340px;
   height:460px;
+  position:relative;
 
   background-image:url("cover.jpg");
   background-size:cover;
   background-position:center;
-  background-repeat:no-repeat;
 
-  border-radius:14px;
+  border-radius:16px;
 
-  /* ❌ убираем белый фон/плоскость */
-  border:none;
-  outline:none;
-
-  /* ✨ Apple Books глубина */
+  /* 🍎 Apple depth shadow */
   box-shadow:
-    0 40px 90px rgba(0,0,0,0.6),
-    0 10px 30px rgba(0,0,0,0.4);
+    0 60px 120px rgba(0,0,0,0.65),
+    0 15px 40px rgba(0,0,0,0.4);
+
+  transform-style:preserve-3d;
+  transition:transform 0.2s ease;
 
   overflow:hidden;
-
-  transform-origin:left;
-  transition:1s ease;
-
-  filter: brightness(1.05) contrast(1.08);
 }
 
-/* ✨ лёгкий глянец (как у Apple Books) */
+/* ✨ LIGHT REFLECTION (Apple-style gloss) */
+.cover::before{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background: radial-gradient(
+    circle at var(--x,50%) var(--y,50%),
+    rgba(255,255,255,0.25),
+    transparent 40%
+  );
+
+  transform:rotate(10deg);
+  pointer-events:none;
+}
+
+/* 🌌 EDGE LIGHT (leather feel) */
 .cover::after{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(
-    135deg,
-    rgba(255,255,255,0.22),
-    transparent 45%
+  background: linear-gradient(
+    120deg,
+    rgba(0,0,0,0.2),
+    transparent 40%,
+    rgba(0,0,0,0.3)
   );
   pointer-events:none;
-  mix-blend-mode:overlay;
 }
 
 /* OPEN EFFECT */
 .cover.open{
-  transform:rotateY(-120deg) translateX(-90px);
+  transform: rotateY(-120deg) translateX(-80px);
   opacity:0;
 }
 </style>
@@ -69,9 +81,31 @@ body{
 <div class="cover" id="cover"></div>
 
 <script>
-document.getElementById("cover").onclick = () => {
-  document.getElementById("cover").classList.add("open");
+const cover = document.getElementById("cover");
+
+/* 📱 OPEN */
+cover.onclick = () => {
+  cover.classList.add("open");
 };
+
+/* 🌌 APPLE PARALLAX LIGHT */
+document.addEventListener("mousemove",(e)=>{
+
+  const x = (e.clientX / window.innerWidth) * 100;
+  const y = (e.clientY / window.innerHeight) * 100;
+
+  cover.style.setProperty("--x", x + "%");
+  cover.style.setProperty("--y", y + "%");
+
+  /* subtle 3D tilt */
+  const rotateY = (x - 50) * 0.08;
+  const rotateX = (y - 50) * -0.05;
+
+  cover.style.transform = `
+    rotateY(${rotateY}deg)
+    rotateX(${rotateX}deg)
+  `;
+});
 </script>
 
 </body>
