@@ -3,108 +3,137 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Книга</title>
+<title>Ultra Premium Book</title>
 
 <style>
-body {
-  margin: 0;
+body{
+  margin:0;
+  background: radial-gradient(circle at center, #2a2a2a, #0f0f0f);
   font-family: Georgia, serif;
-  background: #1b1b1b;
-  overflow: hidden;
+  overflow:hidden;
 }
 
 /* ===== STAGE ===== */
-.stage {
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  perspective: 2000px;
+.stage{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  perspective:2500px;
 }
 
 /* ===== BOOK ===== */
-.book {
-  width: 700px;
-  height: 450px;
-  position: relative;
-  transform-style: preserve-3d;
+.book{
+  width:760px;
+  height:480px;
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform 1s ease;
+}
+
+/* ===== SPINE (THICKNESS) ===== */
+.book::before{
+  content:"";
+  position:absolute;
+  width:20px;
+  height:100%;
+  left:50%;
+  transform:translateX(-50%);
+  background:#111;
+  z-index:0;
 }
 
 /* ===== COVER ===== */
-.cover {
-  position: absolute;
-  width: 50%;
-  height: 100%;
-  left: 50%;
-  transform-origin: left;
+.cover{
+  position:absolute;
+  width:50%;
+  height:100%;
+  left:50%;
+  transform-origin:left;
   background: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f') center/cover;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  box-shadow:0 40px 80px rgba(0,0,0,0.7);
   transition: transform 1.2s ease;
-  z-index: 5;
+  z-index:10;
 }
 
 /* OPEN COVER */
-.book.open .cover {
+.book.open .cover{
   transform: rotateY(-180deg);
 }
 
 /* ===== PAGES ===== */
-.page {
-  position: absolute;
-  width: 50%;
-  height: 100%;
-  left: 50%;
-  transform-origin: left;
-  background: #fff;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-  padding: 40px;
-  box-sizing: border-box;
-  transition: transform 1s ease;
-  overflow: hidden;
+.page{
+  position:absolute;
+  width:50%;
+  height:100%;
+  left:50%;
+  transform-origin:left;
+  background:#fdfaf3;
+  box-shadow:0 20px 50px rgba(0,0,0,0.4);
+  padding:40px;
+  box-sizing:border-box;
+  transition:transform 1s cubic-bezier(.77,0,.18,1);
+  overflow:hidden;
 }
 
-/* stack pages */
-.page:nth-child(2) { z-index: 4; }
-.page:nth-child(3) { z-index: 3; }
-.page:nth-child(4) { z-index: 2; }
+/* stacking */
+.page:nth-child(2){ z-index:5; }
+.page:nth-child(3){ z-index:4; }
+.page:nth-child(4){ z-index:3; }
+.page:nth-child(5){ z-index:2; }
 
-/* flipped pages */
-.page.flipped {
+/* flipped */
+.page.flipped{
   transform: rotateY(-180deg);
 }
 
-/* TEXT */
-h1 {
-  font-size: 24px;
-  text-align: center;
+/* text */
+h1{
+  text-align:center;
+  font-size:26px;
 }
 
-p {
-  font-size: 16px;
-  line-height: 1.7;
+p{
+  font-size:17px;
+  line-height:1.8;
 }
 
-/* BUTTONS */
-.controls {
-  position: fixed;
-  bottom: 20px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
+/* ===== LIGHT SHADOW DEPTH ===== */
+.page::after{
+  content:"";
+  position:absolute;
+  top:0;
+  right:0;
+  width:20px;
+  height:100%;
+  background:linear-gradient(to left, rgba(0,0,0,0.1), transparent);
 }
 
-button {
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  background: white;
-  border-radius: 8px;
+/* ===== CONTROLS ===== */
+.controls{
+  position:fixed;
+  bottom:20px;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  gap:10px;
+}
+
+button{
+  padding:10px 18px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  background:white;
+  font-weight:bold;
+}
+button:hover{
+  transform:scale(1.05);
 }
 </style>
 </head>
@@ -117,23 +146,23 @@ button {
 
     <!-- COVER -->
     <div class="cover" onclick="openBook()">
-      📖 НАЖМИ ЧТОБЫ ОТКРЫТЬ
+      📖 CLICK TO OPEN
     </div>
 
     <!-- PAGES -->
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Это первая страница твоей книги. Она выглядит как настоящая бумага.</p>
+      <p>Это Ultra Premium книга. Теперь у неё есть глубина, тень и ощущение настоящих страниц.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Перелистывание страниц происходит с 3D эффектом.</p>
+      <p>Перелистывание работает как физическая книга с 3D вращением.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>Ты можешь заменить этот текст на свои рассказы.</p>
+      <p>Ты можешь вставить сюда любые свои тексты — это твоя цифровая книга.</p>
     </div>
 
   </div>
@@ -141,31 +170,38 @@ button {
 
 <!-- CONTROLS -->
 <div class="controls">
-  <button onclick="flipPage()">📄 Перелистнуть</button>
+  <button onclick="flip()">➡ Перелистнуть</button>
   <button onclick="resetBook()">🔄 Сброс</button>
 </div>
 
 <script>
-let current = 0;
-const pages = document.querySelectorAll('.page');
-const book = document.getElementById('book');
+const book = document.getElementById("book");
+const pages = document.querySelectorAll(".page");
+let index = 0;
 
-function openBook() {
-  book.classList.add('open');
+function openBook(){
+  book.classList.add("open");
 }
 
-function flipPage() {
-  if (current < pages.length) {
-    pages[current].classList.add('flipped');
-    current++;
+function flip(){
+  if(index < pages.length){
+    pages[index].classList.add("flipped");
+    index++;
   }
 }
 
-function resetBook() {
-  pages.forEach(p => p.classList.remove('flipped'));
-  book.classList.remove('open');
-  current = 0;
+/* reset */
+function resetBook(){
+  pages.forEach(p => p.classList.remove("flipped"));
+  book.classList.remove("open");
+  index = 0;
 }
+
+/* keyboard control */
+document.addEventListener("keydown",(e)=>{
+  if(e.key==="ArrowRight") flip();
+  if(e.key==="ArrowLeft") resetBook();
+});
 </script>
 
 </body>
