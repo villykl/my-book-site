@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apple Books Stable Pro</title>
+<title>Book Cover Fix</title>
 
 <style>
 body{
@@ -13,166 +13,65 @@ body{
   overflow:hidden;
 }
 
-/* COVER */
-#cover{
-  position:fixed;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background: radial-gradient(circle, #000, #1a0f0a);
-}
-
+/* 📖 COVER FIX */
 .cover{
   width:340px;
   height:460px;
-  background:url("cover.jpg");
+
+  background-image:url("cover.jpg");
   background-size:cover;
   background-position:center;
+  background-repeat:no-repeat;
 
-  border-radius:12px;
-  box-shadow:0 80px 180px rgba(0,0,0,0.9);
+  border-radius:14px;
 
-  transition:1s ease;
+  /* ❌ убираем белый фон/плоскость */
+  border:none;
+  outline:none;
+
+  /* ✨ Apple Books глубина */
+  box-shadow:
+    0 40px 90px rgba(0,0,0,0.6),
+    0 10px 30px rgba(0,0,0,0.4);
+
+  overflow:hidden;
+
   transform-origin:left;
+  transition:1s ease;
+
+  filter: brightness(1.05) contrast(1.08);
 }
 
+/* ✨ лёгкий глянец (как у Apple Books) */
+.cover::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    135deg,
+    rgba(255,255,255,0.22),
+    transparent 45%
+  );
+  pointer-events:none;
+  mix-blend-mode:overlay;
+}
+
+/* OPEN EFFECT */
 .cover.open{
   transform:rotateY(-120deg) translateX(-90px);
   opacity:0;
-}
-
-/* BOOK */
-#reader{
-  display:none;
-  height:100vh;
-  justify-content:center;
-  align-items:center;
-  background: radial-gradient(circle, #1a1a1a, #000);
-}
-
-.book{
-  width:820px;
-  height:520px;
-  position:relative;
-  perspective:2000px;
-}
-
-/* SPINE */
-.book::before{
-  content:"";
-  position:absolute;
-  width:30px;
-  height:100%;
-  left:50%;
-  transform:translateX(-50%);
-  background:linear-gradient(#111,#000,#111);
-}
-
-/* PAGE */
-.page{
-  position:absolute;
-  width:50%;
-  height:100%;
-  left:50%;
-  transform-origin:left;
-
-  background:linear-gradient(to right, #f7f2e6, #efe6d3);
-
-  padding:40px;
-  box-sizing:border-box;
-
-  box-shadow:0 30px 80px rgba(0,0,0,0.5);
-
-  transition:0.8s cubic-bezier(.2,.8,.2,1);
-}
-
-/* STACK */
-.page:nth-child(1){ z-index:3; }
-.page:nth-child(2){ z-index:2; }
-.page:nth-child(3){ z-index:1; }
-
-.page.flipped{
-  transform:rotateY(-180deg);
-}
-
-/* UI */
-.ui{
-  position:fixed;
-  right:20px;
-  top:50%;
-  transform:translateY(-50%);
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-button{
-  padding:10px 14px;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  background:rgba(255,255,255,0.92);
-  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<div id="cover">
-  <div class="cover" id="coverBook"></div>
-</div>
-
-<div id="reader">
-
-  <div class="book">
-
-    <div class="page">📖 Глава 1</div>
-    <div class="page">📖 Глава 2</div>
-    <div class="page">📖 Глава 3</div>
-
-  </div>
-
-</div>
-
-<div class="ui">
-  <button onclick="openBook()">📖 Open</button>
-  <button onclick="next()">➡ Next</button>
-  <button onclick="back()">⬅ Back</button>
-</div>
+<div class="cover" id="cover"></div>
 
 <script>
-
-let pages = document.querySelectorAll(".page");
-let i = 0;
-
-/* OPEN */
-function openBook(){
-  document.getElementById("coverBook").classList.add("open");
-
-  setTimeout(()=>{
-    document.getElementById("cover").style.display = "none";
-    document.getElementById("reader").style.display = "flex";
-  },900);
-}
-
-/* NEXT */
-function next(){
-  if(i < pages.length){
-    pages[i].classList.add("flipped");
-    i++;
-  }
-}
-
-/* BACK */
-function back(){
-  if(i > 0){
-    i--;
-    pages[i].classList.remove("flipped");
-  }
-}
-
+document.getElementById("cover").onclick = () => {
+  document.getElementById("cover").classList.add("open");
+};
 </script>
 
 </body>
