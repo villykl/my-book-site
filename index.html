@@ -3,89 +3,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Final Book Fix</title>
+<title>Simple Book Fix</title>
 
 <style>
 body{
   margin:0;
   font-family: Georgia, serif;
-  background:#0b0b0b;
-  overflow:hidden;
+  background:#111;
 }
 
 /* COVER */
 #cover{
   position:fixed;
   inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
   background:#3a2215;
   color:#f3e3d0;
-  z-index:999;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
 }
 
 /* BOOK */
 #book{
   display:none;
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
+  padding:40px;
+  color:#fff;
 }
 
 .page{
   background:#f6f1e3;
-  padding:30px;
-  margin:10px;
-  width:60%;
+  color:#111;
+  padding:20px;
+  margin:10px 0;
   border-radius:10px;
-}
-
-button{
-  padding:12px 18px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<!-- COVER -->
 <div id="cover">
   <h1>Слова — следы души</h1>
-  <button onclick="start()">Открыть книгу</button>
+  <button onclick="openBook()">Открыть книгу</button>
 </div>
 
-<!-- BOOK -->
 <div id="book">
-
-  <div class="page">
-    <h1>Глава 1</h1>
-    <p>Теперь это правильная архитектура приложения.</p>
-  </div>
-
-  <div class="page">
-    <h1>Глава 2</h1>
-    <p>Нет наложения. Нет багов. Только состояние.</p>
-  </div>
-
+  <div class="page">Глава 1</div>
+  <div class="page">Глава 2</div>
+  <div class="page">Глава 3</div>
 </div>
 
 <script>
 
-/* 🚪 REAL APP START */
-function start(){
+function openBook(){
   document.getElementById("cover").style.display = "none";
-  document.getElementById("book").style.display = "flex";
+  document.getElementById("book").style.display = "block";
 }
 
-/* 🚫 BLOCK HASH BUG */
+/* safety */
 if(window.location.hash){
   history.replaceState(null,null," ");
 }
