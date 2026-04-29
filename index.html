@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clean Book App</title>
+<title>Deploy Proof Book</title>
 
 <style>
 body{
@@ -13,16 +13,14 @@ body{
   overflow:hidden;
 }
 
-/* ===== APP WRAPPER ===== */
-.app{
-  height:100vh;
-  width:100vw;
-  position:relative;
+/* 🔒 HARD START LOCK */
+body.locked{
+  overflow:hidden;
 }
 
-/* ===== COVER SCREEN ===== */
+/* ===== COVER ===== */
 .cover{
-  position:absolute;
+  position:fixed;
   inset:0;
   display:flex;
   align-items:center;
@@ -37,7 +35,7 @@ body{
   color:#f3e3d0;
   text-align:center;
 
-  z-index:10;
+  z-index:9999;
   transition:0.8s ease;
 }
 
@@ -55,23 +53,23 @@ body{
   font-weight:bold;
 }
 
-/* hide cover */
+/* hide */
 .cover.hide{
   opacity:0;
   transform:scale(1.1);
   pointer-events:none;
 }
 
-/* ===== BOOK VIEW ===== */
-.book{
-  height:100%;
+/* ===== BOOK ===== */
+.stage{
+  height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  perspective:2000px;
+  perspective:2500px;
 }
 
-.pages{
+.book{
   width:800px;
   height:500px;
   position:relative;
@@ -79,7 +77,7 @@ body{
 }
 
 /* spine */
-.pages::before{
+.book::before{
   content:"";
   position:absolute;
   width:28px;
@@ -89,7 +87,7 @@ body{
   background:linear-gradient(#111,#000,#111);
 }
 
-/* page */
+/* pages */
 .page{
   position:absolute;
   width:50%;
@@ -101,7 +99,7 @@ body{
   padding:40px;
   box-sizing:border-box;
 
-  transition:0.9s ease;
+  transition:1s;
   box-shadow:0 30px 80px rgba(0,0,0,0.6);
 }
 
@@ -135,40 +133,34 @@ button{
 </style>
 </head>
 
-<body>
+<body class="locked">
 
-<div class="app">
+<!-- 📖 COVER -->
+<div class="cover" id="cover">
+  <h1>Слова — следы души</h1>
+  <button onclick="startApp()">Открыть книгу</button>
+</div>
 
-  <!-- 📖 COVER -->
-  <div class="cover" id="cover">
-    <h1>Слова — следы души</h1>
-    <button onclick="openApp()">Открыть книгу</button>
-  </div>
-
-  <!-- 📚 BOOK -->
+<!-- 📚 BOOK -->
+<div class="stage">
   <div class="book">
 
-    <div class="pages">
+    <div class="page">
+      <h1>Глава 1</h1>
+      <p>Deploy-proof версия. GitHub больше не ломает старт.</p>
+    </div>
 
-      <div class="page">
-        <h1>Глава 1</h1>
-        <p>Это чистая версия приложения книги.</p>
-      </div>
+    <div class="page">
+      <h1>Глава 2</h1>
+      <p>Обложка всегда первая, даже при кешировании и hash.</p>
+    </div>
 
-      <div class="page">
-        <h1>Глава 2</h1>
-        <p>GitHub больше не ломает структуру.</p>
-      </div>
-
-      <div class="page">
-        <h1>Глава 3</h1>
-        <p>Обложка всегда первая и не обходится через #hash.</p>
-      </div>
-
+    <div class="page">
+      <h1>Глава 3</h1>
+      <p>Это финальная стабильная версия книги.</p>
     </div>
 
   </div>
-
 </div>
 
 <!-- UI -->
@@ -184,9 +176,10 @@ const pages = document.querySelectorAll(".page");
 
 let i = 0;
 
-/* 🚪 OPEN APP */
-function openApp(){
+/* 🚪 START (HARD ENTRY CONTROL) */
+function startApp(){
   cover.classList.add("hide");
+  document.body.classList.remove("locked");
 }
 
 /* 📄 FLIP */
@@ -203,7 +196,7 @@ function reset(){
   i = 0;
 }
 
-/* 🚫 HARD BLOCK HASH (CRITICAL FIX) */
+/* 🚫 BLOCK ANY HASH ENTRY */
 if (window.location.hash) {
   history.replaceState(null, null, " ");
 }
