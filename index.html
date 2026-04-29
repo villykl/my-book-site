@@ -3,39 +3,154 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Книга</title>
+
+<title>Моя книга</title>
+
 <style>
-:root{--bg:#0f0f12;--text:#eee;--nav:rgba(0,0,0,0.6);}
-body.light{--bg:#f5f2ea;--text:#1a1a1a;--nav:rgba(255,255,255,0.7);}
-body{margin:0;font-family:Georgia,serif;background:var(--bg);color:var(--text);overflow:hidden;}
-.book-nav{position:fixed;top:0;left:0;right:0;height:60px;display:flex;justify-content:center;align-items:center;gap:20px;background:var(--nav);z-index:100;}
-.book{position:absolute;top:60px;width:100%;height:calc(100vh - 60px);perspective:2500px;}
-.page{position:absolute;width:100%;height:100%;padding:60px 20px;background:var(--bg);transform-origin:left;transition:transform 0.9s;}
-.page.flipped{transform:rotateY(-180deg);}
-.cover{display:flex;justify-content:center;align-items:center;height:100%;}
-.cover img{max-width:80%;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,0.6);}
+body {
+  margin: 0;
+  font-family: Georgia, serif;
+  background: linear-gradient(to right, #e9e4d8, #f7f3ea);
+  color: #2b2b2b;
+  scroll-behavior: smooth;
+}
+
+/* TOP MENU */
+nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 12px;
+  z-index: 1000;
+  border-bottom: 1px solid #ddd;
+}
+
+nav a {
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+}
+
+nav a:hover {
+  color: black;
+  font-weight: bold;
+}
+
+/* COVER */
+.cover {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  background: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f') center/cover;
+  color: white;
+}
+
+.cover h1 {
+  font-size: 50px;
+  text-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+.cover p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+/* BOOK STYLE */
+.container {
+  max-width: 850px;
+  margin: auto;
+  background: white;
+  padding: 60px 30px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.15);
+}
+
+.chapter {
+  padding: 80px 0;
+  border-bottom: 1px solid #eee;
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeIn 1s forwards;
+}
+
+.chapter:nth-child(2) { animation-delay: 0.2s; }
+.chapter:nth-child(3) { animation-delay: 0.4s; }
+.chapter:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h1 {
+  text-align: center;
+  font-weight: normal;
+}
+
+p {
+  font-size: 18px;
+  line-height: 1.9;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .cover h1 { font-size: 32px; }
+  .container { padding: 30px 15px; }
+}
 </style>
 </head>
+
 <body>
 
-<div class="book-nav">
-<a onclick="goTo(1)">Глава 1</a>
-<a onclick="goTo(2)">Глава 2</a>
-<a onclick="goTo(3)">Глава 3</a>
-</div>
+<!-- MENU -->
+<nav>
+  <a href="#cover">Обложка</a>
+  <a href="#ch1">Глава 1</a>
+  <a href="#ch2">Глава 2</a>
+  <a href="#ch3">Глава 3</a>
+</nav>
 
-<div class="book">
-<div class="page"><div class="cover"><img src="cover.jpg"></div></div>
-<div class="page"><h1>Глава 1</h1><p>Текст...</p></div>
-<div class="page"><h1>Глава 2</h1><p>Текст...</p></div>
-<div class="page"><h1>Глава 3</h1><p>Текст...</p></div>
-</div>
+<!-- COVER -->
+<section id="cover" class="cover">
+  <h1>Моя книга</h1>
+  <p>Слова, которые становятся историей</p>
+</section>
 
-<script>
-const pages=document.querySelectorAll(".page");let current=0;
-function render(){pages.forEach((p,i)=>{if(i<current){p.classList.add("flipped");}else{p.classList.remove("flipped");}});}
-async function goTo(t){let s=t>current?1:-1;while(current!=t){current+=s;render();await new Promise(r=>setTimeout(r,400));}}
-</script>
+<!-- BOOK -->
+<div class="container">
+
+  <section id="ch1" class="chapter">
+    <h1>Глава 1</h1>
+    <p>
+      Вставь сюда свой текст первой главы.  
+      Это будет выглядеть как настоящая печатная книга.
+    </p>
+  </section>
+
+  <section id="ch2" class="chapter">
+    <h1>Глава 2</h1>
+    <p>
+      Вставь сюда текст второй главы.
+    </p>
+  </section>
+
+  <section id="ch3" class="chapter">
+    <h1>Глава 3</h1>
+    <p>
+      Вставь сюда текст третьей главы.
+    </p>
+  </section>
+
+</div>
 
 </body>
 </html>
