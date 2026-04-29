@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apple Book Fixed UI</title>
+<title>Fixed Apple Book</title>
 
 <style>
 body{
@@ -30,26 +30,26 @@ body{
   background-image:url("cover.jpg");
   background-size:cover;
   background-position:center;
+  background-repeat:no-repeat;
 
   border-radius:18px;
-
-  position:relative;
-  overflow:hidden;
 
   box-shadow:
     0 90px 180px rgba(0,0,0,0.75),
     0 25px 60px rgba(0,0,0,0.5);
 
-  transition:1s cubic-bezier(.2,.8,.2,1);
   transform-origin:left;
+  transition:1s cubic-bezier(.2,.8,.2,1);
+
+  position:relative;
+  overflow:hidden;
 }
 
-/* light */
 .cover::before{
   content:"";
   position:absolute;
   inset:0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent 50%);
+  background:linear-gradient(135deg, rgba(255,255,255,0.2), transparent 50%);
   pointer-events:none;
 }
 
@@ -73,6 +73,18 @@ body{
   perspective:2000px;
 }
 
+/* spine */
+.book::before{
+  content:"";
+  position:absolute;
+  width:30px;
+  height:100%;
+  left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(#111,#000,#111);
+}
+
+/* pages */
 .page{
   position:absolute;
   width:50%;
@@ -98,7 +110,7 @@ body{
   transform:rotateY(-180deg);
 }
 
-/* 🎛 UI BUTTONS */
+/* 🎛 UI */
 .ui{
   position:fixed;
   right:20px;
@@ -107,7 +119,7 @@ body{
   display:flex;
   flex-direction:column;
   gap:10px;
-  z-index:999;
+  z-index:9999; /* 🔥 FIX: кнопки всегда сверху */
 }
 
 button{
@@ -115,10 +127,8 @@ button{
   border:none;
   border-radius:12px;
   cursor:pointer;
-
   background:rgba(255,255,255,0.92);
   font-weight:bold;
-
   box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 </style>
@@ -156,7 +166,7 @@ button{
 let pages = document.querySelectorAll(".page");
 let i = 0;
 
-/* OPEN */
+/* OPEN BOOK */
 function openBook(){
   document.getElementById("coverBook").classList.add("open");
 
@@ -166,7 +176,7 @@ function openBook(){
   },900);
 }
 
-/* NEXT */
+/* NEXT PAGE */
 function next(){
   if(i < pages.length){
     pages[i].classList.add("flipped");
@@ -174,7 +184,7 @@ function next(){
   }
 }
 
-/* BACK */
+/* BACK PAGE */
 function back(){
   if(i > 0){
     i--;
