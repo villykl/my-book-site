@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kindle Apple Book Fixed</title>
+<title>Slow Kindle Book</title>
 
 <style>
 body{
@@ -30,19 +30,16 @@ body{
   background-image:url("cover.jpg");
   background-size:cover;
   background-position:center;
-  background-repeat:no-repeat;
 
   border-radius:18px;
 
-  box-shadow:
-    0 100px 200px rgba(0,0,0,0.75),
-    0 30px 60px rgba(0,0,0,0.5);
+  box-shadow:0 100px 200px rgba(0,0,0,0.75);
 
   position:relative;
   overflow:hidden;
 
-  transition:1s cubic-bezier(.2,.8,.2,1);
   transform-origin:left;
+  transition:1s cubic-bezier(.2,.8,.2,1);
 }
 
 .cover::before{
@@ -50,7 +47,6 @@ body{
   position:absolute;
   inset:0;
   background:linear-gradient(135deg, rgba(255,255,255,0.22), transparent 50%);
-  pointer-events:none;
 }
 
 .cover.open{
@@ -71,11 +67,9 @@ body{
   height:520px;
   position:relative;
   perspective:2000px;
-
   touch-action: pan-y;
 }
 
-/* spine */
 .book::before{
   content:"";
   position:absolute;
@@ -92,7 +86,6 @@ body{
   width:50%;
   height:100%;
   left:50%;
-
   transform-origin:left;
 
   background:linear-gradient(to right, #f7f2e6, #efe6d3);
@@ -102,8 +95,8 @@ body{
 
   box-shadow:0 30px 80px rgba(0,0,0,0.5);
 
-  transition:transform 0.6s cubic-bezier(.2,.8,.2,1);
-
+  /* 🔥 SLOW FIX */
+  transition: transform 1.25s cubic-bezier(0.25, 0.8, 0.25, 1);
   will-change: transform;
 }
 
@@ -185,9 +178,11 @@ function openBook(){
   },900);
 }
 
-/* 🔄 RENDER (SYNC CORE) */
+/* 🔄 RENDER */
 function render(){
   pages.forEach((p, i)=>{
+    p.style.transition = "transform 1.25s cubic-bezier(0.25, 0.8, 0.25, 1)";
+
     if(i < current){
       p.classList.add("flipped");
       p.style.transform = "rotateY(-180deg)";
@@ -214,7 +209,7 @@ function back(){
   }
 }
 
-/* 📱 SWIPE */
+/* 📱 SWIPE (мягкий) */
 let startX = 0;
 let dragging = false;
 
@@ -230,8 +225,10 @@ function move(e){
   let delta = x - startX;
 
   let page = pages[current];
+
   if(page){
-    page.style.transform = `translateX(${delta}px) rotateY(${delta * 0.12}deg)`;
+    let smooth = delta * 0.45; // 🔥 замедление swipe
+    page.style.transform = `translateX(${smooth}px) rotateY(${smooth * 0.08}deg)`;
   }
 }
 
@@ -239,7 +236,8 @@ function end(){
   if(!dragging) return;
   dragging = false;
 
-  let threshold = 80;
+  let threshold = 90;
+  let page = pages[current];
 
   let x = event.changedTouches ? event.changedTouches[0].clientX : event.clientX;
   let delta = x - startX;
