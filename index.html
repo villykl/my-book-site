@@ -3,46 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GOD MODE BOOK</title>
+<title>GOD MODE 2.0 BOOK</title>
 
 <style>
 body{
   margin:0;
-  background: radial-gradient(circle at center, #111, #000);
-  font-family: Georgia, serif;
   overflow:hidden;
-  color:#222;
+  background: radial-gradient(circle at center, #0a0a0a, #000);
+  font-family: Georgia, serif;
 }
 
-/* ===== STAGE ===== */
+/* ===== 3D STAGE ===== */
 .stage{
   height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  perspective:3000px;
+  perspective:2500px;
 }
 
-/* ===== BOOK ===== */
+/* ===== BOOK 3D OBJECT ===== */
 .book{
   width:800px;
   height:500px;
   position:relative;
   transform-style:preserve-3d;
-  transition: transform 1s ease;
+  transform: rotateY(0deg) rotateX(5deg);
+  transition: transform 0.2s linear;
 }
 
 /* spine */
 .book::before{
   content:"";
   position:absolute;
-  width:24px;
+  width:26px;
   height:100%;
   left:50%;
   transform:translateX(-50%);
   background:linear-gradient(#111,#000,#111);
+  box-shadow:0 0 40px rgba(0,0,0,0.8);
   z-index:0;
-  box-shadow:0 0 30px rgba(0,0,0,0.6);
 }
 
 /* ===== COVER ===== */
@@ -52,15 +52,15 @@ body{
   height:100%;
   left:50%;
   transform-origin:left;
-  background: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f') center/cover;
+  background:url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f') center/cover;
   display:flex;
   align-items:center;
   justify-content:center;
   color:white;
-  font-size:30px;
+  font-size:32px;
   text-shadow:0 10px 40px black;
-  box-shadow:0 50px 120px rgba(0,0,0,0.8);
-  transition:transform 1.5s cubic-bezier(.2,.8,.2,1);
+  box-shadow:0 60px 120px rgba(0,0,0,0.8);
+  transition:transform 1.2s cubic-bezier(.2,.8,.2,1);
   z-index:10;
 }
 
@@ -75,26 +75,26 @@ body{
   height:100%;
   left:50%;
   transform-origin:left;
-  background: #f7f1e3;
-  box-shadow:0 30px 60px rgba(0,0,0,0.5);
+  background:#f6f1e3;
+  box-shadow:0 30px 80px rgba(0,0,0,0.6);
   padding:45px;
   box-sizing:border-box;
-  transition: transform 1.2s cubic-bezier(.77,0,.18,1);
+  transition:transform 1s cubic-bezier(.77,0,.18,1);
   overflow:hidden;
 }
 
-/* stacking depth */
+/* depth stacking */
 .page:nth-child(2){ z-index:5; }
 .page:nth-child(3){ z-index:4; }
 .page:nth-child(4){ z-index:3; }
 .page:nth-child(5){ z-index:2; }
 
-/* flipped state */
+/* flip */
 .page.flipped{
   transform: rotateY(-180deg);
 }
 
-/* page shadow */
+/* paper shading */
 .page::after{
   content:"";
   position:absolute;
@@ -105,7 +105,7 @@ body{
   background:linear-gradient(to left, rgba(0,0,0,0.15), transparent);
 }
 
-/* TEXT */
+/* text */
 h1{
   text-align:center;
   font-size:26px;
@@ -116,14 +116,12 @@ p{
   line-height:1.8;
 }
 
-/* ===== LIGHT SYSTEM ===== */
+/* ===== LIGHT SOURCE ===== */
 .light{
   position:fixed;
-  top:0;
-  left:0;
   width:100%;
   height:100%;
-  background: radial-gradient(circle at var(--x,50%) var(--y,50%), rgba(255,255,255,0.08), transparent 40%);
+  background: radial-gradient(circle at var(--x,50%) var(--y,50%), rgba(255,255,255,0.08), transparent 45%);
   pointer-events:none;
 }
 
@@ -138,22 +136,24 @@ p{
 }
 
 button{
-  padding:10px 16px;
+  padding:10px 14px;
   border:none;
   border-radius:10px;
   cursor:pointer;
   background:white;
   font-weight:bold;
-  transition:0.2s;
 }
 
-button:hover{
-  transform:scale(1.1);
-}
-
-/* NIGHT MODE */
-.night{
-  filter: brightness(0.8) contrast(1.1);
+/* glow floor */
+.floorGlow{
+  position:fixed;
+  bottom:-200px;
+  left:50%;
+  transform:translateX(-50%);
+  width:600px;
+  height:600px;
+  background:radial-gradient(circle, rgba(255,255,255,0.08), transparent 60%);
+  filter:blur(40px);
 }
 </style>
 </head>
@@ -161,28 +161,29 @@ button:hover{
 <body>
 
 <div class="light"></div>
+<div class="floorGlow"></div>
 
 <div class="stage">
 
   <div class="book" id="book">
 
     <div class="cover" onclick="openBook()">
-      📖 GOD MODE BOOK
+      📖 GOD MODE 2.0
     </div>
 
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Это GOD MODE книга. Она имитирует настоящую физическую книгу с глубиной, светом и анимацией.</p>
+      <p>Это уже не сайт. Это цифровой объект с глубиной и физикой света.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Каждая страница перелистывается как реальная бумага с 3D эффектом.</p>
+      <p>Страницы ведут себя как настоящая бумага в 3D пространстве.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>Ты можешь заменить текст на свои истории, стихи или книгу.</p>
+      <p>Книга реагирует на мышь, свайпы и клавиатуру.</p>
     </div>
 
   </div>
@@ -190,16 +191,14 @@ button:hover{
 
 <!-- UI -->
 <div class="ui">
-  <button onclick="flip()">➡ Next</button>
+  <button onclick="flip()">➡ Flip</button>
   <button onclick="resetBook()">🔄 Reset</button>
-  <button onclick="toggleNight()">🌙 Night</button>
-  <button onclick="autoPlay()">🎬 Auto</button>
+  <button onclick="autoMode()">🎬 Auto</button>
 </div>
 
 <script>
 const book = document.getElementById("book");
 const pages = document.querySelectorAll(".page");
-const light = document.querySelector(".light");
 
 let i = 0;
 let auto = false;
@@ -224,13 +223,8 @@ function resetBook(){
   i = 0;
 }
 
-/* NIGHT MODE */
-function toggleNight(){
-  document.body.classList.toggle("night");
-}
-
-/* AUTO PLAY */
-function autoPlay(){
+/* AUTO MODE */
+function autoMode(){
   if(auto) return;
   auto = true;
 
@@ -241,16 +235,27 @@ function autoPlay(){
       clearInterval(interval);
       auto = false;
     }
-  }, 1200);
+  }, 1000);
 }
 
-/* LIGHT FOLLOW MOUSE */
+/* ===== MOUSE 3D ROTATION ===== */
+let rotX = 5;
+let rotY = 0;
+
 document.addEventListener("mousemove",(e)=>{
+  let x = (e.clientX / window.innerWidth - 0.5) * 20;
+  let y = (e.clientY / window.innerHeight - 0.5) * -15;
+
+  rotY = x;
+  rotX = 5 + y;
+
+  book.style.transform = `rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+
   document.documentElement.style.setProperty("--x", e.clientX+"px");
   document.documentElement.style.setProperty("--y", e.clientY+"px");
 });
 
-/* SWIPE MOBILE */
+/* ===== TOUCH SWIPE ===== */
 let startX = 0;
 
 document.addEventListener("touchstart",(e)=>{
@@ -260,15 +265,15 @@ document.addEventListener("touchstart",(e)=>{
 document.addEventListener("touchend",(e)=>{
   let endX = e.changedTouches[0].clientX;
 
-  if(endX - startX > 50) resetBook();
-  if(startX - endX > 50) flip();
+  if(endX - startX > 40) resetBook();
+  if(startX - endX > 40) flip();
 });
 
-/* KEYBOARD */
+/* keyboard */
 document.addEventListener("keydown",(e)=>{
   if(e.key==="ArrowRight") flip();
   if(e.key==="ArrowLeft") resetBook();
-  if(e.key===" ") autoPlay();
+  if(e.key===" ") autoMode();
 });
 </script>
 
