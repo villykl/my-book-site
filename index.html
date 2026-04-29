@@ -3,63 +3,186 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clean Book</title>
+<title>Apple Books Style</title>
 
 <style>
 body{
   margin:0;
+  height:100vh;
+  overflow:hidden;
   font-family: Georgia, serif;
-  background:#111;
+  background: radial-gradient(circle at center, #1a1a1a, #000);
 }
 
-/* COVER */
+/* ===== COVER ===== */
 #cover{
   position:fixed;
   inset:0;
-  background:#3a2215;
-  color:#f3e3d0;
   display:flex;
   align-items:center;
   justify-content:center;
   flex-direction:column;
+  background:
+    linear-gradient(145deg, #3a2215, #1a0f0a);
+  color:#f3e3d0;
+  z-index:10;
+  transition:1s ease;
+}
+
+#cover h1{
+  font-size:42px;
+  margin:0;
+}
+
+#cover button{
+  margin-top:20px;
+  padding:12px 18px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* ===== BOOK ===== */
+#scene{
+  height:100vh;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  perspective:2000px;
 }
 
 /* BOOK */
-#book{
-  display:none;
-  padding:40px;
+.book{
+  width:800px;
+  height:500px;
+  position:relative;
+  transform-style:preserve-3d;
+  transform: rotateX(8deg);
 }
 
+/* SPINE */
+.book::before{
+  content:"";
+  position:absolute;
+  width:30px;
+  height:100%;
+  left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(#111,#000,#111);
+}
+
+/* PAGES */
 .page{
+  position:absolute;
+  width:50%;
+  height:100%;
+  left:50%;
+  transform-origin:left;
   background:#f6f1e3;
-  margin:10px 0;
-  padding:20px;
+  padding:40px;
+  box-sizing:border-box;
+  transition:1s ease;
+  box-shadow:0 30px 80px rgba(0,0,0,0.6);
+  border-radius:0 10px 10px 0;
+}
+
+/* stacking */
+.page:nth-child(1){ z-index:3; }
+.page:nth-child(2){ z-index:2; }
+.page:nth-child(3){ z-index:1; }
+
+/* flip animation */
+.page.flipped{
+  transform: rotateY(-180deg);
+}
+
+/* UI */
+.ui{
+  position:fixed;
+  bottom:20px;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  z-index:20;
+}
+
+button{
+  padding:10px 14px;
+  border:none;
   border-radius:10px;
+  cursor:pointer;
+  background:white;
+  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<!-- COVER -->
+<!-- 📖 COVER -->
 <div id="cover">
   <h1>Слова — следы души</h1>
-  <button onclick="start()">Открыть книгу</button>
+  <button onclick="openBook()">Открыть книгу</button>
 </div>
 
-<!-- BOOK -->
-<div id="book">
-  <div class="page">Глава 1</div>
-  <div class="page">Глава 2</div>
-  <div class="page">Глава 3</div>
+<!-- 📚 BOOK SCENE -->
+<div id="scene">
+
+  <div class="book">
+
+    <div class="page">
+      <h1>Глава 1</h1>
+      <p>Это Apple Books стиль. Теперь книга выглядит как настоящая.</p>
+    </div>
+
+    <div class="page">
+      <h1>Глава 2</h1>
+      <p>Страницы переворачиваются как бумага.</p>
+    </div>
+
+    <div class="page">
+      <h1>Глава 3</h1>
+      <p>Можно заменить текст на свои рассказы.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- UI -->
+<div class="ui">
+  <button onclick="flip()">➡ Next Page</button>
+  <button onclick="reset()">🔄 Reset</button>
 </div>
 
 <script>
 
-/* 🚪 START APP */
-function start(){
-  document.getElementById("cover").style.display = "none";
-  document.getElementById("book").style.display = "block";
+let i = 0;
+const pages = document.querySelectorAll(".page");
+
+/* OPEN BOOK (Apple Books style reveal) */
+function openBook(){
+  document.getElementById("cover").style.opacity = "0";
+  setTimeout(()=>{
+    document.getElementById("cover").style.display = "none";
+    document.getElementById("scene").style.display = "flex";
+  }, 800);
+}
+
+/* FLIP PAGE */
+function flip(){
+  if(i < pages.length){
+    pages[i].classList.add("flipped");
+    i++;
+  }
+}
+
+/* RESET BOOK */
+function reset(){
+  pages.forEach(p => p.classList.remove("flipped"));
+  i = 0;
 }
 
 </script>
