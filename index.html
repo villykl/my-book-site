@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apple Books Style</title>
+<title>Apple Books with Cover</title>
 
 <style>
 body{
@@ -13,46 +13,59 @@ body{
   overflow:hidden;
 }
 
-/* ===== COVER STAGE ===== */
+/* ===== COVER ===== */
 #cover{
   position:fixed;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-  background: radial-gradient(circle at center, #3a2215, #0b0604);
+  background: radial-gradient(circle at center, #000, #120a06);
   perspective:1200px;
 }
 
-/* book cover object */
+/* 📸 PHOTO COVER */
 .cover-book{
-  width:320px;
-  height:440px;
-  background: linear-gradient(145deg, #5a341f, #2a160d);
-  border-radius:10px;
-  box-shadow:0 40px 100px rgba(0,0,0,0.8);
+  width:340px;
+  height:460px;
+  background:
+    linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.75)),
+    url("cover.jpg");
+  background-size:cover;
+  background-position:center;
+
+  border-radius:12px;
+  box-shadow:0 40px 120px rgba(0,0,0,0.9);
+
   transform-origin:left;
   transition:1s ease;
+
   position:relative;
   display:flex;
-  align-items:center;
+  align-items:flex-end;
   justify-content:center;
-  color:#f3e3d0;
-  font-size:22px;
-  text-align:center;
-  padding:20px;
 }
 
-/* open animation */
+/* TEXT ON COVER */
+.cover-text{
+  color:white;
+  font-size:22px;
+  font-weight:bold;
+  text-align:center;
+  padding:25px;
+  text-shadow:0 3px 15px rgba(0,0,0,0.9);
+}
+
+/* OPEN ANIMATION */
 .cover-open{
   transform: rotateY(-120deg);
   opacity:0;
 }
 
-/* button */
+/* BUTTON */
 #openBtn{
   position:absolute;
-  bottom:80px;
+  bottom:70px;
   padding:12px 18px;
   border:none;
   border-radius:10px;
@@ -119,6 +132,7 @@ body{
   display:flex;
   justify-content:center;
   gap:10px;
+  z-index:20;
 }
 
 button{
@@ -136,8 +150,11 @@ button{
 
 <!-- 📖 COVER -->
 <div id="cover">
+
   <div class="cover-book" id="coverBook">
-    Слова — следы души
+    <div class="cover-text">
+      Слова — следы души
+    </div>
   </div>
 
   <button id="openBtn" onclick="openBook()">Открыть книгу</button>
@@ -150,17 +167,17 @@ button{
 
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Теперь это выглядит как Apple Books.</p>
+      <p>Теперь обложка использует твоё фото.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Обложка раскрывается как настоящая книга.</p>
+      <p>Apple Books стиль + персональная обложка.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>Перелистывание страниц работает как анимация.</p>
+      <p>Полностью готовая книжная сцена.</p>
     </div>
 
   </div>
@@ -178,7 +195,7 @@ button{
 let i = 0;
 const pages = document.querySelectorAll(".page");
 
-/* 📖 OPEN BOOK (COVER ANIMATION) */
+/* 📖 OPEN BOOK */
 function openBook(){
   document.getElementById("coverBook").classList.add("cover-open");
 
