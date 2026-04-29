@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Locked Book</title>
+<title>Clean Book App</title>
 
 <style>
 body{
@@ -13,9 +13,16 @@ body{
   overflow:hidden;
 }
 
-/* 🚫 FORCE START SCREEN */
+/* ===== APP WRAPPER ===== */
+.app{
+  height:100vh;
+  width:100vw;
+  position:relative;
+}
+
+/* ===== COVER SCREEN ===== */
 .cover{
-  position:fixed;
+  position:absolute;
   inset:0;
   display:flex;
   align-items:center;
@@ -23,24 +30,20 @@ body{
   flex-direction:column;
 
   background:
-    linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.95)),
+    linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.95)),
     url('https://www.transparenttextures.com/patterns/dark-leather.png');
   background-color:#3a2215;
 
   color:#f3e3d0;
   text-align:center;
 
-  z-index:9999;
-  transition:1s ease;
+  z-index:10;
+  transition:0.8s ease;
 }
 
 .cover h1{
-  font-size:42px;
+  font-size:44px;
   margin:0;
-}
-
-.cover p{
-  opacity:0.8;
 }
 
 .cover button{
@@ -59,26 +62,24 @@ body{
   pointer-events:none;
 }
 
-/* BOOK STAGE */
-.stage{
-  height:100vh;
+/* ===== BOOK VIEW ===== */
+.book{
+  height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
-  perspective:2600px;
+  perspective:2000px;
 }
 
-/* BOOK */
-.book{
+.pages{
   width:800px;
   height:500px;
   position:relative;
   transform-style:preserve-3d;
-  transform: rotateX(6deg);
 }
 
 /* spine */
-.book::before{
+.pages::before{
   content:"";
   position:absolute;
   width:28px;
@@ -88,7 +89,7 @@ body{
   background:linear-gradient(#111,#000,#111);
 }
 
-/* PAGES */
+/* page */
 .page{
   position:absolute;
   width:50%;
@@ -100,7 +101,7 @@ body{
   padding:40px;
   box-sizing:border-box;
 
-  transition:1s;
+  transition:0.9s ease;
   box-shadow:0 30px 80px rgba(0,0,0,0.6);
 }
 
@@ -120,7 +121,7 @@ body{
   display:flex;
   justify-content:center;
   gap:10px;
-  z-index:10;
+  z-index:20;
 }
 
 button{
@@ -136,40 +137,44 @@ button{
 
 <body>
 
-<!-- 📖 COVER (FORCED ENTRY) -->
-<div class="cover" id="cover">
-  <h1>Слова — следы души</h1>
-  <p>Нажми, чтобы открыть книгу</p>
-  <button onclick="enterBook()">Открыть</button>
-</div>
+<div class="app">
 
-<!-- 📚 BOOK -->
-<div class="stage">
+  <!-- 📖 COVER -->
+  <div class="cover" id="cover">
+    <h1>Слова — следы души</h1>
+    <button onclick="openApp()">Открыть книгу</button>
+  </div>
 
+  <!-- 📚 BOOK -->
   <div class="book">
 
-    <div class="page">
-      <h1>Глава 1</h1>
-      <p>Теперь обложка всегда показывается первой. Нельзя зайти сразу в главы.</p>
-    </div>
+    <div class="pages">
 
-    <div class="page">
-      <h1>Глава 2</h1>
-      <p>Книга работает как приложение, а не как обычная страница GitHub Pages.</p>
-    </div>
+      <div class="page">
+        <h1>Глава 1</h1>
+        <p>Это чистая версия приложения книги.</p>
+      </div>
 
-    <div class="page">
-      <h1>Глава 3</h1>
-      <p>Ты можешь вставить сюда свои тексты.</p>
+      <div class="page">
+        <h1>Глава 2</h1>
+        <p>GitHub больше не ломает структуру.</p>
+      </div>
+
+      <div class="page">
+        <h1>Глава 3</h1>
+        <p>Обложка всегда первая и не обходится через #hash.</p>
+      </div>
+
     </div>
 
   </div>
+
 </div>
 
 <!-- UI -->
 <div class="ui">
   <button onclick="flip()">➡ Flip</button>
-  <button onclick="resetBook()">🔄 Reset</button>
+  <button onclick="reset()">🔄 Reset</button>
 </div>
 
 <script>
@@ -179,8 +184,8 @@ const pages = document.querySelectorAll(".page");
 
 let i = 0;
 
-/* 🚪 OPEN BOOK */
-function enterBook(){
+/* 🚪 OPEN APP */
+function openApp(){
   cover.classList.add("hide");
 }
 
@@ -193,20 +198,18 @@ function flip(){
 }
 
 /* 🔄 RESET */
-function resetBook(){
+function reset(){
   pages.forEach(p=>p.classList.remove("flipped"));
   i = 0;
 }
 
-/* 🚫 HARD LOCK: block #ch1 bypass */
-if (window.location.hash.includes("ch")) {
-  window.location.hash = "";
+/* 🚫 HARD BLOCK HASH (CRITICAL FIX) */
+if (window.location.hash) {
+  history.replaceState(null, null, " ");
 }
 
-/* ⌨️ keyboard */
-document.addEventListener("keydown",(e)=>{
-  if(e.key==="ArrowRight") flip();
-  if(e.key==="ArrowLeft") resetBook();
+window.addEventListener("hashchange", ()=>{
+  history.replaceState(null, null, " ");
 });
 
 </script>
