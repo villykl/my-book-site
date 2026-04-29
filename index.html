@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stable Book</title>
+<title>Kindle Swipe Book</title>
 
 <style>
 body{
@@ -30,27 +30,35 @@ body{
   background-image:url("cover.jpg");
   background-size:cover;
   background-position:center;
+  background-repeat:no-repeat;
 
   border-radius:18px;
 
-  box-shadow:0 100px 200px rgba(0,0,0,0.7);
+  box-shadow:
+    0 100px 200px rgba(0,0,0,0.75),
+    0 30px 60px rgba(0,0,0,0.5);
 
   position:relative;
   overflow:hidden;
+  transform-origin:left;
+  transition:1s cubic-bezier(.2,.8,.2,1);
 }
 
 .cover::before{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(135deg, rgba(255,255,255,0.2), transparent 50%);
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.22),
+    transparent 50%
+  );
   pointer-events:none;
 }
 
 .cover.open{
   transform:rotateY(-120deg) translateX(-90px);
   opacity:0;
-  transition:1s ease;
 }
 
 /* 📚 BOOK */
@@ -65,8 +73,23 @@ body{
   width:820px;
   height:520px;
   position:relative;
+  perspective:2000px;
+
+  touch-action: pan-y;
 }
 
+/* spine */
+.book::before{
+  content:"";
+  position:absolute;
+  width:30px;
+  height:100%;
+  left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(#111,#000,#111);
+}
+
+/* 📄 PAGES */
 .page{
   position:absolute;
   width:50%;
@@ -74,13 +97,16 @@ body{
   left:50%;
 
   transform-origin:left;
-  background:#f5f0e6;
+  background:linear-gradient(to right, #f7f2e6, #efe6d3);
 
   padding:40px;
   box-sizing:border-box;
 
-  transition:0.8s ease;
-  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  box-shadow:0 30px 80px rgba(0,0,0,0.5);
+
+  transition:transform 0.6s cubic-bezier(.2,.8,.2,1);
+
+  will-change: transform;
 }
 
 .page:nth-child(1){ z-index:3; }
@@ -108,9 +134,17 @@ button{
   border:none;
   border-radius:12px;
   cursor:pointer;
-  background:white;
+
+  background:rgba(255,255,255,0.92);
   font-weight:bold;
+
   box-shadow:0 10px 25px rgba(0,0,0,0.3);
+
+  transition:0.2s ease;
+}
+
+button:active{
+  transform:scale(0.96);
 }
 </style>
 </head>
@@ -125,13 +159,15 @@ button{
 <!-- 📚 BOOK -->
 <div id="reader">
   <div class="book">
+
     <div class="page">📖 Глава 1</div>
     <div class="page">📖 Глава 2</div>
     <div class="page">📖 Глава 3</div>
+
   </div>
 </div>
 
-<!-- 🎛 BUTTONS -->
+<!-- 🎛 UI -->
 <div class="ui">
   <button onclick="openBook()">📖 Open</button>
   <button onclick="next()">➡ Next</button>
@@ -141,9 +177,13 @@ button{
 <script>
 
 let pages = document.querySelectorAll(".page");
-let i = 0;
+let current = 0;
 
-/* OPEN */
+let startX = 0;
+let deltaX = 0;
+let dragging = false;
+
+/* 📖 OPEN */
 function openBook(){
   document.getElementById("coverBook").classList.add("open");
 
@@ -153,21 +193,75 @@ function openBook(){
   },900);
 }
 
-/* NEXT */
+/* ➡ NEXT */
 function next(){
-  if(i < pages.length){
-    pages[i].classList.add("flipped");
-    i++;
+  if(current < pages.length){
+    pages[current].classList.add("flipped");
+    current++;
   }
 }
 
-/* BACK */
+/* ⬅ BACK */
 function back(){
-  if(i > 0){
-    i--;
-    pages[i].classList.remove("flipped");
+  if(current > 0){
+    current--;
+    pages[current].classList.remove("flipped");
   }
 }
+
+/* 📱 SWIPE START */
+function start(e){
+  dragging = true;
+  startX = e.touches ? e.touches[0].clientX : e.clientX;
+}
+
+/* 📱 SWIPE MOVE */
+function move(e){
+  if(!dragging) return;
+
+  let x = e.touches ? e.touches[0].clientX : e.clientX;
+  deltaX = x - startX;
+
+  let page = pages[current];
+  if(page){
+    page.style.transform = `translateX(${deltaX}px) rotateY(${deltaX * 0.12}deg)`;
+  }
+}
+
+/* 📱 SWIPE END */
+function end(){
+  if(!dragging) return;
+  dragging = false;
+
+  let threshold = 80;
+  let page = pages[current];
+
+  if(deltaX < -threshold && current < pages.length){
+    page.style.transform = "translateX(-100%) rotateY(-30deg)";
+    current++;
+  }
+  else if(deltaX > threshold && current > 0){
+    current--;
+    let prev = pages[current];
+    prev.style.transform = "translateX(0) rotateY(0deg)";
+  }
+  else{
+    if(page){
+      page.style.transform = "translateX(0) rotateY(0deg)";
+    }
+  }
+
+  deltaX = 0;
+}
+
+/* 📱 EVENTS */
+document.addEventListener("mousedown", start);
+document.addEventListener("mousemove", move);
+document.addEventListener("mouseup", end);
+
+document.addEventListener("touchstart", start);
+document.addEventListener("touchmove", move);
+document.addEventListener("touchend", end);
 
 </script>
 
