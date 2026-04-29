@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultra Book Page Curl</title>
+<title>Ultimate Physics Book</title>
 
 <style>
 body{
@@ -21,7 +21,7 @@ body{
   align-items:center;
   justify-content:center;
   background: radial-gradient(circle at center, #000, #120a06);
-  perspective:1600px;
+  perspective:1800px;
 }
 
 /* BOOK COVER */
@@ -30,7 +30,7 @@ body{
   height:460px;
 
   background:
-    linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.8)),
+    linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.85)),
     url("cover.jpg");
 
   background-size:cover;
@@ -39,10 +39,11 @@ body{
   border-radius:8px 18px 18px 8px;
 
   box-shadow:
-    -14px 0 0 rgba(0,0,0,0.25),
-    0 50px 120px rgba(0,0,0,0.9);
+    -16px 0 0 rgba(0,0,0,0.25),
+    0 60px 140px rgba(0,0,0,0.9);
 
   transform-origin:left;
+
   position:relative;
   overflow:hidden;
 
@@ -51,37 +52,36 @@ body{
   transition:1.2s cubic-bezier(.2,.8,.2,1);
 }
 
-/* 🌟 SPINE LIGHT */
+/* SPINE LIGHT */
 .cover-book::after{
   content:"";
   position:absolute;
   left:0;
   top:0;
-  width:12px;
+  width:14px;
   height:100%;
 
   background:linear-gradient(
     180deg,
-    rgba(255,255,255,0),
-    rgba(255,255,255,0.25),
-    rgba(255,255,255,0)
+    transparent,
+    rgba(255,255,255,0.35),
+    transparent
   );
 
   opacity:0;
   transition:1s ease;
 }
 
-/* OPEN STATE */
+/* OPEN */
 .cover-open{
-  transform: perspective(1200px)
-             rotateY(-110deg)
-             translateX(-80px)
-             scale(0.95);
+  transform: perspective(1400px)
+             rotateY(-115deg)
+             translateX(-90px)
+             scale(0.92);
+  opacity:0.15;
   filter: blur(2px);
-  opacity:0.2;
 }
 
-/* activate spine light */
 .cover-open::after{
   opacity:1;
   animation:shine 1.2s ease;
@@ -90,7 +90,7 @@ body{
 @keyframes shine{
   0%{ transform:translateX(0); opacity:0; }
   40%{ opacity:1; }
-  100%{ transform:translateX(320px); opacity:0; }
+  100%{ transform:translateX(340px); opacity:0; }
 }
 
 /* ================= BOOK ================= */
@@ -99,7 +99,7 @@ body{
   height:100vh;
   align-items:center;
   justify-content:center;
-  perspective:2200px;
+  perspective:2600px;
   background: radial-gradient(circle at center, #1a1a1a, #000);
 }
 
@@ -122,7 +122,7 @@ body{
   background:linear-gradient(#111,#000,#111);
 }
 
-/* SPINE LIGHT CORE */
+/* SPINE GLOW CORE */
 .book::after{
   content:"";
   position:absolute;
@@ -130,17 +130,11 @@ body{
   height:100%;
   left:50%;
   transform:translateX(-50%);
-  background:linear-gradient(
-    180deg,
-    transparent,
-    rgba(255,255,255,0.5),
-    transparent
-  );
-  opacity:0;
-  transition:1s ease;
+  background:linear-gradient(180deg, transparent, rgba(255,255,255,0.6), transparent);
+  opacity:0.8;
 }
 
-/* pages */
+/* PAGES */
 .page{
   position:absolute;
   width:50%;
@@ -148,22 +142,26 @@ body{
   left:50%;
   transform-origin:left;
 
-  background:#f6f1e3;
+  background:linear-gradient(to right, #f7f2e6, #efe7d5);
 
   padding:40px;
   box-sizing:border-box;
 
-  transition:1s cubic-bezier(.2,.8,.2,1);
+  transition:1.1s cubic-bezier(.2,.8,.2,1);
 
-  box-shadow:0 30px 80px rgba(0,0,0,0.6);
+  box-shadow:0 30px 90px rgba(0,0,0,0.6);
 }
 
 .page:nth-child(1){ z-index:3; }
 .page:nth-child(2){ z-index:2; }
 .page:nth-child(3){ z-index:1; }
 
+/* PHYSICS CURL */
 .page.flipped{
-  transform: rotateY(-180deg);
+  transform:
+    rotateY(-170deg)
+    skewY(2deg)
+    translateX(-10px);
 }
 
 /* ================= UI ================= */
@@ -215,17 +213,17 @@ button:hover{
 
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Теперь есть page curl + свет по корешку.</p>
+      <p>Physics page curl engine активирован.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Эффект как у Apple Books.</p>
+      <p>Корешок светится при открытии.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>Премиум рендер книги.</p>
+      <p>Физика бумаги + глубина.</p>
     </div>
 
   </div>
@@ -236,6 +234,7 @@ button:hover{
 <div class="ui">
   <button onclick="openBook()">📖 Open</button>
   <button onclick="flip()">➡ Next</button>
+  <button onclick="back()">⬅ Back</button>
   <button onclick="reset()">🔄 Reset</button>
 </div>
 
@@ -244,46 +243,35 @@ button:hover{
 let i = 0;
 const pages = document.querySelectorAll(".page");
 
-/* OPEN BOOK + SPINE LIGHT */
+/* OPEN */
 function openBook(){
-  const cover = document.getElementById("coverBook");
-  const book = document.querySelector(".book");
-
-  cover.classList.add("cover-open");
-
-  // spine light activation
-  book.style.setProperty("--open","1");
-  book.querySelector && (book.style.opacity = "1");
+  document.getElementById("coverBook").classList.add("cover-open");
 
   setTimeout(()=>{
     document.getElementById("cover").style.display = "none";
     document.getElementById("scene").style.display = "flex";
-
-    // show spine light
-    book.style.setProperty("filter","brightness(1.1)");
   }, 900);
 }
 
-/* PAGE CURL SIMULATION */
+/* NEXT (PHYSICS FLIP) */
 function flip(){
   if(i < pages.length){
-    pages[i].style.transition = "1s cubic-bezier(.2,.8,.2,1)";
-    pages[i].style.transformOrigin = "left";
-
-    pages[i].style.transform =
-      "rotateY(-160deg) skewY(2deg)";
-
     pages[i].classList.add("flipped");
     i++;
   }
 }
 
+/* BACK */
+function back(){
+  if(i > 0){
+    i--;
+    pages[i].classList.remove("flipped");
+  }
+}
+
 /* RESET */
 function reset(){
-  pages.forEach(p=>{
-    p.classList.remove("flipped");
-    p.style.transform = "";
-  });
+  pages.forEach(p=>p.classList.remove("flipped"));
   i = 0;
 }
 
