@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simple Book Fix</title>
+<title>Clean Book App</title>
 
 <style>
 body{
@@ -12,28 +12,27 @@ body{
   background:#111;
 }
 
-/* COVER */
+/* COVER (REAL ENTRY POINT) */
 #cover{
   position:fixed;
   inset:0;
-  background:#3a2215;
-  color:#f3e3d0;
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
+  flex-direction:column;
+  background:#3a2215;
+  color:#f3e3d0;
+  z-index:1000;
 }
 
-/* BOOK */
+/* BOOK (hidden until start) */
 #book{
   display:none;
   padding:40px;
-  color:#fff;
 }
 
 .page{
   background:#f6f1e3;
-  color:#111;
   padding:20px;
   margin:10px 0;
   border-radius:10px;
@@ -43,11 +42,13 @@ body{
 
 <body>
 
+<!-- COVER -->
 <div id="cover">
   <h1>Слова — следы души</h1>
-  <button onclick="openBook()">Открыть книгу</button>
+  <button onclick="start()">Открыть книгу</button>
 </div>
 
+<!-- BOOK -->
 <div id="book">
   <div class="page">Глава 1</div>
   <div class="page">Глава 2</div>
@@ -56,12 +57,13 @@ body{
 
 <script>
 
-function openBook(){
+/* 🚪 START APP (IMPORTANT FIX) */
+function start(){
   document.getElementById("cover").style.display = "none";
   document.getElementById("book").style.display = "block";
 }
 
-/* safety */
+/* 🚫 BLOCK HASH ISSUES */
 if(window.location.hash){
   history.replaceState(null,null," ");
 }
