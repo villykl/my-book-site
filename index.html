@@ -8,51 +8,68 @@
 <style>
 body{
   margin:0;
-  height:100vh;
-  overflow:hidden;
   font-family: Georgia, serif;
-  background: radial-gradient(circle at center, #1a1a1a, #000);
+  background:#0b0b0b;
+  overflow:hidden;
 }
 
-/* ===== COVER ===== */
+/* ===== COVER STAGE ===== */
 #cover{
   position:fixed;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-  flex-direction:column;
-  background:
-    linear-gradient(145deg, #3a2215, #1a0f0a);
-  color:#f3e3d0;
-  z-index:10;
+  background: radial-gradient(circle at center, #3a2215, #0b0604);
+  perspective:1200px;
+}
+
+/* book cover object */
+.cover-book{
+  width:320px;
+  height:440px;
+  background: linear-gradient(145deg, #5a341f, #2a160d);
+  border-radius:10px;
+  box-shadow:0 40px 100px rgba(0,0,0,0.8);
+  transform-origin:left;
   transition:1s ease;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#f3e3d0;
+  font-size:22px;
+  text-align:center;
+  padding:20px;
 }
 
-#cover h1{
-  font-size:42px;
-  margin:0;
+/* open animation */
+.cover-open{
+  transform: rotateY(-120deg);
+  opacity:0;
 }
 
-#cover button{
-  margin-top:20px;
+/* button */
+#openBtn{
+  position:absolute;
+  bottom:80px;
   padding:12px 18px;
   border:none;
-  border-radius:12px;
+  border-radius:10px;
   cursor:pointer;
   font-weight:bold;
 }
 
 /* ===== BOOK ===== */
 #scene{
-  height:100vh;
   display:none;
+  height:100vh;
   align-items:center;
   justify-content:center;
   perspective:2000px;
+  background: radial-gradient(circle at center, #1a1a1a, #000);
 }
 
-/* BOOK */
 .book{
   width:800px;
   height:500px;
@@ -61,7 +78,7 @@ body{
   transform: rotateX(8deg);
 }
 
-/* SPINE */
+/* spine */
 .book::before{
   content:"";
   position:absolute;
@@ -72,7 +89,7 @@ body{
   background:linear-gradient(#111,#000,#111);
 }
 
-/* PAGES */
+/* pages */
 .page{
   position:absolute;
   width:50%;
@@ -84,15 +101,12 @@ body{
   box-sizing:border-box;
   transition:1s ease;
   box-shadow:0 30px 80px rgba(0,0,0,0.6);
-  border-radius:0 10px 10px 0;
 }
 
-/* stacking */
 .page:nth-child(1){ z-index:3; }
 .page:nth-child(2){ z-index:2; }
 .page:nth-child(3){ z-index:1; }
 
-/* flip animation */
 .page.flipped{
   transform: rotateY(-180deg);
 }
@@ -105,7 +119,6 @@ body{
   display:flex;
   justify-content:center;
   gap:10px;
-  z-index:20;
 }
 
 button{
@@ -123,28 +136,31 @@ button{
 
 <!-- 📖 COVER -->
 <div id="cover">
-  <h1>Слова — следы души</h1>
-  <button onclick="openBook()">Открыть книгу</button>
+  <div class="cover-book" id="coverBook">
+    Слова — следы души
+  </div>
+
+  <button id="openBtn" onclick="openBook()">Открыть книгу</button>
 </div>
 
-<!-- 📚 BOOK SCENE -->
+<!-- 📚 BOOK -->
 <div id="scene">
 
   <div class="book">
 
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Это Apple Books стиль. Теперь книга выглядит как настоящая.</p>
+      <p>Теперь это выглядит как Apple Books.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Страницы переворачиваются как бумага.</p>
+      <p>Обложка раскрывается как настоящая книга.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>Можно заменить текст на свои рассказы.</p>
+      <p>Перелистывание страниц работает как анимация.</p>
     </div>
 
   </div>
@@ -153,7 +169,7 @@ button{
 
 <!-- UI -->
 <div class="ui">
-  <button onclick="flip()">➡ Next Page</button>
+  <button onclick="flip()">➡ Next</button>
   <button onclick="reset()">🔄 Reset</button>
 </div>
 
@@ -162,16 +178,17 @@ button{
 let i = 0;
 const pages = document.querySelectorAll(".page");
 
-/* OPEN BOOK (Apple Books style reveal) */
+/* 📖 OPEN BOOK (COVER ANIMATION) */
 function openBook(){
-  document.getElementById("cover").style.opacity = "0";
+  document.getElementById("coverBook").classList.add("cover-open");
+
   setTimeout(()=>{
     document.getElementById("cover").style.display = "none";
     document.getElementById("scene").style.display = "flex";
-  }, 800);
+  }, 900);
 }
 
-/* FLIP PAGE */
+/* 📄 FLIP */
 function flip(){
   if(i < pages.length){
     pages[i].classList.add("flipped");
@@ -179,7 +196,7 @@ function flip(){
   }
 }
 
-/* RESET BOOK */
+/* 🔄 RESET */
 function reset(){
   pages.forEach(p => p.classList.remove("flipped"));
   i = 0;
