@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultra Apple Cover</title>
+<title>Apple Book Ultra Cover</title>
 
 <style>
 body{
@@ -20,58 +20,70 @@ body{
 .cover{
   width:340px;
   height:460px;
-  position:relative;
 
   background-image:url("cover.jpg");
   background-size:cover;
   background-position:center;
+  background-repeat:no-repeat;
 
-  border-radius:16px;
+  border-radius:18px;
 
-  /* 🍎 Apple depth shadow */
-  box-shadow:
-    0 60px 120px rgba(0,0,0,0.65),
-    0 15px 40px rgba(0,0,0,0.4);
-
-  transform-style:preserve-3d;
-  transition:transform 0.2s ease;
-
+  position:relative;
   overflow:hidden;
+
+  /* 🍎 deep Apple shadow */
+  box-shadow:
+    0 90px 180px rgba(0,0,0,0.75),
+    0 25px 60px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+
+  transform-origin:left;
+  transition:1s cubic-bezier(.2,.8,.2,1);
+
+  filter: contrast(1.08) saturate(1.05);
 }
 
-/* ✨ LIGHT REFLECTION (Apple-style gloss) */
+/* ✨ LIGHT REFLECTION */
 .cover::before{
   content:"";
   position:absolute;
-  inset:-40%;
-  background: radial-gradient(
-    circle at var(--x,50%) var(--y,50%),
-    rgba(255,255,255,0.25),
-    transparent 40%
+  inset:0;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.22),
+    transparent 45%,
+    rgba(0,0,0,0.25)
   );
 
-  transform:rotate(10deg);
+  mix-blend-mode: overlay;
   pointer-events:none;
 }
 
-/* 🌌 EDGE LIGHT (leather feel) */
+/* 🌌 subtle depth glow */
 .cover::after{
   content:"";
   position:absolute;
   inset:0;
-  background: linear-gradient(
-    120deg,
-    rgba(0,0,0,0.2),
-    transparent 40%,
-    rgba(0,0,0,0.3)
+
+  background: radial-gradient(
+    circle at 30% 20%,
+    rgba(255,255,255,0.18),
+    transparent 60%
   );
+
   pointer-events:none;
 }
 
-/* OPEN EFFECT */
+/* OPEN ANIMATION */
 .cover.open{
-  transform: rotateY(-120deg) translateX(-80px);
+  transform: rotateY(-120deg) translateX(-90px);
   opacity:0;
+}
+
+/* CLICK FEEL */
+.cover:active{
+  transform: scale(0.98);
 }
 </style>
 </head>
@@ -81,31 +93,9 @@ body{
 <div class="cover" id="cover"></div>
 
 <script>
-const cover = document.getElementById("cover");
-
-/* 📱 OPEN */
-cover.onclick = () => {
-  cover.classList.add("open");
+document.getElementById("cover").onclick = () => {
+  document.getElementById("cover").classList.add("open");
 };
-
-/* 🌌 APPLE PARALLAX LIGHT */
-document.addEventListener("mousemove",(e)=>{
-
-  const x = (e.clientX / window.innerWidth) * 100;
-  const y = (e.clientY / window.innerHeight) * 100;
-
-  cover.style.setProperty("--x", x + "%");
-  cover.style.setProperty("--y", y + "%");
-
-  /* subtle 3D tilt */
-  const rotateY = (x - 50) * 0.08;
-  const rotateX = (y - 50) * -0.05;
-
-  cover.style.transform = `
-    rotateY(${rotateY}deg)
-    rotateX(${rotateX}deg)
-  `;
-});
 </script>
 
 </body>
