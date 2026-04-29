@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultimate Physics Book</title>
+<title>Realistic Page Turn Book</title>
 
 <style>
 body{
@@ -24,7 +24,6 @@ body{
   perspective:1800px;
 }
 
-/* BOOK COVER */
 .cover-book{
   width:340px;
   height:460px;
@@ -38,41 +37,17 @@ body{
 
   border-radius:8px 18px 18px 8px;
 
-  box-shadow:
-    -16px 0 0 rgba(0,0,0,0.25),
-    0 60px 140px rgba(0,0,0,0.9);
+  box-shadow:0 60px 140px rgba(0,0,0,0.9);
 
   transform-origin:left;
+  transition:1.2s cubic-bezier(.2,.8,.2,1);
 
   position:relative;
   overflow:hidden;
 
   border-left:6px solid rgba(0,0,0,0.35);
-
-  transition:1.2s cubic-bezier(.2,.8,.2,1);
 }
 
-/* SPINE LIGHT */
-.cover-book::after{
-  content:"";
-  position:absolute;
-  left:0;
-  top:0;
-  width:14px;
-  height:100%;
-
-  background:linear-gradient(
-    180deg,
-    transparent,
-    rgba(255,255,255,0.35),
-    transparent
-  );
-
-  opacity:0;
-  transition:1s ease;
-}
-
-/* OPEN */
 .cover-open{
   transform: perspective(1400px)
              rotateY(-115deg)
@@ -80,17 +55,6 @@ body{
              scale(0.92);
   opacity:0.15;
   filter: blur(2px);
-}
-
-.cover-open::after{
-  opacity:1;
-  animation:shine 1.2s ease;
-}
-
-@keyframes shine{
-  0%{ transform:translateX(0); opacity:0; }
-  40%{ opacity:1; }
-  100%{ transform:translateX(340px); opacity:0; }
 }
 
 /* ================= BOOK ================= */
@@ -111,7 +75,6 @@ body{
   transform: rotateX(10deg);
 }
 
-/* SPINE */
 .book::before{
   content:"";
   position:absolute;
@@ -122,19 +85,7 @@ body{
   background:linear-gradient(#111,#000,#111);
 }
 
-/* SPINE GLOW CORE */
-.book::after{
-  content:"";
-  position:absolute;
-  width:6px;
-  height:100%;
-  left:50%;
-  transform:translateX(-50%);
-  background:linear-gradient(180deg, transparent, rgba(255,255,255,0.6), transparent);
-  opacity:0.8;
-}
-
-/* PAGES */
+/* ================= PAGE (REAL PAPER FEEL) ================= */
 .page{
   position:absolute;
   width:50%;
@@ -142,26 +93,58 @@ body{
   left:50%;
   transform-origin:left;
 
-  background:linear-gradient(to right, #f7f2e6, #efe7d5);
+  background:
+    linear-gradient(to right, #f8f3e7, #efe6d3);
 
   padding:40px;
   box-sizing:border-box;
 
-  transition:1.1s cubic-bezier(.2,.8,.2,1);
-
   box-shadow:0 30px 90px rgba(0,0,0,0.6);
+
+  transition:
+    transform 1.2s cubic-bezier(.2,.8,.2,1),
+    box-shadow 1.2s ease;
+
+  backface-visibility:hidden;
 }
 
+/* page edge shading */
+.page::after{
+  content:"";
+  position:absolute;
+  top:0;
+  right:0;
+  width:30px;
+  height:100%;
+  background:linear-gradient(to left, rgba(0,0,0,0.15), transparent);
+}
+
+/* STACK ORDER */
 .page:nth-child(1){ z-index:3; }
 .page:nth-child(2){ z-index:2; }
 .page:nth-child(3){ z-index:1; }
 
-/* PHYSICS CURL */
+/* ================= REALISTIC CURL ================= */
 .page.flipped{
   transform:
-    rotateY(-170deg)
-    skewY(2deg)
-    translateX(-10px);
+    rotateY(-180deg)
+    skewY(1.5deg)
+    translateX(-20px);
+
+  box-shadow:
+    -20px 0 40px rgba(0,0,0,0.4);
+}
+
+/* “paper bending highlight” */
+.page.flipped::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:linear-gradient(90deg, rgba(255,255,255,0.15), transparent);
+  pointer-events:none;
 }
 
 /* ================= UI ================= */
@@ -213,17 +196,17 @@ button:hover{
 
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Physics page curl engine активирован.</p>
+      <p>Реальный paper curl эффект активирован.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Корешок светится при открытии.</p>
+      <p>Страница изгибается как настоящая бумага.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>Физика бумаги + глубина.</p>
+      <p>Физика перелистывания улучшена.</p>
     </div>
 
   </div>
@@ -253,7 +236,7 @@ function openBook(){
   }, 900);
 }
 
-/* NEXT (PHYSICS FLIP) */
+/* NEXT */
 function flip(){
   if(i < pages.length){
     pages[i].classList.add("flipped");
@@ -271,7 +254,10 @@ function back(){
 
 /* RESET */
 function reset(){
-  pages.forEach(p=>p.classList.remove("flipped"));
+  pages.forEach(p=>{
+    p.classList.remove("flipped");
+    p.style.transform = "";
+  });
   i = 0;
 }
 
