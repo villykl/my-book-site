@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deploy Proof Book</title>
+<title>Book App Fixed</title>
 
 <style>
 body{
@@ -13,38 +13,20 @@ body{
   overflow:hidden;
 }
 
-/* 🔒 HARD START LOCK */
-body.locked{
-  overflow:hidden;
-}
-
 /* ===== COVER ===== */
-.cover{
+#cover{
   position:fixed;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
   flex-direction:column;
-
-  background:
-    linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.95)),
-    url('https://www.transparenttextures.com/patterns/dark-leather.png');
-  background-color:#3a2215;
-
+  background:#3a2215;
   color:#f3e3d0;
-  text-align:center;
-
-  z-index:9999;
-  transition:0.8s ease;
+  z-index:10;
 }
 
-.cover h1{
-  font-size:44px;
-  margin:0;
-}
-
-.cover button{
+#cover button{
   margin-top:20px;
   padding:12px 18px;
   border:none;
@@ -53,62 +35,27 @@ body.locked{
   font-weight:bold;
 }
 
-/* hide */
-.cover.hide{
-  opacity:0;
-  transform:scale(1.1);
-  pointer-events:none;
-}
-
 /* ===== BOOK ===== */
-.stage{
+#book{
+  display:none;
   height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  perspective:2500px;
+  flex-direction:column;
+  color:white;
+  text-align:center;
 }
 
-.book{
-  width:800px;
-  height:500px;
-  position:relative;
-  transform-style:preserve-3d;
-}
-
-/* spine */
-.book::before{
-  content:"";
-  position:absolute;
-  width:28px;
-  height:100%;
-  left:50%;
-  transform:translateX(-50%);
-  background:linear-gradient(#111,#000,#111);
-}
-
-/* pages */
 .page{
-  position:absolute;
-  width:50%;
-  height:100%;
-  left:50%;
-  transform-origin:left;
-
+  width:60%;
+  max-width:600px;
   background:#f6f1e3;
-  padding:40px;
-  box-sizing:border-box;
-
-  transition:1s;
-  box-shadow:0 30px 80px rgba(0,0,0,0.6);
-}
-
-.page:nth-child(1){ z-index:5; }
-.page:nth-child(2){ z-index:4; }
-.page:nth-child(3){ z-index:3; }
-
-.page.flipped{
-  transform: rotateY(-180deg);
+  color:#111;
+  padding:30px;
+  margin:10px;
+  border-radius:10px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);
 }
 
 /* UI */
@@ -119,7 +66,6 @@ body.locked{
   display:flex;
   justify-content:center;
   gap:10px;
-  z-index:20;
 }
 
 button{
@@ -133,76 +79,76 @@ button{
 </style>
 </head>
 
-<body class="locked">
+<body>
 
 <!-- 📖 COVER -->
-<div class="cover" id="cover">
+<div id="cover">
   <h1>Слова — следы души</h1>
-  <button onclick="startApp()">Открыть книгу</button>
+  <button onclick="startBook()">Открыть книгу</button>
 </div>
 
 <!-- 📚 BOOK -->
-<div class="stage">
-  <div class="book">
+<div id="book">
 
-    <div class="page">
-      <h1>Глава 1</h1>
-      <p>Deploy-proof версия. GitHub больше не ломает старт.</p>
-    </div>
-
-    <div class="page">
-      <h1>Глава 2</h1>
-      <p>Обложка всегда первая, даже при кешировании и hash.</p>
-    </div>
-
-    <div class="page">
-      <h1>Глава 3</h1>
-      <p>Это финальная стабильная версия книги.</p>
-    </div>
-
+  <div class="page">
+    <h1>Глава 1</h1>
+    <p>Книга теперь не загружается заранее — только после открытия.</p>
   </div>
+
+  <div class="page">
+    <h1>Глава 2</h1>
+    <p>GitHub Pages больше не ломает структуру.</p>
+  </div>
+
+  <div class="page">
+    <h1>Глава 3</h1>
+    <p>Это стабильная версия без багов с #hash.</p>
+  </div>
+
 </div>
 
 <!-- UI -->
 <div class="ui">
-  <button onclick="flip()">➡ Flip</button>
+  <button onclick="next()">➡ Next</button>
   <button onclick="reset()">🔄 Reset</button>
 </div>
 
 <script>
 
-const cover = document.getElementById("cover");
+let index = 0;
 const pages = document.querySelectorAll(".page");
 
-let i = 0;
-
-/* 🚪 START (HARD ENTRY CONTROL) */
-function startApp(){
-  cover.classList.add("hide");
-  document.body.classList.remove("locked");
+/* 🚪 START APP */
+function startBook(){
+  document.getElementById("cover").style.display = "none";
+  document.getElementById("book").style.display = "flex";
 }
 
-/* 📄 FLIP */
-function flip(){
-  if(i < pages.length){
-    pages[i].classList.add("flipped");
-    i++;
+/* 📄 NEXT PAGE */
+function next(){
+  if(index < pages.length){
+    pages[index].style.transform = "scale(1.02)";
+    pages[index].style.opacity = "0.5";
+    index++;
   }
 }
 
 /* 🔄 RESET */
 function reset(){
-  pages.forEach(p=>p.classList.remove("flipped"));
-  i = 0;
+  pages.forEach(p=>{
+    p.style.transform = "scale(1)";
+    p.style.opacity = "1";
+  });
+  index = 0;
 }
 
-/* 🚫 BLOCK ANY HASH ENTRY */
-if (window.location.hash) {
-  history.replaceState(null, null, " ");
+/* 🚫 BLOCK HASH BUGS */
+if(window.location.hash){
+  history.replaceState(null,null," ");
 }
 
 window.addEventListener("hashchange", ()=>{
-  history.replaceState(null, null, " ");
+  history.replaceState(null,null," ");
 });
 
 </script>
