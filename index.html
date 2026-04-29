@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Book App Fixed</title>
+<title>Fixed Book</title>
 
 <style>
 body{
@@ -13,7 +13,7 @@ body{
   overflow:hidden;
 }
 
-/* ===== COVER ===== */
+/* COVER */
 #cover{
   position:fixed;
   inset:0;
@@ -26,54 +26,31 @@ body{
   z-index:10;
 }
 
-#cover button{
-  margin-top:20px;
-  padding:12px 18px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-/* ===== BOOK ===== */
+/* BOOK (hidden initially) */
 #book{
   display:none;
   height:100vh;
-  display:flex;
   align-items:center;
   justify-content:center;
   flex-direction:column;
   color:white;
-  text-align:center;
 }
 
+/* PAGE */
 .page{
   width:60%;
-  max-width:600px;
   background:#f6f1e3;
   color:#111;
   padding:30px;
   margin:10px;
   border-radius:10px;
-  box-shadow:0 20px 60px rgba(0,0,0,0.5);
-}
-
-/* UI */
-.ui{
-  position:fixed;
-  bottom:20px;
-  width:100%;
-  display:flex;
-  justify-content:center;
-  gap:10px;
 }
 
 button{
-  padding:10px 14px;
+  padding:12px 18px;
   border:none;
   border-radius:10px;
   cursor:pointer;
-  background:white;
   font-weight:bold;
 }
 </style>
@@ -84,7 +61,7 @@ button{
 <!-- 📖 COVER -->
 <div id="cover">
   <h1>Слова — следы души</h1>
-  <button onclick="startBook()">Открыть книгу</button>
+  <button onclick="openBook()">Открыть книгу</button>
 </div>
 
 <!-- 📚 BOOK -->
@@ -92,64 +69,28 @@ button{
 
   <div class="page">
     <h1>Глава 1</h1>
-    <p>Книга теперь не загружается заранее — только после открытия.</p>
+    <p>Теперь книга создаётся только после открытия.</p>
   </div>
 
   <div class="page">
     <h1>Глава 2</h1>
-    <p>GitHub Pages больше не ломает структуру.</p>
+    <p>Нет наложения слоёв — чистая логика приложения.</p>
   </div>
 
-  <div class="page">
-    <h1>Глава 3</h1>
-    <p>Это стабильная версия без багов с #hash.</p>
-  </div>
-
-</div>
-
-<!-- UI -->
-<div class="ui">
-  <button onclick="next()">➡ Next</button>
-  <button onclick="reset()">🔄 Reset</button>
 </div>
 
 <script>
 
-let index = 0;
-const pages = document.querySelectorAll(".page");
-
 /* 🚪 START APP */
-function startBook(){
+function openBook(){
   document.getElementById("cover").style.display = "none";
   document.getElementById("book").style.display = "flex";
 }
 
-/* 📄 NEXT PAGE */
-function next(){
-  if(index < pages.length){
-    pages[index].style.transform = "scale(1.02)";
-    pages[index].style.opacity = "0.5";
-    index++;
-  }
-}
-
-/* 🔄 RESET */
-function reset(){
-  pages.forEach(p=>{
-    p.style.transform = "scale(1)";
-    p.style.opacity = "1";
-  });
-  index = 0;
-}
-
-/* 🚫 BLOCK HASH BUGS */
+/* 🚫 BLOCK HASH BUG */
 if(window.location.hash){
   history.replaceState(null,null," ");
 }
-
-window.addEventListener("hashchange", ()=>{
-  history.replaceState(null,null," ");
-});
 
 </script>
 
