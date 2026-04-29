@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apple Books Safe UI</title>
+<title>Smooth Apple Book</title>
 
 <style>
 body{
@@ -22,9 +22,10 @@ body{
   justify-content:center;
   background: radial-gradient(circle at center, #000, #120a06);
   perspective:1400px;
+  transition:opacity 0.9s ease;
 }
 
-/* 📖 COVER */
+/* 📖 COVER BOOK */
 .cover-book{
   width:340px;
   height:460px;
@@ -43,18 +44,27 @@ body{
     0 50px 120px rgba(0,0,0,0.9);
 
   transform-origin:left;
-  transition:1s cubic-bezier(.2,.8,.2,1);
 
   position:relative;
   overflow:hidden;
 
   border-left:6px solid rgba(0,0,0,0.35);
+
+  transition:
+    transform 1.2s cubic-bezier(.2,.8,.2,1),
+    opacity 0.8s ease,
+    filter 1.2s ease;
 }
 
-/* OPEN */
+/* 🌟 SMOOTH OPEN EFFECT */
 .cover-open{
-  transform: rotateY(-120deg) translateX(-40px);
-  opacity:0;
+  transform: perspective(1200px)
+             rotateY(-95deg)
+             translateX(-60px)
+             scale(0.95);
+
+  opacity:0.15;
+  filter: blur(6px);
 }
 
 /* ================= BOOK ================= */
@@ -85,6 +95,7 @@ body{
   background:linear-gradient(#111,#000,#111);
 }
 
+/* pages */
 .page{
   position:absolute;
   width:50%;
@@ -110,7 +121,7 @@ body{
   transform: rotateY(-180deg);
 }
 
-/* ================= SAFE UI ================= */
+/* ================= UI ================= */
 .ui{
   position:fixed;
   right:20px;
@@ -159,26 +170,26 @@ button:hover{
 
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Кнопка теперь не мешает обложке.</p>
+      <p>Плавное раскрытие обложки реализовано.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Apple Books стиль сохранён.</p>
+      <p>Apple Books стиль + мягкая анимация.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>Чистый UI как в приложении.</p>
+      <p>Финальная премиум версия.</p>
     </div>
 
   </div>
 
 </div>
 
-<!-- 📱 UI PANEL -->
+<!-- 📱 UI -->
 <div class="ui">
-  <button onclick="openBook()">📖 Открыть книгу</button>
+  <button onclick="openBook()">📖 Open</button>
   <button onclick="flip()">➡ Next</button>
   <button onclick="reset()">🔄 Reset</button>
 </div>
@@ -188,17 +199,24 @@ button:hover{
 let i = 0;
 const pages = document.querySelectorAll(".page");
 
-/* OPEN */
+/* 📖 SMOOTH OPEN */
 function openBook(){
-  document.getElementById("coverBook").classList.add("cover-open");
+  const cover = document.getElementById("coverBook");
+
+  cover.classList.add("cover-open");
 
   setTimeout(()=>{
-    document.getElementById("cover").style.display = "none";
-    document.getElementById("scene").style.display = "flex";
+    document.getElementById("cover").style.opacity = "0";
+
+    setTimeout(()=>{
+      document.getElementById("cover").style.display = "none";
+      document.getElementById("scene").style.display = "flex";
+    }, 800);
+
   }, 900);
 }
 
-/* FLIP */
+/* 📄 FLIP */
 function flip(){
   if(i < pages.length){
     pages[i].classList.add("flipped");
@@ -206,7 +224,7 @@ function flip(){
   }
 }
 
-/* RESET */
+/* 🔄 RESET */
 function reset(){
   pages.forEach(p => p.classList.remove("flipped"));
   i = 0;
