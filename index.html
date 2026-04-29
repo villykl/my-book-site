@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kindle Swipe Book</title>
+<title>Kindle Apple Book Fixed</title>
 
 <style>
 body{
@@ -40,19 +40,16 @@ body{
 
   position:relative;
   overflow:hidden;
-  transform-origin:left;
+
   transition:1s cubic-bezier(.2,.8,.2,1);
+  transform-origin:left;
 }
 
 .cover::before{
   content:"";
   position:absolute;
   inset:0;
-  background: linear-gradient(
-    135deg,
-    rgba(255,255,255,0.22),
-    transparent 50%
-  );
+  background:linear-gradient(135deg, rgba(255,255,255,0.22), transparent 50%);
   pointer-events:none;
 }
 
@@ -97,6 +94,7 @@ body{
   left:50%;
 
   transform-origin:left;
+
   background:linear-gradient(to right, #f7f2e6, #efe6d3);
 
   padding:40px;
@@ -139,8 +137,6 @@ button{
   font-weight:bold;
 
   box-shadow:0 10px 25px rgba(0,0,0,0.3);
-
-  transition:0.2s ease;
 }
 
 button:active{
@@ -179,10 +175,6 @@ button:active{
 let pages = document.querySelectorAll(".page");
 let current = 0;
 
-let startX = 0;
-let deltaX = 0;
-let dragging = false;
-
 /* 📖 OPEN */
 function openBook(){
   document.getElementById("coverBook").classList.add("open");
@@ -193,11 +185,24 @@ function openBook(){
   },900);
 }
 
+/* 🔄 RENDER (SYNC CORE) */
+function render(){
+  pages.forEach((p, i)=>{
+    if(i < current){
+      p.classList.add("flipped");
+      p.style.transform = "rotateY(-180deg)";
+    } else {
+      p.classList.remove("flipped");
+      p.style.transform = "translateX(0) rotateY(0deg)";
+    }
+  });
+}
+
 /* ➡ NEXT */
 function next(){
   if(current < pages.length){
-    pages[current].classList.add("flipped");
     current++;
+    render();
   }
 }
 
@@ -205,56 +210,51 @@ function next(){
 function back(){
   if(current > 0){
     current--;
-    pages[current].classList.remove("flipped");
+    render();
   }
 }
 
-/* 📱 SWIPE START */
+/* 📱 SWIPE */
+let startX = 0;
+let dragging = false;
+
 function start(e){
   dragging = true;
   startX = e.touches ? e.touches[0].clientX : e.clientX;
 }
 
-/* 📱 SWIPE MOVE */
 function move(e){
   if(!dragging) return;
 
   let x = e.touches ? e.touches[0].clientX : e.clientX;
-  deltaX = x - startX;
+  let delta = x - startX;
 
   let page = pages[current];
   if(page){
-    page.style.transform = `translateX(${deltaX}px) rotateY(${deltaX * 0.12}deg)`;
+    page.style.transform = `translateX(${delta}px) rotateY(${delta * 0.12}deg)`;
   }
 }
 
-/* 📱 SWIPE END */
 function end(){
   if(!dragging) return;
   dragging = false;
 
   let threshold = 80;
-  let page = pages[current];
 
-  if(deltaX < -threshold && current < pages.length){
-    page.style.transform = "translateX(-100%) rotateY(-30deg)";
+  let x = event.changedTouches ? event.changedTouches[0].clientX : event.clientX;
+  let delta = x - startX;
+
+  if(delta < -threshold && current < pages.length){
     current++;
   }
-  else if(deltaX > threshold && current > 0){
+  else if(delta > threshold && current > 0){
     current--;
-    let prev = pages[current];
-    prev.style.transform = "translateX(0) rotateY(0deg)";
-  }
-  else{
-    if(page){
-      page.style.transform = "translateX(0) rotateY(0deg)";
-    }
   }
 
-  deltaX = 0;
+  render();
 }
 
-/* 📱 EVENTS */
+/* EVENTS */
 document.addEventListener("mousedown", start);
 document.addEventListener("mousemove", move);
 document.addEventListener("mouseup", end);
@@ -262,6 +262,9 @@ document.addEventListener("mouseup", end);
 document.addEventListener("touchstart", start);
 document.addEventListener("touchmove", move);
 document.addEventListener("touchend", end);
+
+/* INIT */
+render();
 
 </script>
 
