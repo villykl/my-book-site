@@ -2,35 +2,106 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Final Boss Cinema Book</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fixed GitHub Book</title>
 
 <style>
 body{
   margin:0;
+  font-family: Georgia, serif;
+  background:#0b0b0b;
   overflow:hidden;
-  background: radial-gradient(circle at center, #0a0a0a, #000);
 }
 
-/* CINEMA VIGNETTE */
-body::after{
-  content:"";
+/* ================= COVER ================= */
+#cover{
   position:fixed;
   inset:0;
-  background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.7));
-  pointer-events:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: radial-gradient(circle at center, #000, #120a06);
 }
 
-/* UI */
+/* 📖 SAFE COVER LOAD */
+.cover-book{
+  width:340px;
+  height:460px;
+
+  /* 🔥 ЖЁСТКИЙ ФИКС ПУТИ */
+  background-image:url("./cover.jpg");
+  background-size:cover;
+  background-position:center;
+
+  border-radius:10px 18px 18px 10px;
+
+  box-shadow:0 60px 140px rgba(0,0,0,0.9);
+
+  transform-origin:left;
+
+  transition:1s ease;
+
+  border-left:6px solid rgba(0,0,0,0.35);
+}
+
+/* OPEN */
+.cover-open{
+  transform: perspective(1200px) rotateY(-110deg) translateX(-80px);
+  opacity:0;
+}
+
+/* ================= BOOK ================= */
+#scene{
+  display:none;
+  height:100vh;
+  align-items:center;
+  justify-content:center;
+  background: radial-gradient(circle at center, #1a1a1a, #000);
+}
+
+.book{
+  width:800px;
+  height:500px;
+  position:relative;
+  transform-style:preserve-3d;
+}
+
+.page{
+  position:absolute;
+  width:50%;
+  height:100%;
+  left:50%;
+  transform-origin:left;
+
+  background:#f6f1e3;
+
+  padding:40px;
+  box-sizing:border-box;
+
+  transition:0.8s ease;
+
+  box-shadow:0 30px 80px rgba(0,0,0,0.6);
+}
+
+.page:nth-child(1){ z-index:3; }
+.page:nth-child(2){ z-index:2; }
+.page:nth-child(3){ z-index:1; }
+
+.page.flipped{
+  transform:rotateY(-180deg);
+}
+
+/* ================= UI ================= */
 .ui{
   position:fixed;
   right:20px;
   top:50%;
   transform:translateY(-50%);
+
   display:flex;
   flex-direction:column;
   gap:10px;
-  z-index:10;
+  z-index:999;
 }
 
 button{
@@ -38,198 +109,77 @@ button{
   border:none;
   border-radius:12px;
   cursor:pointer;
-  background:rgba(255,255,255,0.9);
+  background:rgba(255,255,255,0.92);
   font-weight:bold;
-  box-shadow:0 10px 25px rgba(0,0,0,0.4);
-}
-
-canvas{
-  display:block;
 }
 </style>
-
 </head>
+
 <body>
 
-<div class="ui">
-  <button onclick="openBook()">📖 Open</button>
-  <button onclick="nextPage()">➡ Next</button>
-  <button onclick="prevPage()">⬅ Back</button>
+<!-- 📖 COVER -->
+<div id="cover">
+  <div class="cover-book" id="coverBook"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<!-- 📚 BOOK -->
+<div id="scene">
+
+  <div class="book">
+
+    <div class="page">
+      <h1>Глава 1</h1>
+      <p>GitHub Fixed Version работает.</p>
+    </div>
+
+    <div class="page">
+      <h1>Глава 2</h1>
+      <p>Обложка теперь всегда грузится.</p>
+    </div>
+
+    <div class="page">
+      <h1>Глава 3</h1>
+      <p>Стабильный deployment.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- UI -->
+<div class="ui">
+  <button onclick="openBook()">📖 Open</button>
+  <button onclick="flip()">➡ Next</button>
+  <button onclick="reset()">🔄 Reset</button>
+</div>
 
 <script>
 
-let scene, camera, renderer;
-let pages = [];
-let current = 0;
+let i = 0;
+const pages = document.querySelectorAll(".page");
 
-let dragging = false;
-let lastX = 0;
-let velocity = 0;
-
-/* ================= INIT CINEMA ================= */
-init();
-animate();
-
-function init(){
-
-  scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x000000, 2, 8);
-
-  camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 1000);
-  camera.position.set(0,0,5);
-
-  renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  /* LIGHT CINEMA STYLE */
-  const keyLight = new THREE.PointLight(0xffffff, 1.5);
-  keyLight.position.set(2,2,3);
-
-  const fillLight = new THREE.PointLight(0x88aaff, 0.5);
-  fillLight.position.set(-3,1,2);
-
-  const ambient = new THREE.AmbientLight(0x222222);
-
-  scene.add(keyLight, fillLight, ambient);
-
-  /* BOOK GEOMETRY */
-  const geo = new THREE.PlaneGeometry(2.2, 3.2, 40, 40);
-
-  const materials = [
-    new THREE.MeshStandardMaterial({color:0xf5f1e6, side:THREE.DoubleSide}),
-    new THREE.MeshStandardMaterial({color:0xf0e7d2, side:THREE.DoubleSide}),
-    new THREE.MeshStandardMaterial({color:0xe9dec5, side:THREE.DoubleSide})
-  ];
-
-  for(let i=0;i<3;i++){
-
-    let mesh = new THREE.Mesh(geo, materials[i]);
-
-    mesh.position.z = -i * 0.03;
-
-    scene.add(mesh);
-    pages.push(mesh);
-  }
-
-  /* DRAG CONTROL */
-  window.addEventListener("mousedown",(e)=>{
-    dragging = true;
-    lastX = e.clientX;
-  });
-
-  window.addEventListener("mouseup",()=>{
-    dragging = false;
-
-    if(velocity < -0.02) nextPage();
-    if(velocity > 0.02) prevPage();
-
-    velocity *= 0.5;
-  });
-
-  window.addEventListener("mousemove",(e)=>{
-    if(!dragging) return;
-
-    velocity = (e.clientX - lastX) * 0.003;
-    lastX = e.clientX;
-
-    applyCinemaCurl(velocity);
-  });
-
-  window.addEventListener("resize",onResize);
-}
-
-/* ================= CINEMA CURL ================= */
-function applyCinemaCurl(v){
-
-  let mesh = pages[current];
-  let pos = mesh.geometry.attributes.position;
-
-  for(let i=0;i<pos.count;i++){
-
-    let x = pos.getX(i);
-    let y = pos.getY(i);
-
-    let wave =
-      Math.sin(x * 2.5 + v * 2) *
-      Math.cos(y * 2.5 + v * 2);
-
-    pos.setZ(i, wave * Math.abs(v) * 0.8);
-  }
-
-  pos.needsUpdate = true;
-}
-
-/* ================= PAGE FLIP ================= */
-function flip(mesh, dir){
-
-  let a = 0;
-
-  function step(){
-    a += 0.08;
-
-    mesh.rotation.y = dir * -a;
-
-    mesh.position.z = Math.sin(a) * 0.1;
-
-    if(a < Math.PI){
-      requestAnimationFrame(step);
-    }
-  }
-
-  step();
-}
-
-function nextPage(){
-  if(current < pages.length-1){
-    flip(pages[current], -1);
-    current++;
-  }
-}
-
-function prevPage(){
-  if(current > 0){
-    current--;
-    flip(pages[current], 1);
-  }
-}
-
-/* ================= OPEN CINEMA ================= */
+/* OPEN */
 function openBook(){
+  document.getElementById("coverBook").classList.add("cover-open");
 
-  camera.position.z = 4.5;
+  setTimeout(()=>{
+    document.getElementById("cover").style.display = "none";
+    document.getElementById("scene").style.display = "flex";
+  }, 900);
+}
 
-  let t = 0;
-
-  function bloom(){
-    t += 0.02;
-
-    camera.position.y = Math.sin(t) * 0.1;
-
-    if(t < 1){
-      requestAnimationFrame(bloom);
-    }
+/* NEXT */
+function flip(){
+  if(i < pages.length){
+    pages[i].classList.add("flipped");
+    i++;
   }
-
-  bloom();
 }
 
-/* ================= RENDER ================= */
-function animate(){
-
-  requestAnimationFrame(animate);
-
-  renderer.render(scene,camera);
-}
-
-/* ================= RESIZE ================= */
-function onResize(){
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+/* RESET */
+function reset(){
+  pages.forEach(p=>p.classList.remove("flipped"));
+  i = 0;
 }
 
 </script>
