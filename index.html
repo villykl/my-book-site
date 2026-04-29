@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apple Books Fixed Engine</title>
+<title>Apple Books Stable Pro</title>
 
 <style>
 body{
@@ -13,45 +13,42 @@ body{
   overflow:hidden;
 }
 
-/* ================= COVER ================= */
+/* COVER */
 #cover{
   position:fixed;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-  background: radial-gradient(circle at center, #000, #1a0f0a);
+  background: radial-gradient(circle, #000, #1a0f0a);
 }
 
 .cover{
   width:340px;
   height:460px;
-
-  background-image:url("cover.jpg");
+  background:url("cover.jpg");
   background-size:cover;
   background-position:center;
 
   border-radius:12px;
-  box-shadow:0 70px 160px rgba(0,0,0,0.9);
+  box-shadow:0 80px 180px rgba(0,0,0,0.9);
 
+  transition:1s ease;
   transform-origin:left;
-  transition:1s cubic-bezier(.2,.8,.2,1);
-
-  filter:brightness(1.1) contrast(1.05);
 }
 
 .cover.open{
-  transform:rotateY(-120deg) translateX(-80px);
+  transform:rotateY(-120deg) translateX(-90px);
   opacity:0;
 }
 
-/* ================= BOOK ================= */
+/* BOOK */
 #reader{
   display:none;
   height:100vh;
-  align-items:center;
   justify-content:center;
-  background: radial-gradient(circle at center, #1a1a1a, #000);
+  align-items:center;
+  background: radial-gradient(circle, #1a1a1a, #000);
 }
 
 .book{
@@ -87,10 +84,10 @@ body{
 
   box-shadow:0 30px 80px rgba(0,0,0,0.5);
 
-  transition:0.7s cubic-bezier(.2,.8,.2,1);
+  transition:0.8s cubic-bezier(.2,.8,.2,1);
 }
 
-/* stack */
+/* STACK */
 .page:nth-child(1){ z-index:3; }
 .page:nth-child(2){ z-index:2; }
 .page:nth-child(3){ z-index:1; }
@@ -99,7 +96,7 @@ body{
   transform:rotateY(-180deg);
 }
 
-/* ================= UI ================= */
+/* UI */
 .ui{
   position:fixed;
   right:20px;
@@ -108,42 +105,37 @@ body{
   display:flex;
   flex-direction:column;
   gap:10px;
-  z-index:999;
 }
 
 button{
   padding:10px 14px;
   border:none;
   border-radius:12px;
+  cursor:pointer;
   background:rgba(255,255,255,0.92);
   font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 </style>
 </head>
 
 <body>
 
-<!-- 📖 COVER -->
 <div id="cover">
   <div class="cover" id="coverBook"></div>
 </div>
 
-<!-- 📚 BOOK -->
 <div id="reader">
 
   <div class="book">
 
-    <div class="page">📖 Глава 1 — старт</div>
-    <div class="page">📖 Глава 2 — развитие</div>
-    <div class="page">📖 Глава 3 — финал</div>
+    <div class="page">📖 Глава 1</div>
+    <div class="page">📖 Глава 2</div>
+    <div class="page">📖 Глава 3</div>
 
   </div>
 
 </div>
 
-<!-- UI -->
 <div class="ui">
   <button onclick="openBook()">📖 Open</button>
   <button onclick="next()">➡ Next</button>
