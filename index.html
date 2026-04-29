@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Realistic Page Turn Book</title>
+<title>Ultimate Drag Physics Book</title>
 
 <style>
 body{
@@ -24,37 +24,46 @@ body{
   perspective:1800px;
 }
 
+/* 📖 BRIGHTER COVER */
 .cover-book{
   width:340px;
   height:460px;
 
   background:
-    linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.85)),
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,0.12),
+      rgba(0,0,0,0.65)
+    ),
     url("cover.jpg");
 
   background-size:cover;
   background-position:center;
 
+  filter: brightness(1.15) contrast(1.05);
+
   border-radius:8px 18px 18px 8px;
 
-  box-shadow:0 60px 140px rgba(0,0,0,0.9);
+  box-shadow:0 60px 150px rgba(0,0,0,0.9);
 
   transform-origin:left;
-  transition:1.2s cubic-bezier(.2,.8,.2,1);
 
   position:relative;
   overflow:hidden;
 
   border-left:6px solid rgba(0,0,0,0.35);
+
+  transition:1.2s cubic-bezier(.2,.8,.2,1);
 }
 
+/* OPEN COVER */
 .cover-open{
   transform: perspective(1400px)
              rotateY(-115deg)
              translateX(-90px)
              scale(0.92);
   opacity:0.15;
-  filter: blur(2px);
+  filter: blur(2px) brightness(1.0);
 }
 
 /* ================= BOOK ================= */
@@ -85,7 +94,7 @@ body{
   background:linear-gradient(#111,#000,#111);
 }
 
-/* ================= PAGE (REAL PAPER FEEL) ================= */
+/* ================= PAGES ================= */
 .page{
   position:absolute;
   width:50%;
@@ -93,8 +102,7 @@ body{
   left:50%;
   transform-origin:left;
 
-  background:
-    linear-gradient(to right, #f8f3e7, #efe6d3);
+  background:linear-gradient(to right, #f8f3e7, #efe6d3);
 
   padding:40px;
   box-sizing:border-box;
@@ -102,48 +110,36 @@ body{
   box-shadow:0 30px 90px rgba(0,0,0,0.6);
 
   transition:
-    transform 1.2s cubic-bezier(.2,.8,.2,1),
-    box-shadow 1.2s ease;
+    transform 0.9s cubic-bezier(.2,.8,.2,1),
+    box-shadow 0.9s ease;
 
   backface-visibility:hidden;
 }
 
-/* page edge shading */
-.page::after{
-  content:"";
-  position:absolute;
-  top:0;
-  right:0;
-  width:30px;
-  height:100%;
-  background:linear-gradient(to left, rgba(0,0,0,0.15), transparent);
-}
-
-/* STACK ORDER */
+/* stack */
 .page:nth-child(1){ z-index:3; }
 .page:nth-child(2){ z-index:2; }
 .page:nth-child(3){ z-index:1; }
 
-/* ================= REALISTIC CURL ================= */
+/* ================= DRAG STATE ================= */
+.page.dragging{
+  transition:none !important;
+}
+
+/* flipped page physics */
 .page.flipped{
   transform:
     rotateY(-180deg)
-    skewY(1.5deg)
-    translateX(-20px);
-
-  box-shadow:
-    -20px 0 40px rgba(0,0,0,0.4);
+    skewY(2deg)
+    translateX(-25px);
 }
 
-/* “paper bending highlight” */
+/* curl highlight */
 .page.flipped::before{
   content:"";
   position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:linear-gradient(90deg, rgba(255,255,255,0.15), transparent);
+  inset:0;
+  background:linear-gradient(90deg, rgba(255,255,255,0.18), transparent);
   pointer-events:none;
 }
 
@@ -196,17 +192,17 @@ button:hover{
 
     <div class="page">
       <h1>Глава 1</h1>
-      <p>Реальный paper curl эффект активирован.</p>
+      <p>Ultimate drag physics активирован.</p>
     </div>
 
     <div class="page">
       <h1>Глава 2</h1>
-      <p>Страница изгибается как настоящая бумага.</p>
+      <p>Теперь страницы можно тянуть мышью.</p>
     </div>
 
     <div class="page">
       <h1>Глава 3</h1>
-      <p>Физика перелистывания улучшена.</p>
+      <p>Почти как реальная бумага.</p>
     </div>
 
   </div>
@@ -216,8 +212,6 @@ button:hover{
 <!-- UI -->
 <div class="ui">
   <button onclick="openBook()">📖 Open</button>
-  <button onclick="flip()">➡ Next</button>
-  <button onclick="back()">⬅ Back</button>
   <button onclick="reset()">🔄 Reset</button>
 </div>
 
@@ -225,6 +219,9 @@ button:hover{
 
 let i = 0;
 const pages = document.querySelectorAll(".page");
+
+let isDragging = false;
+let startX = 0;
 
 /* OPEN */
 function openBook(){
@@ -236,30 +233,52 @@ function openBook(){
   }, 900);
 }
 
-/* NEXT */
-function flip(){
-  if(i < pages.length){
-    pages[i].classList.add("flipped");
-    i++;
-  }
-}
-
-/* BACK */
-function back(){
-  if(i > 0){
-    i--;
-    pages[i].classList.remove("flipped");
-  }
-}
-
 /* RESET */
 function reset(){
   pages.forEach(p=>{
-    p.classList.remove("flipped");
+    p.classList.remove("flipped","dragging");
     p.style.transform = "";
   });
   i = 0;
 }
+
+/* ================= DRAG PHYSICS ================= */
+document.addEventListener("mousedown", (e)=>{
+  startX = e.clientX;
+  isDragging = true;
+});
+
+document.addEventListener("mouseup", (e)=>{
+  if(!isDragging) return;
+
+  let diff = e.clientX - startX;
+
+  let page = pages[i];
+
+  if(!page){
+    isDragging = false;
+    return;
+  }
+
+  page.classList.add("dragging");
+
+  if(diff < -80){
+    // FLIP FORWARD
+    page.classList.remove("dragging");
+    page.classList.add("flipped");
+    i++;
+  }
+
+  if(diff > 80){
+    // BACK
+    if(i > 0){
+      i--;
+      pages[i].classList.remove("flipped");
+    }
+  }
+
+  isDragging = false;
+});
 
 </script>
 
