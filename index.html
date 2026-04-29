@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apple Books Evolution</title>
+<title>Stable Apple Book</title>
 
 <style>
 body{
@@ -41,13 +41,10 @@ body{
     0 100px 200px rgba(0,0,0,0.75),
     0 30px 60px rgba(0,0,0,0.5);
 
-  transform-origin:left;
-  transition:1s cubic-bezier(.2,.8,.2,1);
-
-  will-change: transform;
+  transform:rotateY(0deg) !important; /* 🔥 фикс: НИКАКОГО движения */
 }
 
-/* ✨ LIGHT APPLE SWEEP */
+/* light */
 .cover::before{
   content:"";
   position:absolute;
@@ -65,6 +62,7 @@ body{
 .cover.open{
   transform:rotateY(-120deg) translateX(-90px);
   opacity:0;
+  transition:1s cubic-bezier(.2,.8,.2,1);
 }
 
 /* 📚 BOOK */
@@ -75,7 +73,6 @@ body{
   justify-content:center;
 }
 
-/* PAGE */
 .book{
   width:820px;
   height:520px;
@@ -83,6 +80,7 @@ body{
   perspective:2000px;
 }
 
+/* spine */
 .book::before{
   content:"";
   position:absolute;
@@ -93,6 +91,7 @@ body{
   background:linear-gradient(#111,#000,#111);
 }
 
+/* pages */
 .page{
   position:absolute;
   width:50%;
@@ -107,7 +106,7 @@ body{
 
   box-shadow:0 30px 80px rgba(0,0,0,0.5);
 
-  transition:0.85s cubic-bezier(.2,.8,.2,1);
+  transition:0.8s ease;
 }
 
 .page:nth-child(1){ z-index:3; }
@@ -127,7 +126,7 @@ body{
   display:flex;
   flex-direction:column;
   gap:12px;
-  z-index:99999;
+  z-index:9999;
 }
 
 button{
@@ -140,8 +139,6 @@ button{
   font-weight:bold;
 
   box-shadow:0 10px 25px rgba(0,0,0,0.3);
-
-  transition:0.2s ease;
 }
 
 button:active{
@@ -162,9 +159,9 @@ button:active{
 
   <div class="book">
 
-    <div class="page">📖 Глава 1 — начало</div>
-    <div class="page">📖 Глава 2 — развитие</div>
-    <div class="page">📖 Глава 3 — финал</div>
+    <div class="page">📖 Глава 1</div>
+    <div class="page">📖 Глава 2</div>
+    <div class="page">📖 Глава 3</div>
 
   </div>
 
@@ -182,7 +179,7 @@ button:active{
 let pages = document.querySelectorAll(".page");
 let i = 0;
 
-/* OPEN */
+/* OPEN BOOK */
 function openBook(){
   document.getElementById("coverBook").classList.add("open");
 
@@ -192,7 +189,7 @@ function openBook(){
   },900);
 }
 
-/* NEXT */
+/* NEXT PAGE */
 function next(){
   if(i < pages.length){
     pages[i].classList.add("flipped");
@@ -200,30 +197,13 @@ function next(){
   }
 }
 
-/* BACK */
+/* BACK PAGE */
 function back(){
   if(i > 0){
     i--;
     pages[i].classList.remove("flipped");
   }
 }
-
-/* 🌌 SAFE PARALLAX (Apple feel) */
-document.addEventListener("mousemove",(e)=>{
-
-  const x = (e.clientX / window.innerWidth - 0.5) * 4;
-  const y = (e.clientY / window.innerHeight - 0.5) * -4;
-
-  const cover = document.getElementById("coverBook");
-
-  if(cover && !cover.classList.contains("open")){
-    cover.style.transform = `
-      rotateY(${-120 + x}deg)
-      translateX(-90px)
-      rotateX(${y}deg)
-    `;
-  }
-});
 
 </script>
 
