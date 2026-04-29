@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fixed Apple Book</title>
+<title>Apple Books Evolution</title>
 
 <style>
 body{
   margin:0;
   height:100vh;
   font-family: Georgia, serif;
-  background: radial-gradient(circle at center, #1a1a1a, #000);
+  background: radial-gradient(circle at center, #151515, #000);
   overflow:hidden;
 }
 
@@ -34,25 +34,34 @@ body{
 
   border-radius:18px;
 
+  position:relative;
+  overflow:hidden;
+
   box-shadow:
-    0 90px 180px rgba(0,0,0,0.75),
-    0 25px 60px rgba(0,0,0,0.5);
+    0 100px 200px rgba(0,0,0,0.75),
+    0 30px 60px rgba(0,0,0,0.5);
 
   transform-origin:left;
   transition:1s cubic-bezier(.2,.8,.2,1);
 
-  position:relative;
-  overflow:hidden;
+  will-change: transform;
 }
 
+/* ✨ LIGHT APPLE SWEEP */
 .cover::before{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(135deg, rgba(255,255,255,0.2), transparent 50%);
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.22),
+    transparent 45%,
+    rgba(0,0,0,0.25)
+  );
   pointer-events:none;
 }
 
+/* OPEN */
 .cover.open{
   transform:rotateY(-120deg) translateX(-90px);
   opacity:0;
@@ -66,6 +75,7 @@ body{
   justify-content:center;
 }
 
+/* PAGE */
 .book{
   width:820px;
   height:520px;
@@ -73,7 +83,6 @@ body{
   perspective:2000px;
 }
 
-/* spine */
 .book::before{
   content:"";
   position:absolute;
@@ -84,7 +93,6 @@ body{
   background:linear-gradient(#111,#000,#111);
 }
 
-/* pages */
 .page{
   position:absolute;
   width:50%;
@@ -99,7 +107,7 @@ body{
 
   box-shadow:0 30px 80px rgba(0,0,0,0.5);
 
-  transition:0.8s ease;
+  transition:0.85s cubic-bezier(.2,.8,.2,1);
 }
 
 .page:nth-child(1){ z-index:3; }
@@ -118,18 +126,26 @@ body{
   transform:translateY(-50%);
   display:flex;
   flex-direction:column;
-  gap:10px;
-  z-index:9999; /* 🔥 FIX: кнопки всегда сверху */
+  gap:12px;
+  z-index:99999;
 }
 
 button{
   padding:10px 14px;
   border:none;
-  border-radius:12px;
+  border-radius:14px;
   cursor:pointer;
+
   background:rgba(255,255,255,0.92);
   font-weight:bold;
+
   box-shadow:0 10px 25px rgba(0,0,0,0.3);
+
+  transition:0.2s ease;
+}
+
+button:active{
+  transform:scale(0.96);
 }
 </style>
 </head>
@@ -146,15 +162,15 @@ button{
 
   <div class="book">
 
-    <div class="page">📖 Глава 1</div>
-    <div class="page">📖 Глава 2</div>
-    <div class="page">📖 Глава 3</div>
+    <div class="page">📖 Глава 1 — начало</div>
+    <div class="page">📖 Глава 2 — развитие</div>
+    <div class="page">📖 Глава 3 — финал</div>
 
   </div>
 
 </div>
 
-<!-- 🎛 BUTTONS -->
+<!-- 🎛 UI -->
 <div class="ui">
   <button onclick="openBook()">📖 Open</button>
   <button onclick="next()">➡ Next</button>
@@ -166,7 +182,7 @@ button{
 let pages = document.querySelectorAll(".page");
 let i = 0;
 
-/* OPEN BOOK */
+/* OPEN */
 function openBook(){
   document.getElementById("coverBook").classList.add("open");
 
@@ -176,7 +192,7 @@ function openBook(){
   },900);
 }
 
-/* NEXT PAGE */
+/* NEXT */
 function next(){
   if(i < pages.length){
     pages[i].classList.add("flipped");
@@ -184,13 +200,30 @@ function next(){
   }
 }
 
-/* BACK PAGE */
+/* BACK */
 function back(){
   if(i > 0){
     i--;
     pages[i].classList.remove("flipped");
   }
 }
+
+/* 🌌 SAFE PARALLAX (Apple feel) */
+document.addEventListener("mousemove",(e)=>{
+
+  const x = (e.clientX / window.innerWidth - 0.5) * 4;
+  const y = (e.clientY / window.innerHeight - 0.5) * -4;
+
+  const cover = document.getElementById("coverBook");
+
+  if(cover && !cover.classList.contains("open")){
+    cover.style.transform = `
+      rotateY(${-120 + x}deg)
+      translateX(-90px)
+      rotateX(${y}deg)
+    `;
+  }
+});
 
 </script>
 
