@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apple Studio Book Engine</title>
+<title>Book Typography Pro</title>
+
+<!-- 📖 ШРИФТЫ -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
 body{
   margin:0;
   height:100vh;
-  font-family: Georgia, serif;
   background: radial-gradient(circle at center, #151515, #000);
   overflow:hidden;
 }
@@ -26,27 +28,11 @@ body{
 .cover{
   width:340px;
   height:460px;
-
-  background-image:url("cover.jpg");
-  background-size:cover;
-  background-position:center;
-
+  background:url("cover.jpg") center/cover no-repeat;
   border-radius:18px;
-
   box-shadow:0 120px 240px rgba(0,0,0,0.8);
-
-  position:relative;
-  overflow:hidden;
-
-  transform-origin:left;
   transition:1s cubic-bezier(.2,.8,.2,1);
-}
-
-.cover::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(135deg, rgba(255,255,255,0.25), transparent 55%);
+  transform-origin:left;
 }
 
 .cover.open{
@@ -70,68 +56,62 @@ body{
   touch-action:none;
 }
 
-/* spine */
-.book::before{
-  content:"";
-  position:absolute;
-  width:40px;
-  height:100%;
-  left:50%;
-  transform:translateX(-50%);
-  background:linear-gradient(#0a0a0a,#000,#0a0a0a);
-  z-index:0;
-}
-
 /* 📄 PAGE */
 .page{
   position:absolute;
   width:50%;
   height:100%;
   left:50%;
-  transform-origin:left center;
+  transform-origin:left;
 
-  background:linear-gradient(to right, #f7f2e6, #efe6d3);
+  background:linear-gradient(to right, #f8f3e8, #efe6d3);
 
-  padding:40px;
+  padding:60px 70px;
   box-sizing:border-box;
 
   box-shadow:0 40px 90px rgba(0,0,0,0.6);
 
   transition:transform 1.1s cubic-bezier(.2,.8,.2,1);
 
-  will-change: transform;
+  font-family:"Playfair Display", Georgia, serif;
+  font-size:18px;
+  line-height:1.75;
+  color:#2a2a2a;
+
   overflow:hidden;
 }
 
-/* 🌌 APPLE STUDIO LIGHT */
+/* 🌌 LIGHT */
 .page::before{
   content:"";
   position:absolute;
   inset:0;
-
   background: radial-gradient(
     circle at var(--lx, 50%) var(--ly, 20%),
     rgba(255,255,255,0.35),
     rgba(255,255,255,0.12) 25%,
     transparent 60%
   );
-
-  mix-blend-mode: soft-light;
-  pointer-events:none;
+  mix-blend-mode:soft-light;
 }
 
-/* page edge shadow */
-.page::after{
-  content:"";
-  position:absolute;
-  right:0;
-  top:0;
-  width:30px;
-  height:100%;
-  background:linear-gradient(to left, rgba(0,0,0,0.25), transparent);
-  pointer-events:none;
+/* 📖 TEXT */
+.page h1{
+  font-size:28px;
+  margin-bottom:25px;
+  font-weight:600;
 }
 
+.page p{
+  margin-bottom:16px;
+  text-align:justify;
+}
+
+.page p:first-of-type{
+  text-indent:24px;
+}
+
+/* 📄 STACK */
 .page:nth-child(1){ z-index:3; }
 .page:nth-child(2){ z-index:2; }
 .page:nth-child(3){ z-index:1; }
@@ -157,38 +137,42 @@ button{
   border:none;
   border-radius:12px;
   cursor:pointer;
-
   background:rgba(255,255,255,0.92);
   font-weight:bold;
-
-  box-shadow:0 10px 25px rgba(0,0,0,0.3);
-}
-
-button:active{
-  transform:scale(0.96);
 }
 </style>
 </head>
 
 <body>
 
-<!-- 📖 COVER -->
 <div id="cover">
   <div class="cover" id="coverBook"></div>
 </div>
 
-<!-- 📚 BOOK -->
 <div id="reader">
   <div class="book">
 
-    <div class="page">📖 Глава 1</div>
-    <div class="page">📖 Глава 2</div>
-    <div class="page">📖 Глава 3</div>
+    <div class="page">
+      <h1>Глава 1</h1>
+      <p>А о Небе я с детства мечтала. Я мечтала о нём и тогда, когда буря кругом завывала и когда в дом врывалась беда.</p>
+      <p>Когда в трудной дороге слабела, когда не было сил крест нести, и когда враг метал в меня стрелы — я искала небесной любви.</p>
+    </div>
+
+    <div class="page">
+      <h1>Глава 2</h1>
+      <p>И в тишине, среди тревог и боли, рождалась вера тихо во мне.</p>
+      <p>И даже там, где всё казалось тёмным, свет находил дорогу к душе.</p>
+    </div>
+
+    <div class="page">
+      <h1>Глава 3</h1>
+      <p>И вот теперь, оглядываясь в прошлое, я понимаю — всё не зря.</p>
+      <p>Через испытания и дороги Господь вёл меня любя.</p>
+    </div>
 
   </div>
 </div>
 
-<!-- 🎛 UI -->
 <div class="ui">
   <button onclick="openBook()">📖 Open</button>
   <button onclick="next()">➡ Next</button>
@@ -200,30 +184,26 @@ button:active{
 let pages = document.querySelectorAll(".page");
 let current = 0;
 
-/* 📖 OPEN */
 function openBook(){
   document.getElementById("coverBook").classList.add("open");
-
   setTimeout(()=>{
-    document.getElementById("cover").style.display = "none";
-    document.getElementById("reader").style.display = "flex";
+    document.getElementById("cover").style.display="none";
+    document.getElementById("reader").style.display="flex";
   },900);
 }
 
-/* 🔄 RENDER */
 function render(){
   pages.forEach((p,i)=>{
     if(i < current){
       p.classList.add("flipped");
-      p.style.transform = "rotateY(-180deg)";
-    } else {
+      p.style.transform="rotateY(-180deg)";
+    }else{
       p.classList.remove("flipped");
-      p.style.transform = "translateX(0) rotateY(0deg)";
+      p.style.transform="rotateY(0deg)";
     }
   });
 }
 
-/* ➡ NEXT */
 function next(){
   if(current < pages.length){
     current++;
@@ -231,7 +211,6 @@ function next(){
   }
 }
 
-/* ⬅ BACK */
 function back(){
   if(current > 0){
     current--;
@@ -239,74 +218,45 @@ function back(){
   }
 }
 
-/* 📱 SWIPE PHYSICS */
-let startX = 0;
-let dragging = false;
+/* SWIPE */
+let startX=0, dragging=false;
 
-function start(e){
-  dragging = true;
-  startX = e.touches ? e.touches[0].clientX : e.clientX;
-}
+document.addEventListener("mousedown",e=>{
+  dragging=true;
+  startX=e.clientX;
+});
 
-function move(e){
+document.addEventListener("mousemove",e=>{
   if(!dragging) return;
-
-  let x = e.touches ? e.touches[0].clientX : e.clientX;
-  let delta = x - startX;
-
-  let page = pages[current];
-
+  let delta=e.clientX-startX;
+  let page=pages[current];
   if(page){
-    let bend = delta * 0.35;
-    let rotate = delta * 0.06;
-
-    page.style.transform = `
-      translateX(${bend}px)
-      rotateY(${rotate}deg)
-    `;
+    page.style.transform=`translateX(${delta*0.4}px) rotateY(${delta*0.07}deg)`;
   }
-}
+});
 
-function end(e){
+document.addEventListener("mouseup",e=>{
   if(!dragging) return;
-  dragging = false;
+  dragging=false;
+  let delta=e.clientX-startX;
 
-  let x = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-  let delta = x - startX;
-
-  let threshold = 90;
-
-  if(delta < -threshold && current < pages.length){
-    current++;
-  }
-  else if(delta > threshold && current > 0){
-    current--;
-  }
+  if(delta<-80 && current<pages.length) current++;
+  if(delta>80 && current>0) current--;
 
   render();
-}
+});
 
-/* 🎛 EVENTS */
-document.addEventListener("mousedown", start);
-document.addEventListener("mousemove", move);
-document.addEventListener("mouseup", end);
+/* LIGHT */
+document.addEventListener("mousemove",e=>{
+  let x=e.clientX/window.innerWidth*100;
+  let y=e.clientY/window.innerHeight*100;
 
-document.addEventListener("touchstart", start);
-document.addEventListener("touchmove", move);
-document.addEventListener("touchend", end);
-
-/* 🌌 APPLE STUDIO LIGHT TRACKING */
-document.addEventListener("mousemove", (e) => {
-  let x = (e.clientX / window.innerWidth) * 100;
-  let y = (e.clientY / window.innerHeight) * 100;
-
-  document.querySelectorAll(".page").forEach(p => {
-    p.style.setProperty("--lx", x + "%");
-    p.style.setProperty("--ly", y + "%");
+  pages.forEach(p=>{
+    p.style.setProperty("--lx",x+"%");
+    p.style.setProperty("--ly",y+"%");
   });
 });
 
-/* INIT */
 render();
 
 </script>
