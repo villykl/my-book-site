@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Моя книга</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
@@ -10,19 +11,19 @@
 <style>
 body{
   margin:0;
-  height:100vh;
   background:#111;
   overflow:hidden;
+  font-family:"Playfair Display", serif;
 }
 
 /* 📚 BOOK */
 .book{
   width:820px;
   height:520px;
-  margin:auto;
-  position:relative;
+  position:absolute;
   top:50%;
-  transform:translateY(-50%);
+  left:50%;
+  transform:translate(-50%,-50%);
   perspective:2000px;
 }
 
@@ -32,16 +33,13 @@ body{
   width:50%;
   height:100%;
   left:50%;
-
-  background:linear-gradient(to right,#f8f3e8,#efe6d3);
+  background:#f8f3e8;
 
   padding:60px;
   box-sizing:border-box;
 
-  font-family:"Playfair Display", serif;
   font-size:18px;
-  line-height:1.75;
-  color:#2a2a2a;
+  line-height:1.8;
 
   transform-origin:left;
   transition:1s;
@@ -55,7 +53,6 @@ body{
 
 /* 📖 TITLE */
 .page h1{
-  font-size:28px;
   text-align:center;
   margin-bottom:30px;
 }
@@ -64,8 +61,6 @@ body{
 .poem{
   white-space:pre-line;
   text-align:center;
-  font-size:18px;
-  line-height:1.8;
 }
 
 /* 🎛 UI */
@@ -79,7 +74,7 @@ body{
 button{
   display:block;
   margin:10px;
-  padding:10px 14px;
+  padding:12px;
   border:none;
   border-radius:10px;
   cursor:pointer;
@@ -89,12 +84,14 @@ button{
 
 <body>
 
-<div class="book" id="book">
+<div class="book" id="book"></div>
 
-  <div class="page">
-    <h1>Тебе, мой Создатель</h1>
+<!-- 📖 ВСТАВЛЯЙ СТИХИ ТОЛЬКО СЮДА -->
+<div id="content" style="display:none">
 
-    <div class="poem">
+<h1>Тебе, мой Создатель</h1>
+
+<div class="poem">
 Тебе, мой Создатель, всё лучшее в мире:
 И море стихов. И море цветов.
 Это Тебе летят по эфиру
@@ -129,8 +126,7 @@ button{
 Что жизни моей не погасла свеча.
 За то, что Ты кормишь хлебом планету,
 Пусть гимны Тебе непрестанно звучат.
-    </div>
-  </div>
+</div>
 
 </div>
 
@@ -141,7 +137,25 @@ button{
 
 <script>
 
-let pages=document.querySelectorAll(".page");
+/* 📖 АВТО СТРАНИЦЫ */
+const raw = document.getElementById("content").innerHTML;
+const parts = raw.split("<h1>");
+const book = document.getElementById("book");
+
+let pages=[];
+
+parts.forEach(p=>{
+  if(!p.trim()) return;
+
+  let div=document.createElement("div");
+  div.className="page";
+  div.innerHTML="<h1>"+p;
+
+  book.appendChild(div);
+  pages.push(div);
+});
+
+/* управление */
 let current=0;
 
 function render(){
