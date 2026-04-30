@@ -4,94 +4,145 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Моя книга</title>
+<title>Книга</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
+
+/* 🌙 BASE */
 body{
   margin:0;
-  background:#111;
-  overflow:hidden;
-  font-family:"Playfair Display", serif;
+  font-family: "Playfair Display", serif;
+  background:#0f0f0f;
+  color:#eee;
 }
 
-/* 📚 BOOK */
-.book{
-  width:820px;
-  height:520px;
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  perspective:2000px;
+/* 📚 LAYOUT */
+.wrapper{
+  display:flex;
+  height:100vh;
+}
+
+/* 📖 SIDEBAR (ОГЛАВЛЕНИЕ) */
+.toc{
+  width:260px;
+  background:#151515;
+  padding:20px;
+  overflow:auto;
+}
+
+.toc h2{
+  font-size:16px;
+  margin-bottom:15px;
+  color:#aaa;
+}
+
+.toc button{
+  width:100%;
+  padding:10px;
+  margin-bottom:8px;
+  background:#222;
+  border:none;
+  color:#fff;
+  cursor:pointer;
+  text-align:left;
+  border-radius:6px;
+}
+
+.toc button:hover{
+  background:#333;
+}
+
+/* 📖 BOOK AREA */
+.book-area{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:40px;
 }
 
 /* 📄 PAGE */
 .page{
-  position:absolute;
-  width:50%;
-  height:100%;
-  left:50%;
-  background:#f8f3e8;
+  width:700px;
+  max-width:90%;
+  background:#f6f1e6;
+  color:#222;
 
-  padding:60px;
-  box-sizing:border-box;
-
-  font-size:18px;
+  padding:60px 70px;
   line-height:1.8;
+  font-size:18px;
 
-  transform-origin:left;
-  transition:1s;
+  border-radius:10px;
+  box-shadow:0 30px 80px rgba(0,0,0,0.6);
 
-  box-shadow:0 30px 80px rgba(0,0,0,0.5);
+  display:none;
 }
 
-.page.flipped{
-  transform:rotateY(-180deg);
+/* active page */
+.page.active{
+  display:block;
 }
 
 /* 📖 TITLE */
 .page h1{
   text-align:center;
+  font-size:28px;
   margin-bottom:30px;
 }
 
-/* ✍️ POEM */
+/* ✍️ POEM STYLE */
 .poem{
   white-space:pre-line;
   text-align:center;
 }
 
-/* 🎛 UI */
-.ui{
-  position:fixed;
-  right:20px;
-  top:50%;
-  transform:translateY(-50%);
+/* 📱 MOBILE */
+@media(max-width:768px){
+  .wrapper{
+    flex-direction:column;
+  }
+
+  .toc{
+    width:100%;
+    display:flex;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+
+  .toc button{
+    min-width:160px;
+    margin-right:10px;
+  }
+
+  .book-area{
+    padding:20px;
+  }
 }
 
-button{
-  display:block;
-  margin:10px;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
 </style>
 </head>
 
 <body>
 
-<div class="book" id="book"></div>
+<div class="wrapper">
 
-<!-- 📖 ВСТАВЛЯЙ СТИХИ ТОЛЬКО СЮДА -->
-<div id="content" style="display:none">
+  <!-- 📚 ОГЛАВЛЕНИЕ -->
+  <div class="toc">
+    <h2>Оглавление</h2>
+    <button onclick="openPage(0)">Тебе, мой Создатель</button>
+    <button onclick="openPage(1)">Свет внутри</button>
+  </div>
 
-<h1>Тебе, мой Создатель</h1>
+  <!-- 📖 КНИГА -->
+  <div class="book-area">
 
-<div class="poem">
+    <div class="page active">
+
+      <h1>Тебе, мой Создатель</h1>
+
+      <div class="poem">
 Тебе, мой Создатель, всё лучшее в мире:
 И море стихов. И море цветов.
 Это Тебе летят по эфиру
@@ -108,81 +159,42 @@ button{
 Тебе поклонились до самой земли.
 
 Тебе улыбаются солнцем рассветы...
-А милость Твоя всё приводит в восторг:
 И паутинки бабьего лета,
 И север, и запад, и юг, и восток.
 
-И, ощущая тепло, и заботу,
-Поёт и моя от восторга душа...
-Спасибо Тебе, мой Отец, за щедроты,
-За верность Твою. И за смех малыша.
+Спасибо Тебе за жизнь и за свет.
+      </div>
 
-За жизни моей золотистую осень.
-За птичий оркестр и душевный простор.
-За песни в ночи. За медовые росы.
-Что милость Твоя надо мной, как шатёр.
+    </div>
 
-За то, что любовью Твоей я согрета,
-Что жизни моей не погасла свеча.
-За то, что Ты кормишь хлебом планету,
-Пусть гимны Тебе непрестанно звучат.
-</div>
+    <div class="page">
 
-</div>
+      <h1>Свет внутри</h1>
 
-<div class="ui">
-  <button onclick="next()">➡</button>
-  <button onclick="back()">⬅</button>
+      <div class="poem">
+И в тишине рождается ответ,
+Когда душа устала от тревог.
+И даже там, где будто света нет,
+Внутри горит невидимый порог.
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
 
 <script>
 
-/* 📖 АВТО СТРАНИЦЫ */
-const raw = document.getElementById("content").innerHTML;
-const parts = raw.split("<h1>");
-const book = document.getElementById("book");
+/* 📖 ОГЛАВЛЕНИЕ */
+let pages = document.querySelectorAll(".page");
 
-let pages=[];
-
-parts.forEach(p=>{
-  if(!p.trim()) return;
-
-  let div=document.createElement("div");
-  div.className="page";
-  div.innerHTML="<h1>"+p;
-
-  book.appendChild(div);
-  pages.push(div);
-});
-
-/* управление */
-let current=0;
-
-function render(){
-  pages.forEach((p,i)=>{
-    if(i<current){
-      p.classList.add("flipped");
-    }else{
-      p.classList.remove("flipped");
-    }
-  });
+function openPage(i){
+  pages.forEach(p=>p.classList.remove("active"));
+  pages[i].classList.add("active");
 }
 
-function next(){
-  if(current<pages.length){
-    current++;
-    render();
-  }
-}
-
-function back(){
-  if(current>0){
-    current--;
-    render();
-  }
-}
-
-render();
+/* 📱 (позже можно добавить swipe) */
 
 </script>
 
