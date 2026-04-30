@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Protected Book</title>
+<title>My Book</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
 
@@ -11,182 +11,138 @@
 body{
   margin:0;
   height:100vh;
-  background: radial-gradient(circle at center, #151515, #000);
+  background:#111;
   overflow:hidden;
-
-  /* 🔒 запрет выделения */
   user-select:none;
-  -webkit-user-select:none;
 }
 
-/* 📖 COVER */
-#cover{
-  position:fixed;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.cover{
-  width:340px;
-  height:460px;
-  background:url("cover.jpg") center/cover no-repeat;
-  border-radius:18px;
-  box-shadow:0 120px 240px rgba(0,0,0,0.8);
-  transition:1s;
-  transform-origin:left;
-}
-
-.cover.open{
-  transform:rotateY(-120deg) translateX(-90px);
-  opacity:0;
-}
-
-/* 📚 BOOK */
-#reader{
-  display:none;
-  height:100vh;
-  align-items:center;
-  justify-content:center;
-}
-
+/* книга */
 .book{
   width:820px;
   height:520px;
+  margin:auto;
   position:relative;
+  top:50%;
+  transform:translateY(-50%);
   perspective:2000px;
 }
 
-/* 📄 PAGE */
+/* страницы */
 .page{
   position:absolute;
   width:50%;
   height:100%;
   left:50%;
+  background:#f8f3e8;
 
-  background:linear-gradient(to right,#f8f3e8,#efe6d3);
-  padding:60px 70px;
+  padding:60px;
+  box-sizing:border-box;
 
   font-family:"Playfair Display", serif;
   font-size:18px;
-  line-height:1.75;
-  color:#2a2a2a;
-
-  box-shadow:0 40px 90px rgba(0,0,0,0.6);
+  line-height:1.7;
 
   transform-origin:left;
-  transition:transform 1.1s cubic-bezier(.2,.8,.2,1);
-
-  overflow:hidden;
-
-  user-select:none;
+  transition:1s;
 }
-
-.page::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:radial-gradient(circle at var(--lx,50%) var(--ly,20%),
-    rgba(255,255,255,0.3),
-    transparent 60%);
-  mix-blend-mode:soft-light;
-}
-
-.page h1{
-  font-size:28px;
-  margin-bottom:25px;
-}
-
-.page p{
-  margin-bottom:16px;
-  text-align:justify;
-}
-
-.page p:first-of-type{
-  text-indent:24px;
-}
-
-/* stack */
-.page:nth-child(1){z-index:3;}
-.page:nth-child(2){z-index:2;}
-.page:nth-child(3){z-index:1;}
 
 .page.flipped{
   transform:rotateY(-180deg);
 }
 
-/* 🎛 UI */
+/* текст */
+.page h1{
+  font-size:26px;
+  margin-bottom:20px;
+}
+
+.page p{
+  margin-bottom:14px;
+  text-align:justify;
+}
+
+.poem{
+  white-space:pre-line;
+  margin-bottom:20px;
+}
+
+/* кнопки */
 .ui{
   position:fixed;
   right:20px;
   top:50%;
   transform:translateY(-50%);
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  z-index:9999;
 }
 
 button{
-  padding:10px 14px;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  background:white;
-  font-weight:bold;
+  display:block;
+  margin:10px;
+  padding:10px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="cover">
-  <div class="cover" id="coverBook"></div>
+<div class="book" id="book"></div>
+
+<!-- 📖 ВСТАВЛЯЙ ТЕКСТ СЮДА -->
+<div id="bookContent" style="display:none">
+
+<h1>Глава 1</h1>
+
+<div class="poem">
+А о Небе я с детства мечтала.
+Я мечтала о нём и тогда,
+Когда буря кругом завывала,
+И когда в дом врывалась беда.
 </div>
 
-<div id="reader">
-  <div class="book">
+<p>
+Когда в трудной дороге слабела, когда не было сил крест нести,
+и когда враг метал в меня стрелы — я искала небесной любви.
+</p>
 
-    <div class="page">
-      <h1>Глава 1</h1>
-      <p>А о Небе я с детства мечтала. Я мечтала о нём и тогда, когда буря кругом завывала и когда в дом врывалась беда.</p>
-      <p>Когда в трудной дороге слабела, когда не было сил крест нести, и когда враг метал в меня стрелы — я искала небесной любви.</p>
-    </div>
+<h1>Глава 2</h1>
 
-    <div class="page">
-      <h1>Глава 2</h1>
-      <p>И в тишине, среди тревог и боли, рождалась вера тихо во мне.</p>
-      <p>И даже там, где всё казалось тёмным, свет находил дорогу к душе.</p>
-    </div>
-
-    <div class="page">
-      <h1>Глава 3</h1>
-      <p>И вот теперь, оглядываясь назад, я вижу путь, которым шла душа.</p>
-      <p>И понимаю — через всё это меня вела любовь свыше.</p>
-    </div>
-
-  </div>
+<div class="poem">
+И в тишине среди тревог
+Рождался свет внутри меня,
+И даже в самых тёмных днях
+Жила незримая заря.
 </div>
 
+</div>
+
+<!-- UI -->
 <div class="ui">
-  <button onclick="openBook()">📖 Open</button>
-  <button onclick="next()">➡ Next</button>
-  <button onclick="back()">⬅ Back</button>
+  <button onclick="next()">➡</button>
+  <button onclick="back()">⬅</button>
 </div>
 
 <script>
 
-let pages=document.querySelectorAll(".page");
-let current=0;
+/* 📖 АВТО РАЗБИЕНИЕ НА СТРАНИЦЫ */
+const content = document.getElementById("bookContent").innerHTML;
+const book = document.getElementById("book");
 
-function openBook(){
-  document.getElementById("coverBook").classList.add("open");
-  setTimeout(()=>{
-    cover.style.display="none";
-    reader.style.display="flex";
-  },900);
-}
+let chunks = content.split("<h1>");
+let pages = [];
+
+chunks.forEach((chunk,i)=>{
+  if(chunk.trim()==="") return;
+
+  let page = document.createElement("div");
+  page.className="page";
+
+  page.innerHTML = "<h1>" + chunk;
+
+  book.appendChild(page);
+  pages.push(page);
+});
+
+/* управление */
+let current = 0;
 
 function render(){
   pages.forEach((p,i)=>{
@@ -199,49 +155,18 @@ function render(){
 }
 
 function next(){
-  if(current<pages.length){current++;render();}
+  if(current<pages.length){
+    current++;
+    render();
+  }
 }
 
 function back(){
-  if(current>0){current--;render();}
+  if(current>0){
+    current--;
+    render();
+  }
 }
-
-/* swipe */
-let startX=0,drag=false;
-
-document.addEventListener("mousedown",e=>{
-  drag=true;startX=e.clientX;
-});
-
-document.addEventListener("mouseup",e=>{
-  if(!drag)return;
-  drag=false;
-  let d=e.clientX-startX;
-
-  if(d<-80&&current<pages.length)current++;
-  if(d>80&&current>0)current--;
-
-  render();
-});
-
-/* light */
-document.addEventListener("mousemove",e=>{
-  let x=e.clientX/window.innerWidth*100;
-  let y=e.clientY/window.innerHeight*100;
-
-  pages.forEach(p=>{
-    p.style.setProperty("--lx",x+"%");
-    p.style.setProperty("--ly",y+"%");
-  });
-});
-
-/* 🔒 защита */
-document.addEventListener("copy",e=>e.preventDefault());
-document.addEventListener("contextmenu",e=>e.preventDefault());
-document.addEventListener("selectstart",e=>e.preventDefault());
-document.addEventListener("keydown",e=>{
-  if((e.ctrlKey||e.metaKey)&&e.key==="c")e.preventDefault();
-});
 
 render();
 
