@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Book</title>
+<title>Моя книга</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
 
@@ -13,10 +13,9 @@ body{
   height:100vh;
   background:#111;
   overflow:hidden;
-  user-select:none;
 }
 
-/* книга */
+/* 📚 BOOK */
 .book{
   width:820px;
   height:520px;
@@ -27,46 +26,49 @@ body{
   perspective:2000px;
 }
 
-/* страницы */
+/* 📄 PAGE */
 .page{
   position:absolute;
   width:50%;
   height:100%;
   left:50%;
-  background:#f8f3e8;
+
+  background:linear-gradient(to right,#f8f3e8,#efe6d3);
 
   padding:60px;
   box-sizing:border-box;
 
   font-family:"Playfair Display", serif;
   font-size:18px;
-  line-height:1.7;
+  line-height:1.75;
+  color:#2a2a2a;
 
   transform-origin:left;
   transition:1s;
+
+  box-shadow:0 30px 80px rgba(0,0,0,0.5);
 }
 
 .page.flipped{
   transform:rotateY(-180deg);
 }
 
-/* текст */
+/* 📖 TITLE */
 .page h1{
-  font-size:26px;
-  margin-bottom:20px;
+  font-size:28px;
+  text-align:center;
+  margin-bottom:30px;
 }
 
-.page p{
-  margin-bottom:14px;
-  text-align:justify;
-}
-
+/* ✍️ POEM */
 .poem{
   white-space:pre-line;
-  margin-bottom:20px;
+  text-align:center;
+  font-size:18px;
+  line-height:1.8;
 }
 
-/* кнопки */
+/* 🎛 UI */
 .ui{
   position:fixed;
   right:20px;
@@ -77,44 +79,61 @@ body{
 button{
   display:block;
   margin:10px;
-  padding:10px;
+  padding:10px 14px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="book" id="book"></div>
+<div class="book" id="book">
 
-<!-- 📖 ВСТАВЛЯЙ ТЕКСТ СЮДА -->
-<div id="bookContent" style="display:none">
+  <div class="page">
+    <h1>Тебе, мой Создатель</h1>
 
-<h1>Глава 1</h1>
+    <div class="poem">
+Тебе, мой Создатель, всё лучшее в мире:
+И море стихов. И море цветов.
+Это Тебе летят по эфиру
+Сонеты прекрасных возвышенных слов.
 
-<div class="poem">
-А о Небе я с детства мечтала.
-Я мечтала о нём и тогда,
-Когда буря кругом завывала,
-И когда в дом врывалась беда.
+Тебе слагают стихи поэты.
+Тебе журчат по весне ручейки.
+И шлют ароматы душистые ветры,
+А ива, склонившись, поёт у реки.
+
+К Тебе, мой Создатель, в лазурное Небо
+Взметнули от бренной земли журавли.
+А колоски ароматного хлеба
+Тебе поклонились до самой земли.
+
+Тебе улыбаются солнцем рассветы...
+А милость Твоя всё приводит в восторг:
+И паутинки бабьего лета,
+И север, и запад, и юг, и восток.
+
+И, ощущая тепло, и заботу,
+Поёт и моя от восторга душа...
+Спасибо Тебе, мой Отец, за щедроты,
+За верность Твою. И за смех малыша.
+
+За жизни моей золотистую осень.
+За птичий оркестр и душевный простор.
+За песни в ночи. За медовые росы.
+Что милость Твоя надо мной, как шатёр.
+
+За то, что любовью Твоей я согрета,
+Что жизни моей не погасла свеча.
+За то, что Ты кормишь хлебом планету,
+Пусть гимны Тебе непрестанно звучат.
+    </div>
+  </div>
+
 </div>
 
-<p>
-Когда в трудной дороге слабела, когда не было сил крест нести,
-и когда враг метал в меня стрелы — я искала небесной любви.
-</p>
-
-<h1>Глава 2</h1>
-
-<div class="poem">
-И в тишине среди тревог
-Рождался свет внутри меня,
-И даже в самых тёмных днях
-Жила незримая заря.
-</div>
-
-</div>
-
-<!-- UI -->
 <div class="ui">
   <button onclick="next()">➡</button>
   <button onclick="back()">⬅</button>
@@ -122,27 +141,8 @@ button{
 
 <script>
 
-/* 📖 АВТО РАЗБИЕНИЕ НА СТРАНИЦЫ */
-const content = document.getElementById("bookContent").innerHTML;
-const book = document.getElementById("book");
-
-let chunks = content.split("<h1>");
-let pages = [];
-
-chunks.forEach((chunk,i)=>{
-  if(chunk.trim()==="") return;
-
-  let page = document.createElement("div");
-  page.className="page";
-
-  page.innerHTML = "<h1>" + chunk;
-
-  book.appendChild(page);
-  pages.push(page);
-});
-
-/* управление */
-let current = 0;
+let pages=document.querySelectorAll(".page");
+let current=0;
 
 function render(){
   pages.forEach((p,i)=>{
